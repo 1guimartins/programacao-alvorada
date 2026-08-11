@@ -1,9 +1,9 @@
-/* Reset básico e fontes */
+/* RESET BÁSICO */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 body {
@@ -11,7 +11,6 @@ body {
   color: #333;
 }
 
-/* Estilos de tela */
 .header-bar {
   background-color: #0f5c2e;
   color: white;
@@ -21,18 +20,18 @@ body {
 
 .container {
   max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 15px;
+  margin: 15px auto;
+  padding: 0 10px;
 }
 
 .nav-tabs {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .tab-btn {
-  padding: 10px 20px;
+  padding: 10px 15px;
   border: none;
   background: #e0e0e0;
   cursor: pointer;
@@ -41,36 +40,45 @@ body {
 }
 
 .tab-btn.active {
-  background: #0066cc;
+  background: #0f5c2e;
   color: white;
+}
+
+.sub-tabs-container {
+  display: flex;
+  gap: 6px;
 }
 
 .sub-tab-btn {
   padding: 6px 12px;
-  background: #333;
+  background: #0066cc;
   color: white;
   border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.sub-tab-btn.active {
-  background: #0f5c2e;
-}
-
-.btn-add-tab, .btn-del-tab {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
 }
 
-.btn-add-tab { background: #28a745; color: white; }
-.btn-del-tab { background: #dc3545; color: white; }
+.sub-tab-btn.active {
+  background: #004080;
+}
 
+.btn-action, .btn-add-tab, .btn-del-tab {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+}
+
+.blue-btn { background: #0066cc; }
+.btn-add-tab { background: #28a745; }
+.btn-del-tab { background: #dc3545; }
+
+/* LAYOUT NA TELA - 2 COLUNAS IGUAL À FOTO DA PADARIA */
 .programacao-header-title {
-  background-color: #333;
+  background-color: #0066cc;
   color: white;
   text-align: center;
   padding: 10px;
@@ -80,7 +88,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Grids dos Dias na Tela */
 #setores-containers {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -89,53 +96,49 @@ body {
 
 .dia-card {
   background: white;
-  border: 1px solid #ccc;
+  border: 1.5px solid #0066cc;
 }
 
 .dia-card h3 {
-  background: #333;
+  background: #0066cc;
   color: white;
-  padding: 6px 10px;
-  font-size: 0.9rem;
+  padding: 6px;
+  font-size: 0.95rem;
   text-align: center;
+  text-transform: uppercase;
 }
 
-/* ESTILOS DE IMPRESSÃO (AJUSTADOS PARA 1 FOLHA IGUAL A DA IMAGEM 2) */
+/* REGRAS DE IMPRESSÃO - ENCAIXE EM 1 FOLHA A4 */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 5mm;
   }
 
   body {
     background: white !important;
-    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .no-print, header, nav, button, .btn-action, .sub-tabs-wrapper {
+  .no-print, header, nav, button, .actions-header-bar {
     display: none !important;
   }
 
   .container, .table-container, .print-area {
     width: 100% !important;
-    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
   .programacao-header-title {
-    background-color: #222 !important;
+    background-color: #0066cc !important;
     color: white !important;
     font-size: 11pt !important;
-    padding: 4px !important;
+    padding: 5px !important;
     margin-bottom: 6px !important;
-    text-align: center;
-    font-weight: bold;
   }
 
-  /* Grid das 2 Colunas */
   #setores-containers {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -143,33 +146,23 @@ body {
   }
 
   .dia-card {
-    border: 1.5px solid #000 !important;
-    margin-bottom: 0 !important;
-    padding: 0 !important;
+    border: 1.5px solid #0066cc !important;
     page-break-inside: avoid;
   }
 
   .dia-card h3 {
-    background-color: #222 !important;
+    background-color: #0066cc !important;
     color: white !important;
     font-size: 8.5pt !important;
     padding: 3px !important;
-    margin: 0 !important;
-    text-align: center;
   }
 
   .dia-card div {
+    font-size: 8pt !important;
     padding: 2px 4px !important;
   }
 
-  /* Linhas das tabelas/itens */
-  .dia-card div > div {
-    border-bottom: 1px solid #000 !important;
-    padding: 2px 0 !important;
-    font-size: 8.5pt !important;
-  }
-
-  /* Domingo ocupando a largura toda na base */
+  /* Faz o Domingo ocupar as duas colunas no final */
   .dia-card:nth-child(7) {
     grid-column: span 2 !important;
   }
