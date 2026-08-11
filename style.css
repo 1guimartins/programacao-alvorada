@@ -2,11 +2,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background-color: #f4f6f9;
+  background-color: #f0f2f5;
   color: #333;
 }
 
@@ -15,156 +15,126 @@ body {
   color: white;
   padding: 15px;
   text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header-bar h1 {
+  font-size: 1.3rem;
 }
 
 .container {
   max-width: 1200px;
-  margin: 15px auto;
+  margin: 12px auto;
   padding: 0 10px;
 }
 
-.nav-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab-btn {
-  padding: 10px 15px;
-  border: none;
-  background: #e0e0e0;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.tab-btn.active {
-  background: #0f5c2e;
-  color: white;
-}
-
+/* ABAS DE NAVEGAÇÃO */
 .sub-tabs-container {
   display: flex;
-  gap: 6px;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
 }
 
 .sub-tab-btn {
-  padding: 6px 12px;
-  background: #0066cc;
-  color: white;
+  padding: 8px 16px;
+  background: #e0e0e0;
+  color: #333;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .sub-tab-btn.active {
-  background: #004080;
-}
-
-.btn-action, .btn-add-tab, .btn-del-tab {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
+  background: #0066cc;
   color: white;
 }
 
-.blue-btn { background: #0066cc; }
-.btn-add-tab { background: #28a745; }
-.btn-del-tab { background: #dc3545; }
-
+/* TÍTULO DO SETOR */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
   text-align: center;
   padding: 10px;
   font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  font-size: 1.1rem;
+  margin: 10px 0;
+  border-radius: 6px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* GRID EM 2 COLUNAS NA TELA */
+/* GRID DE CARDS */
 #setores-containers, #setores-containers-view {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  #setores-containers, #setores-containers-view {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
 }
 
 .dia-card {
   background: white;
-  border: 1.5px solid #0066cc !important;
-  border-radius: 4px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   overflow: hidden;
-  margin-bottom: 0 !important;
 }
 
 .dia-card-header {
-  background-color: #0066cc !important;
-  color: white !important;
-  padding: 6px 10px !important;
-  font-weight: bold !important;
+  background-color: #0066cc;
+  color: white;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
   text-transform: uppercase;
   text-align: center;
 }
 
-/* IMPRESSÃO EM 1 FOLHA A4 */
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 5mm;
-  }
+.dia-card-body {
+  padding: 6px 10px;
+}
 
-  body {
-    background: white !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+.item-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+  border-bottom: 1px solid #f0f0f0;
+}
 
-  .no-print, header, nav, button, .actions-header-bar {
-    display: none !important;
-  }
+.item-linha:last-child {
+  border-bottom: none;
+}
 
-  .container, .table-container, .print-area {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
+.item-nome {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #222;
+}
 
-  .programacao-header-title {
-    background-color: #0066cc !important;
-    color: white !important;
-    font-size: 11pt !important;
-    padding: 5px !important;
-    margin-bottom: 6px !important;
-  }
+.item-qtd {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #0066cc;
+  background: #e6f0fa;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
 
-  #setores-containers, #setores-containers-view {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
-  }
-
-  .dia-card {
-    border: 1.5px solid #0066cc !important;
-    page-break-inside: avoid;
-  }
-
-  .dia-card-header {
-    background-color: #0066cc !important;
-    color: white !important;
-    font-size: 8.5pt !important;
-    padding: 3px 6px !important;
-  }
-
-  .dia-card div {
-    font-size: 8pt !important;
-    padding: 2px 4px !important;
-  }
-
-  .dia-card:nth-child(7) {
-    grid-column: span 2 !important;
-  }
+.item-vazio {
+  color: #888;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  text-align: center;
 }
