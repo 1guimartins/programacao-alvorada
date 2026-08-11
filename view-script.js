@@ -74,7 +74,7 @@ function renderizarGridsView() {
 
     divDia.innerHTML = `
       <div class="dia-card-header">${dia}</div>
-      <div class="dia-card-body">${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}</div>
+      <div class="dia-card-body">${itensHTML || "<p style='color:#999; font-size:0.8rem; text-align:center; padding:4px;'>Nenhum item programado.</p>"}</div>
     `;
 
     container.appendChild(divDia);

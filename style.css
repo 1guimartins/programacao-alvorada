@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
@@ -13,9 +13,8 @@ body {
 .header-bar {
   background-color: #0f5c2e;
   color: white;
-  padding: 15px;
+  padding: 12px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .header-bar h1 {
@@ -24,23 +23,44 @@ body {
 
 .container {
   max-width: 1200px;
-  margin: 15px auto;
-  padding: 0 12px;
+  margin: 10px auto;
+  padding: 0 10px;
 }
 
-/* NAVEGAÇÃO DE ABAS */
-.sub-tabs-container {
+/* NAVEGAÇÃO PRINCIPAL */
+.nav-tabs {
   display: flex;
   gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  padding: 8px 14px;
+  border: none;
+  background: #e0e0e0;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.tab-btn.active {
+  background: #0f5c2e;
+  color: white;
+}
+
+/* SUB-ABAS (SETORES) */
+.sub-tabs-container {
+  display: flex;
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   margin-bottom: 10px;
 }
 
 .sub-tab-btn {
-  padding: 8px 16px;
-  background-color: #e0e0e0;
-  color: #333;
+  padding: 8px 14px;
+  background: #0066cc;
+  color: white;
   border: none;
   border-radius: 20px;
   cursor: pointer;
@@ -50,66 +70,72 @@ body {
 }
 
 .sub-tab-btn.active {
-  background-color: #0066cc;
-  color: white;
+  background: #004080;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* TÍTULO DO SETOR */
+.btn-action, .btn-add-tab, .btn-del-tab {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.blue-btn { background: #0066cc; }
+.btn-add-tab { background: #28a745; }
+.btn-del-tab { background: #dc3545; }
+
+/* TÍTULO DO PAINEL */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
   text-align: center;
-  padding: 12px;
+  padding: 8px;
   font-weight: bold;
   font-size: 1.1rem;
-  margin: 10px 0 15px 0;
-  border-radius: 6px;
+  margin-bottom: 10px;
+  border-radius: 4px;
   text-transform: uppercase;
 }
 
-/* CARDS DOS DIAS DA SEMANA */
+/* ESTRUTURA DE GRIDS (2 COLUNAS) */
 #setores-containers, #setores-containers-view {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-@media (min-width: 768px) {
-  #setores-containers, #setores-containers-view {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 15px !important;
-  }
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
 }
 
 .dia-card {
-  background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: white;
+  border: 1.5px solid #0066cc !important;
+  border-radius: 6px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .dia-card-header {
-  background-color: #0066cc;
-  color: white;
-  padding: 8px 12px;
-  font-weight: bold;
+  background-color: #0066cc !important;
+  color: white !important;
+  padding: 6px 10px !important;
+  font-weight: bold !important;
   font-size: 0.9rem;
   text-transform: uppercase;
   text-align: center;
 }
 
 .dia-card-body {
-  padding: 8px 12px;
+  padding: 6px 8px;
 }
 
 .item-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 6px 4px;
+  border-bottom: 1px solid #eee;
 }
 
 .item-linha:last-child {
@@ -117,23 +143,86 @@ body {
 }
 
 .item-nome {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #222;
+  font-weight: 500;
+  font-size: 0.85rem;
 }
 
 .item-qtd {
-  font-size: 0.85rem;
   font-weight: bold;
   color: #0066cc;
-  background-color: #e6f0fa;
-  padding: 3px 8px;
-  border-radius: 4px;
+  font-size: 0.85rem;
+  background: #e6f0fa;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
-.item-vazio {
-  color: #888;
-  font-size: 0.85rem;
-  padding: 8px 0;
-  text-align: center;
+/* REGRAS DE IMPRESSÃO - ESTRITAMENTE 1 FOLHA A4 */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 3mm;
+  }
+
+  html, body {
+    height: 100%;
+    background: white !important;
+    font-size: 10px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print, header, nav, button, .actions-header-bar, .kpi-container, .category-buttons {
+    display: none !important;
+  }
+
+  .container, .print-area {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .programacao-header-title {
+    background-color: #0066cc !important;
+    color: white !important;
+    font-size: 10pt !important;
+    padding: 3px !important;
+    margin-bottom: 4px !important;
+  }
+
+  #setores-containers {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 4px !important;
+  }
+
+  .dia-card {
+    border: 1px solid #0066cc !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 0 !important;
+  }
+
+  .dia-card-header {
+    background-color: #0066cc !important;
+    color: white !important;
+    font-size: 8pt !important;
+    padding: 2px 4px !important;
+  }
+
+  .dia-card-body {
+    padding: 2px 4px !important;
+  }
+
+  .item-linha {
+    padding: 2px 0 !important;
+  }
+
+  .item-nome, .item-qtd {
+    font-size: 7.5pt !important;
+  }
+
+  /* Domingo ocupa largura total na parte inferior */
+  .dia-card:nth-child(7) {
+    grid-column: span 2 !important;
+  }
 }
