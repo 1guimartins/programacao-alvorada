@@ -76,7 +76,7 @@ body {
 .btn-add-tab { background: #28a745; }
 .btn-del-tab { background: #dc3545; }
 
-/* LAYOUT NA TELA - 2 COLUNAS IGUAL À FOTO DA PADARIA */
+/* TÍTULO DO PAINEL */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
@@ -88,27 +88,30 @@ body {
   text-transform: uppercase;
 }
 
+/* ESTRUTURA EM 2 COLUNAS NA TELA */
 #setores-containers {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
 }
 
 .dia-card {
   background: white;
-  border: 1.5px solid #0066cc;
+  border: 1.5px solid #0066cc !important;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0 !important;
 }
 
-.dia-card h3 {
-  background: #0066cc;
-  color: white;
-  padding: 6px;
-  font-size: 0.95rem;
-  text-align: center;
+.dia-card-header {
+  background-color: #0066cc !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  font-weight: bold !important;
   text-transform: uppercase;
 }
 
-/* REGRAS DE IMPRESSÃO - ENCAIXE EM 1 FOLHA A4 */
+/* REGRAS DE IMPRESSÃO EM 1 FOLHA A4 (2 COLUNAS) */
 @media print {
   @page {
     size: A4 portrait;
@@ -150,11 +153,11 @@ body {
     page-break-inside: avoid;
   }
 
-  .dia-card h3 {
+  .dia-card-header {
     background-color: #0066cc !important;
     color: white !important;
     font-size: 8.5pt !important;
-    padding: 3px !important;
+    padding: 3px 6px !important;
   }
 
   .dia-card div {
@@ -162,7 +165,7 @@ body {
     padding: 2px 4px !important;
   }
 
-  /* Faz o Domingo ocupar as duas colunas no final */
+  /* Domingo ocupa toda a largura na parte inferior */
   .dia-card:nth-child(7) {
     grid-column: span 2 !important;
   }
