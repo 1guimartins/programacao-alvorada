@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #f0f2f5;
+  background-color: #f4f6f9;
   color: #333;
 }
 
@@ -15,30 +15,31 @@ body {
   color: white;
   padding: 15px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .header-bar h1 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .container {
   max-width: 1200px;
-  margin: 12px auto;
-  padding: 0 10px;
+  margin: 15px auto;
+  padding: 0 12px;
 }
 
-/* ABAS DE NAVEGAÇÃO */
+/* NAVEGAÇÃO DE ABAS */
 .sub-tabs-container {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .sub-tab-btn {
   padding: 8px 16px;
-  background: #e0e0e0;
+  background-color: #e0e0e0;
   color: #333;
   border: none;
   border-radius: 20px;
@@ -46,11 +47,10 @@ body {
   font-weight: bold;
   font-size: 0.85rem;
   white-space: nowrap;
-  transition: all 0.2s;
 }
 
 .sub-tab-btn.active {
-  background: #0066cc;
+  background-color: #0066cc;
   color: white;
 }
 
@@ -59,16 +59,15 @@ body {
   background-color: #0066cc;
   color: white;
   text-align: center;
-  padding: 10px;
+  padding: 12px;
   font-weight: bold;
   font-size: 1.1rem;
-  margin: 10px 0;
+  margin: 10px 0 15px 0;
   border-radius: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-/* GRID DE CARDS */
+/* CARDS DOS DIAS DA SEMANA */
 #setores-containers, #setores-containers-view {
   display: flex;
   flex-direction: column;
@@ -79,14 +78,14 @@ body {
   #setores-containers, #setores-containers-view {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 12px !important;
+    gap: 15px !important;
   }
 }
 
 .dia-card {
-  background: white;
+  background: #ffffff;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #dcdcdc;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   overflow: hidden;
 }
@@ -102,14 +101,14 @@ body {
 }
 
 .dia-card-body {
-  padding: 6px 10px;
+  padding: 8px 12px;
 }
 
 .item-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 4px;
+  padding: 8px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -124,11 +123,11 @@ body {
 }
 
 .item-qtd {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: bold;
   color: #0066cc;
-  background: #e6f0fa;
-  padding: 2px 8px;
+  background-color: #e6f0fa;
+  padding: 3px 8px;
   border-radius: 4px;
 }
 

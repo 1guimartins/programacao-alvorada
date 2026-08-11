@@ -1,4 +1,3 @@
-// CONFIGURAÇÃO DO FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBen86e0DcOv3LCH9cyvwyCiscIvuM-05E",
   authDomain: "programacao-alvorada.firebaseapp.com",
@@ -9,13 +8,14 @@ const firebaseConfig = {
   appId: "1:482889574306:web:56463da674a065162c34fb"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.database();
 
 let setoresProgramacao = {};
 let setorAtivo = "";
 
-// Escuta em tempo real
 db.ref("programacao").on("value", (snapshot) => {
   const dados = snapshot.val();
   if (dados) {
