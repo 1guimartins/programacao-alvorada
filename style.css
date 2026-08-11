@@ -1,0 +1,367 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #e5ebf1;
+  color: #333;
+}
+
+.header-bar {
+  background-color: #0b5a2b;
+  color: white;
+  padding: 12px 20px;
+}
+
+.container {
+  padding: 15px;
+}
+
+/* Tabs Principais */
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tab-btn.active {
+  background: #0b5a2b;
+  color: white;
+}
+
+/* KPI Cards */
+.kpi-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.kpi-card {
+  background: white;
+  flex: 1;
+  padding: 15px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.border-green { border-left: 5px solid #28a745; }
+.border-orange { border-left: 5px solid #fd7e14; }
+
+.kpi-title { font-size: 11px; font-weight: bold; color: #6c757d; }
+.kpi-value { font-size: 22px; font-weight: bold; margin-top: 5px; }
+.green { color: #28a745; }
+.orange { color: #fd7e14; }
+
+/* Categorias */
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.cat-btn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cat-btn.active { background: #0b5a2b; }
+
+/* Tabela Principal */
+.table-container {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  background-color: #1e293b;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.input-produzido {
+  width: 70px;
+  padding: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.em-producao { background: #fff3cd; color: #856404; }
+.concluido { background: #d4edda; color: #155724; }
+
+/* ==========================================
+   BARRA DE SUB-ABAS (SETORES)
+   ========================================== */
+.actions-header-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+  background-color: #222;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.sub-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.sub-tabs-container {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.sub-tab-btn {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.sub-tab-btn.active {
+  background-color: #0066cc;
+  border-bottom: 3px solid #28a745;
+}
+
+.btn-add-tab {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.btn-del-tab {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   PROGRAMAÇÃO SEMANAL (LAYOUT GRIDS)
+   ========================================== */
+.programacao-header-title {
+  background-color: #0066cc;
+  color: white;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.blue-btn { background-color: #0066cc; }
+
+.programacao-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.dia-box {
+  border: 2px solid #0066cc;
+  display: flex;
+  flex-direction: column;
+}
+
+.dia-title {
+  background-color: #0066cc;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 6px;
+  font-size: 14px;
+}
+
+/* Data Editável */
+.data-editable {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 3px;
+  outline: none;
+  cursor: text;
+}
+
+.data-editable:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tb-prog {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tb-prog td {
+  border: 1px solid #0066cc;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tb-prog td:first-child {
+  width: 25%;
+  background-color: #f0f4f8;
+}
+
+.tb-prog td:nth-child(2) {
+  text-transform: uppercase;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.btn-del-row {
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+  background: none;
+}
+
+.btn-add-day {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+/* ==========================================
+   CONFIGURAÇÃO DE IMPRESSÃO (1 FOLHA A4)
+   ========================================== */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 4mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .setor-grid-container {
+    display: none !important;
+  }
+  .setor-grid-container.active-setor {
+    display: block !important;
+  }
+  
+  body, .container, .table-container {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .programacao-header-title {
+    background-color: #004499 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 18px !important;
+    padding: 6px !important;
+    margin-bottom: 6px !important;
+    text-align: center;
+  }
+
+  .programacao-grid {
+    gap: 6px !important;
+  }
+
+  .dia-box {
+    border: 1.5px solid #000 !important;
+  }
+
+  .dia-title {
+    background-color: #004499 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 13px !important;
+    padding: 4px !important;
+    text-align: center;
+  }
+
+  .tb-prog td {
+    border: 1px solid #000 !important;
+    font-size: 11pt !important;
+    padding: 5px 6px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+}

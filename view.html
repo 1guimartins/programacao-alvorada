@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panificação Alvorada - Consulta Líderes</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Ajustes exclusivos para leitura e celular */
+    .no-edit {
+      user-select: none;
+    }
+    .tb-prog td {
+      padding: 12px 8px !important; /* Espaçamento maior para facilitar leitura no celular */
+    }
+    @media (max-width: 768px) {
+      .programacao-grid {
+        grid-template-columns: 1fr !important; /* 1 coluna no celular para não espremer */
+      }
+      .full-width {
+        grid-column: span 1 !important;
+      }
+      .programacao-header-title {
+        font-size: 16px !important;
+      }
+      .sub-tab-btn {
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar no-print">
+    <h1>🥐 Panificação Alvorada - Consulta de Programação</h1>
+  </header>
+
+  <div class="container">
+    <div class="table-container">
+      
+      <div class="actions-header-bar no-print" style="justify-content: flex-start;">
+        <div class="sub-tabs-wrapper">
+          <div class="sub-tabs-container" id="sub-tabs-list">
+            </div>
+        </div>
+      </div>
+
+      <div class="programacao-header-title" id="setor-titulo-display">
+        PROGRAMAÇÃO SEMANAL
+      </div>
+
+      <div id="setores-containers" class="no-edit">
+        </div>
+
+    </div>
+  </div>
+
+  <script src="view-script.js"></script>
+</body>
+</html>

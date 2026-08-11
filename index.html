@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panificação Alvorada - Gestão Integrada</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header-bar no-print">
+    <h1>🥐 Panificação Alvorada - Gestão Integrada</h1>
+  </header>
+
+  <div class="container">
+    <nav class="nav-tabs no-print">
+      <button class="tab-btn active" onclick="trocarAbaPrincipal(this, 'aba-progresso')">📊 Progresso da Produção</button>
+      <button class="tab-btn" onclick="trocarAbaPrincipal(this, 'aba-programacao')">📅 Programação Semanal (Setores)</button>
+    </nav>
+
+    <div id="aba-progresso" class="aba-conteudo">
+      <div class="kpi-container no-print">
+        <div class="kpi-card">
+          <span class="kpi-title">TOTAL DO PEDIDO SEMANAL</span>
+          <span class="kpi-value" id="kpi-total">0 un</span>
+        </div>
+        <div class="kpi-card border-green">
+          <span class="kpi-title">JÁ PRODUZIDO / EMBALADO</span>
+          <span class="kpi-value green" id="kpi-produzido">0 un</span>
+        </div>
+        <div class="kpi-card border-orange">
+          <span class="kpi-title">FALTA PRODUZIR</span>
+          <span class="kpi-value orange" id="kpi-falta">0 un</span>
+        </div>
+      </div>
+
+      <div class="category-buttons no-print" id="category-buttons"></div>
+
+      <div class="table-container">
+        <h2 id="category-title">191-1 - PÃES / ROSCAS</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>CÓDIGO</th>
+              <th>PRODUTO</th>
+              <th>PEDIDO SEMANAL</th>
+              <th>PRODUZIDO</th>
+              <th>FALTA</th>
+              <th>PROGRESSO</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="aba-programacao" class="aba-conteudo" style="display: none;">
+      <div class="table-container print-area">
+        
+        <div class="no-print actions-header-bar">
+          <button class="btn-action blue-btn" onclick="window.print()">🖨️ Imprimir Programação (1 Folha)</button>
+
+          <div class="sub-tabs-wrapper">
+            <div class="sub-tabs-container" id="sub-tabs-list">
+              </div>
+            <button class="btn-add-tab" onclick="criarNovaSubAba()">➕ Nova Aba</button>
+            <button class="btn-del-tab" onclick="excluirAbaAtual()">🗑️ Excluir Aba</button>
+          </div>
+        </div>
+
+        <div class="programacao-header-title" id="setor-titulo-display" contenteditable="true">
+          PROGRAMAÇÃO DE PRÉ PESAGEM E RECHEIO
+        </div>
+
+        <div id="setores-containers">
+          </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
