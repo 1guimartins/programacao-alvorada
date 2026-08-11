@@ -1,3 +1,24 @@
+// Configuração do Firebase com as chaves do seu projeto
+const firebaseConfig = {
+  apiKey: "AIzaSyBen86e0DcOv3LCH9cyvwyCiscIvuM-05E",
+  authDomain: "programacao-alvorada.firebaseapp.com",
+  databaseURL: "https://programacao-alvorada-default-rtdb.firebaseio.com",
+  projectId: "programacao-alvorada",
+  storageBucket: "programacao-alvorada.firebasestorage.app",
+  messagingSenderId: "482889574306",
+  appId: "1:482889574306:web:56463da674a065162c34fb"
+};
+
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Função que envia a programação para os celulares dos líderes
+function salvarDadosNaNuvem() {
+  if (typeof setoresProgramacao !== "undefined") {
+    db.ref("programacao").set(setoresProgramacao);
+  }
+}
 * {
   box-sizing: border-box;
   font-family: 'Segoe UI', Arial, sans-serif;
