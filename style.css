@@ -1,4 +1,3 @@
-/* RESET BÁSICO */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -76,7 +75,6 @@ body {
 .btn-add-tab { background: #28a745; }
 .btn-del-tab { background: #dc3545; }
 
-/* TÍTULO DO PAINEL */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
@@ -88,8 +86,8 @@ body {
   text-transform: uppercase;
 }
 
-/* ESTRUTURA EM 2 COLUNAS NA TELA */
-#setores-containers {
+/* GRID EM 2 COLUNAS NA TELA */
+#setores-containers, #setores-containers-view {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 10px !important;
@@ -106,12 +104,13 @@ body {
 .dia-card-header {
   background-color: #0066cc !important;
   color: white !important;
-  padding: 8px 12px !important;
+  padding: 6px 10px !important;
   font-weight: bold !important;
   text-transform: uppercase;
+  text-align: center;
 }
 
-/* REGRAS DE IMPRESSÃO EM 1 FOLHA A4 (2 COLUNAS) */
+/* IMPRESSÃO EM 1 FOLHA A4 */
 @media print {
   @page {
     size: A4 portrait;
@@ -142,7 +141,7 @@ body {
     margin-bottom: 6px !important;
   }
 
-  #setores-containers {
+  #setores-containers, #setores-containers-view {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 6px !important;
@@ -165,7 +164,6 @@ body {
     padding: 2px 4px !important;
   }
 
-  /* Domingo ocupa toda a largura na parte inferior */
   .dia-card:nth-child(7) {
     grid-column: span 2 !important;
   }
