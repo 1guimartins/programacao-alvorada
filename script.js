@@ -15,9 +15,18 @@ const db = firebase.database();
 
 let setoresProgramacao = {};
 let setorAtivo = "";
-let semanaAtualChave = "atual"; // "atual" ou formato "2026-W33"
+let semanaAtualChave = "atual";
 
-// Carrega dados da semana selecionada
+// Função utilitária para garantir estrutura segura em qualquer formato de dado
+function normalizarDia(dados) {
+  if (!dados) return { data: "", itens: [] };
+  if (Array.isArray(dados)) return { data: "", itens: dados };
+  return {
+    data: dados.data || "",
+    itens: Array.isArray(dados.itens) ? dados.itens : []
+  };
+}
+
 function conectarFirebase() {
   const caminho = semanaAtualChave === "atual" ? "programacao" : `historicos/${semanaAtualChave}`;
   db.ref(caminho).on("value", (snapshot) => {
@@ -35,7 +44,8 @@ conectarFirebase();
 
 function carregarHistoricoSemana(valorSemana) {
   semanaAtualChave = valorSemana || "atual";
-  document.getElementById("info-semana").innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
+  const info = document.getElementById("info-semana");
+  if (info) info.innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
   conectarFirebase();
 }
 
@@ -77,14 +87,12 @@ function renderizarGrids() {
   const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 
   dias.forEach(dia => {
-    const dadosDia = setoresProgramacao[setorAtivo][dia] || { data: "", itens: [] };
-    const itens = Array.isArray(dadosDia) ? dadosDia : (dadosDia.itens || []);
-    const dataVal = Array.isArray(dadosDia) ? "" : (dadosDia.data || "");
+    const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
 
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
-    let itensHTML = itens.map((item, index) => `
+    let itensHTML = objDia.itens.map((item, index) => `
       <div class="item-linha">
         <div class="item-left">
           <span class="item-qtd">${item.qtd}</span>
@@ -97,7 +105,7 @@ function renderizarGrids() {
     divDia.innerHTML = `
       <div class="dia-card-header">
         <span>${dia}</span>
-        <input type="text" class="dia-data-input" placeholder="DD/MM/AAAA" value="${dataVal}" onchange="salvarDataDia('${dia}', this.value)">
+        <input type="text" class="dia-data-input" placeholder="DD/MM/AAAA" value="${objDia.data}" onchange="salvarDataDia('${dia}', this.value)">
       </div>
       <div class="dia-card-body">
         ${itensHTML || "<p class='item-vazio'>Nenhum item adicionado</p>"}
@@ -110,12 +118,9 @@ function renderizarGrids() {
 }
 
 function salvarDataDia(dia, valorData) {
-  if (!setoresProgramacao[setorAtivo][dia] || Array.isArray(setoresProgramacao[setorAtivo][dia])) {
-    const itensAntigos = Array.isArray(setoresProgramacao[setorAtivo][dia]) ? setoresProgramacao[setorAtivo][dia] : [];
-    setoresProgramacao[setorAtivo][dia] = { data: valorData, itens: itensAntigos };
-  } else {
-    setoresProgramacao[setorAtivo][dia].data = valorData;
-  }
+  const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
+  objDia.data = valorData;
+  setoresProgramacao[setorAtivo][dia] = objDia;
   salvarNoFirebase();
 }
 
@@ -125,18 +130,17 @@ function adicionarItem(dia) {
   const nome = prompt("Digite o nome do produto:");
   if (!nome) return;
 
-  if (!setoresProgramacao[setorAtivo][dia] || Array.isArray(setoresProgramacao[setorAtivo][dia])) {
-    const itensAntigos = Array.isArray(setoresProgramacao[setorAtivo][dia]) ? setoresProgramacao[setorAtivo][dia] : [];
-    setoresProgramacao[setorAtivo][dia] = { data: "", itens: itensAntigos };
-  }
-
-  setoresProgramacao[setorAtivo][dia].itens.push({ qtd, nome });
+  const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
+  objDia.itens.push({ qtd, nome });
+  setoresProgramacao[setorAtivo][dia] = objDia;
   salvarNoFirebase();
 }
 
 function removerItem(dia, index) {
   if (confirm("Deseja remover este item?")) {
-    setoresProgramacao[setorAtivo][dia].itens.splice(index, 1);
+    const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
+    objDia.itens.splice(index, 1);
+    setoresProgramacao[setorAtivo][dia] = objDia;
     salvarNoFirebase();
   }
 }

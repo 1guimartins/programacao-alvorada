@@ -17,6 +17,15 @@ let setoresProgramacao = {};
 let setorAtivo = "";
 let semanaAtualChave = "atual";
 
+function normalizarDia(dados) {
+  if (!dados) return { data: "", itens: [] };
+  if (Array.isArray(dados)) return { data: "", itens: dados };
+  return {
+    data: dados.data || "",
+    itens: Array.isArray(dados.itens) ? dados.itens : []
+  };
+}
+
 function conectarFirebaseView() {
   const caminho = semanaAtualChave === "atual" ? "programacao" : `historicos/${semanaAtualChave}`;
   db.ref(caminho).on("value", (snapshot) => {
@@ -34,7 +43,8 @@ conectarFirebaseView();
 
 function carregarHistoricoView(valorSemana) {
   semanaAtualChave = valorSemana || "atual";
-  document.getElementById("info-semana-view").innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
+  const info = document.getElementById("info-semana-view");
+  if (info) info.innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
   conectarFirebaseView();
 }
 
@@ -71,14 +81,12 @@ function renderizarGridsView() {
   const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 
   dias.forEach(dia => {
-    const dadosDia = setoresProgramacao[setorAtivo][dia] || { data: "", itens: [] };
-    const itens = Array.isArray(dadosDia) ? dadosDia : (dadosDia.itens || []);
-    const dataVal = Array.isArray(dadosDia) ? "" : (dadosDia.data || "");
+    const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
 
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
-    let itensHTML = itens.map(item => `
+    let itensHTML = objDia.itens.map(item => `
       <div class="item-linha">
         <div class="item-left">
           <span class="item-qtd">${item.qtd}</span>
@@ -90,7 +98,7 @@ function renderizarGridsView() {
     divDia.innerHTML = `
       <div class="dia-card-header">
         <span>${dia}</span>
-        ${dataVal ? `<span style="font-size:0.8rem; font-weight:normal;">${dataVal}</span>` : ""}
+        ${objDia.data ? `<span style="font-size:0.8rem; font-weight:normal;">${objDia.data}</span>` : ""}
       </div>
       <div class="dia-card-body">${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}</div>
     `;
