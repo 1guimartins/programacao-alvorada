@@ -5,50 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panificação Alvorada - Painel ADM</title>
   <link rel="stylesheet" href="style.css">
-
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-  <header class="header-bar">
-    <h1>🥐 Panificação Alvorada - Gestão Integrada (ADM)</h1>
+  <header>
+    <h1>⚙️ Panificação Alvorada - Gestão ADM</h1>
   </header>
 
-  <div class="container">
-    
-    <div class="main-action-bar">
-      <button class="btn-main btn-secondary" onclick="window.location.href='progresso.html'">
-        📊 Progresso da Produção
-      </button>
-      <button class="btn-main btn-primary active">
-        📅 Programação Semanal
-      </button>
-      <button class="btn-main btn-print" onclick="window.print()">
-        🖨️ Imprimir Programação (1 Folha)
-      </button>
+  <div class="semana-container">
+    <div class="actions-bar" style="margin-bottom: 0;">
+      <button class="btn btn-success" onclick="criarNovaAba()">➕ Criar Novo Setor</button>
+      <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor Atual</button>
     </div>
-
-    <div class="historico-container">
-      <label for="seletor-semana"><strong>📆 Selecionar Semana:</strong></label>
-      <input type="week" id="seletor-semana" onchange="carregarHistoricoSemana(this.value)">
-      <span class="historico-info" id="info-semana">Semana Atual</span>
-    </div>
-
-    <div class="sub-tabs-wrapper">
-      <div class="sub-tabs-container" id="sub-tabs-list"></div>
-      <div class="aba-actions">
-        <button class="btn-aba-act btn-add-aba" onclick="criarNovaAba()">➕ Nova Aba</button>
-        <button class="btn-aba-act btn-del-aba" onclick="excluirAbaAtual()">🗑️ Excluir Aba</button>
-      </div>
-    </div>
-
-    <div class="programacao-header-title" id="setor-titulo">
-      PROGRAMAÇÃO DE SETOR
-    </div>
-
-    <div id="setores-containers"></div>
+    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir Folha</button>
   </div>
+
+  <div class="sub-tabs" id="sub-tabs-list"></div>
+
+  <div class="titulo-setor-exibicao" id="setor-titulo">CARREGANDO...</div>
+
+  <div id="setores-containers"></div>
 
   <script src="script.js"></script>
 </body>

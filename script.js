@@ -99,11 +99,9 @@ function renderizarGrids() {
 
     let itensHTML = objDia.itens.map((item, index) => `
       <div class="item-linha">
-        <div class="item-left">
-          <span class="item-qtd">${item.qtd}</span>
-          <span class="item-nome">${item.nome}</span>
-        </div>
-        <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">&times;</button>
+        <span class="item-qtd">${item.qtd}</span>
+        <span class="item-nome">${item.nome}</span>
+        <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
       </div>
     `).join("");
 
@@ -113,8 +111,8 @@ function renderizarGrids() {
         <input type="text" class="dia-data-input" placeholder="DD/MM/AAAA" value="${objDia.data}" onchange="salvarDataDia('${dia}', this.value)">
       </div>
       <div class="dia-card-body">
-        ${itensHTML || "<p class='item-vazio'>Sem itens</p>"}
-        <button class="btn-add-item-card" onclick="adicionarItem('${dia}')">➕ Add Item</button>
+        ${itensHTML || "<p class='item-vazio'>Sem itens cadastrados</p>"}
+        <button class="btn-add-item-card" onclick="adicionarItem('${dia}')">➕ Adicionar Item</button>
       </div>
     `;
 
@@ -152,11 +150,9 @@ function removerItem(dia, index) {
   }
 }
 
-// CRIAÇÃO DE NOVAS ABAS (SEM LIMITE)
 function criarNovaAba() {
   const nome = prompt("Digite o nome do novo setor:");
   if (nome && nome.trim() !== "") {
-    // Sanitiza a chave para evitar caracteres inválidos no Firebase
     const chave = nome.trim().toUpperCase().replace(/[\.\#\$\[\]]/g, "").replace(/\s+/g, "_");
     
     if (setoresProgramacao[chave]) {
