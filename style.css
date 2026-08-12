@@ -11,7 +11,7 @@ body {
   padding: 16px;
 }
 
-/* Header Estilo Alvorada */
+/* Header Verde Alvorada */
 header {
   background: linear-gradient(135deg, #00853B, #00662d);
   color: #ffffff;
@@ -28,11 +28,10 @@ header {
 header h1 {
   font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
 }
 
-/* Barra de Filtros e Controles */
-.filtros-container, .semana-container {
+/* Container Superior de Filtros */
+.semana-container, .filtros-container {
   background: #ffffff;
   padding: 12px 20px;
   border-radius: 10px;
@@ -64,7 +63,7 @@ header h1 {
   background-color: #ffffff;
 }
 
-/* Abas de Setores */
+/* Abas Arredondadas dos Setores */
 .sub-tabs {
   display: flex;
   gap: 8px;
@@ -98,7 +97,7 @@ header h1 {
   box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
 }
 
-/* Botões Principais */
+/* Botões */
 .actions-bar {
   display: flex;
   gap: 10px;
@@ -121,9 +120,8 @@ header h1 {
 .btn-success { background: #00853B; color: #ffffff; }
 .btn-orange { background: #FF6600; color: #ffffff; }
 .btn-danger { background: #ef4444; color: #ffffff; }
-.btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-/* Título Destaque do Setor */
+/* Título Azul do Setor */
 .titulo-setor-exibicao {
   background: #1F69C1;
   color: #ffffff;
@@ -135,10 +133,9 @@ header h1 {
   margin-bottom: 16px;
   border-radius: 8px;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(31, 105, 193, 0.2);
 }
 
-/* Layout em Grid - 7 Colunas para os Dias da Semana */
+/* Grid de 7 Dias */
 #setores-containers, #setores-containers-view {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -146,7 +143,6 @@ header h1 {
   width: 100%;
 }
 
-/* Card do Dia */
 .dia-card {
   background: #ffffff;
   border-radius: 8px;
@@ -180,8 +176,6 @@ header h1 {
   font-weight: 600;
 }
 
-.dia-data-input::placeholder { color: #e2e8f0; }
-
 .dia-card-body {
   padding: 8px;
   flex: 1;
@@ -198,25 +192,16 @@ header h1 {
   font-size: 0.82rem;
 }
 
-.item-linha:last-child { border-bottom: none; }
-
-.item-left {
-  display: flex;
-  gap: 6px;
-  overflow: hidden;
-}
-
 .item-qtd {
   font-weight: 800;
   color: #1F69C1;
-  white-space: nowrap;
+  margin-right: 6px;
 }
 
 .item-nome {
   text-transform: uppercase;
   font-weight: 600;
   color: #334155;
-  word-break: break-word;
 }
 
 .btn-del-item {
@@ -225,8 +210,6 @@ header h1 {
   color: #ef4444;
   font-size: 1rem;
   cursor: pointer;
-  padding: 0 4px;
-  font-weight: bold;
 }
 
 .btn-add-item-card {
@@ -240,10 +223,7 @@ header h1 {
   cursor: pointer;
   font-weight: 700;
   font-size: 0.78rem;
-  transition: background 0.2s;
 }
-
-.btn-add-item-card:hover { background: #00662d; }
 
 .item-vazio {
   color: #94a3b8;
@@ -253,75 +233,29 @@ header h1 {
   margin: 10px 0;
 }
 
-/* ========================================================
-   REGRAS DE IMPRESSÃO (PERFEITO PARA 1 FOLHA A4 PAISAGEM)
-   ======================================================== */
+/* Impressão A4 Paisagem */
 @media print {
   @page {
     size: A4 landscape;
     margin: 4mm;
   }
 
-  body {
-    background: #ffffff !important;
-    padding: 0 !important;
-    font-size: 8pt !important;
-  }
-
-  header, 
-  nav, 
-  .filtros-container, 
-  .semana-container, 
-  .sub-tabs, 
-  .actions-bar, 
-  .btn, 
-  .btn-add-item-card, 
-  .btn-del-item, 
-  button, 
-  input {
+  body { background: #ffffff !important; padding: 0 !important; }
+  header, .semana-container, .filtros-container, .sub-tabs, .actions-bar, .btn, .btn-add-item-card, .btn-del-item {
     display: none !important;
-  }
-
-  .titulo-setor-exibicao {
-    background: #1F69C1 !important;
-    color: #ffffff !important;
-    font-size: 11pt !important;
-    margin-bottom: 6px !important;
-    padding: 4px !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
   #setores-containers, #setores-containers-view {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
     gap: 4px !important;
-    width: 100% !important;
   }
 
-  .dia-card {
-    border: 1px solid #1F69C1 !important;
-    box-shadow: none !important;
-    border-radius: 4px !important;
-    page-break-inside: avoid !important;
-  }
-
+  .dia-card { border: 1px solid #1F69C1 !important; }
   .dia-card-header {
     background: #1F69C1 !important;
     color: #ffffff !important;
-    padding: 2px 4px !important;
-    font-size: 8pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-
-  .dia-card-body { padding: 4px !important; }
-
-  .item-linha {
-    padding: 2px 0 !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    font-size: 7.5pt !important;
-  }
-
-  .item-qtd { color: #1F69C1 !important; }
 }

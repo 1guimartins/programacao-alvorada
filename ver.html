@@ -14,9 +14,9 @@
     <h1>🥐 Panificação Alvorada - Consulta de Setores</h1>
   </header>
 
-  <div class="filtros-container">
+  <div class="semana-container">
     <div class="filtro-grupo">
-      <label for="filtro-modo">Visualizar por:</label>
+      <label for="filtro-modo">Filtrar por:</label>
       <select id="filtro-modo" onchange="alternarModoFiltro()">
         <option value="todos">Toda a Semana</option>
         <option value="dia">Dia Específico</option>
@@ -36,7 +36,7 @@
       <input type="date" id="filtro-data-fim" onchange="filtrarProgramacao()">
     </div>
 
-    <button class="btn btn-orange" onclick="window.print()">🖨️ Imprimir Folha</button>
+    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir Folha</button>
   </div>
 
   <div class="sub-tabs" id="sub-tabs-list-view"></div>
