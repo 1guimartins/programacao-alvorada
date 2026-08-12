@@ -7,40 +7,57 @@
 
 body {
   background-color: #f4f6f9;
-  color: #333;
-  padding: 20px;
+  color: #222;
+  padding: 15px;
 }
 
+/* Cabeçalho Alvorada */
 header {
-  background-color: #0d6efd;
+  background-color: #00853B;
   color: white;
-  padding: 15px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-header h1 {
-  font-size: 1.5rem;
-}
-
-.semana-container {
-  background: white;
   padding: 12px 20px;
   border-radius: 8px;
   margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
+  border-bottom: 4px solid #FF6600;
 }
 
-.semana-container input, .semana-container select {
-  padding: 6px 12px;
+header h1 {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Painel de Filtros e Opções */
+.filtros-container {
+  background: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+}
+
+.filtro-grupo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.filtro-grupo select, 
+.filtro-grupo input[type="date"] {
+  padding: 6px 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  outline: none;
+  font-size: 0.9rem;
 }
 
 .sub-tabs {
@@ -52,24 +69,25 @@ header h1 {
 
 .sub-tab-btn {
   background: #e9ecef;
-  border: none;
+  border: 1px solid #ccc;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: 600;
-  color: #495057;
+  font-weight: bold;
+  color: #333;
   transition: all 0.2s;
 }
 
 .sub-tab-btn.active {
-  background: #0d6efd;
+  background: #00853B;
   color: white;
+  border-color: #00853B;
 }
 
 .actions-bar {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .btn {
@@ -79,34 +97,49 @@ header h1 {
   cursor: pointer;
   font-weight: bold;
   transition: background 0.2s;
+  font-size: 0.9rem;
 }
 
-.btn-success { background: #198754; color: white; }
+.btn-success { background: #00853B; color: white; }
+.btn-orange { background: #FF6600; color: white; }
 .btn-danger { background: #dc3545; color: white; }
-.btn-primary { background: #0d6efd; color: white; }
 
+.titulo-setor-exibicao {
+  background: #1F69C1;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+/* Grids dos Dias */
 #setores-containers, #setores-containers-view {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 15px;
+  gap: 12px;
 }
 
 .dia-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #1F69C1;
 }
 
 .dia-card-header {
-  background: #0d6efd;
+  background: #1F69C1;
   color: white;
-  padding: 10px 15px;
+  padding: 8px 12px;
   font-weight: bold;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.95rem;
 }
 
 .dia-data-input {
@@ -115,23 +148,27 @@ header h1 {
   color: white;
   padding: 3px 6px;
   border-radius: 4px;
-  width: 100px;
+  width: 105px;
   text-align: center;
   font-size: 0.85rem;
+  font-weight: bold;
 }
 
-.dia-data-input::placeholder { color: #ddd; }
-
 .dia-card-body {
-  padding: 12px;
+  padding: 8px 12px;
 }
 
 .item-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.item-linha:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
 .item-left {
@@ -141,28 +178,33 @@ header h1 {
 
 .item-qtd {
   font-weight: bold;
-  color: #0d6efd;
+  color: #000;
+  min-width: 50px;
+}
+
+.item-nome {
+  text-transform: uppercase;
 }
 
 .btn-del-item {
   background: transparent;
   border: none;
   color: #dc3545;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  line-height: 1;
 }
 
 .btn-add-item-card {
   width: 100%;
-  margin-top: 10px;
-  background: #198754;
+  margin-top: 8px;
+  background: #00853B;
   color: white;
   border: none;
-  padding: 8px;
+  padding: 6px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 0.85rem;
 }
 
 .item-vazio {
@@ -170,11 +212,11 @@ header h1 {
   font-size: 0.85rem;
   font-style: italic;
   text-align: center;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 /* ========================================================
-   REGRAS EXCLUSIVAS DE IMPRESSÃO (FORÇAR 1 FOLHA PAISAGEM)
+   REGRAS EXCLUSIVAS DE IMPRESSÃO (1 FOLHA PAISAGEM)
    ======================================================== */
 @media print {
   @page {
@@ -186,84 +228,59 @@ header h1 {
     background: white !important;
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 10px !important;
+    font-size: 9pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Esconder todos os botões, menus e seletores */
   header, 
   nav, 
-  .semana-container, 
+  .filtros-container, 
   .sub-tabs, 
   .actions-bar, 
   .btn, 
   .btn-add-item-card, 
   .btn-del-item, 
   button, 
-  input[type="button"] {
+  input {
     display: none !important;
   }
 
-  /* Título fixo no topo da impressão */
-  #setor-titulo, #setor-titulo-view {
-    display: block !important;
-    text-align: center;
-    font-size: 14pt !important;
-    font-weight: bold;
-    margin-bottom: 6px;
-    color: #000 !important;
+  .titulo-setor-exibicao {
+    background: #1F69C1 !important;
+    color: white !important;
+    font-size: 12pt !important;
+    margin-bottom: 6px !important;
+    padding: 4px !important;
   }
 
-  /* Layout em Grid de 4 colunas compacto */
   #setores-containers, #setores-containers-view {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 4px !important;
     width: 100% !important;
-    page-break-inside: avoid !important;
   }
 
   .dia-card {
-    border: 1px solid #000 !important;
+    border: 1px solid #1F69C1 !important;
     box-shadow: none !important;
-    border-radius: 3px !important;
-    page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
   .dia-card-header {
-    background: #0d6efd !important;
+    background: #1F69C1 !important;
     color: white !important;
-    padding: 2px 6px !important;
-    font-size: 9pt !important;
-  }
-
-  .dia-data-input {
-    background: transparent !important;
-    border: none !important;
-    color: white !important;
-    font-weight: bold;
-    font-size: 8pt !important;
-    text-align: right !important;
+    padding: 2px 5px !important;
+    font-size: 8.5pt !important;
   }
 
   .dia-card-body {
-    padding: 4px !important;
+    padding: 3px !important;
   }
 
   .item-linha {
     padding: 2px 0 !important;
-    border-bottom: 1px dashed #ccc !important;
-    font-size: 8.5pt !important;
-  }
-
-  .item-qtd {
-    color: #000 !important;
-  }
-
-  .item-vazio {
+    border-bottom: 1px solid #ddd !important;
     font-size: 8pt !important;
-    margin: 4px 0 !important;
   }
 }

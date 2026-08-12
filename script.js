@@ -15,12 +15,9 @@ const db = firebase.database();
 
 let setoresProgramacao = {};
 let setorAtivo = "";
-let semanaAtualChave = "atual";
 
-// Função para normalizar os dados vindos do Firebase (seja Objeto ou Array)
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
-  
   if (Array.isArray(dados)) return { data: "", itens: dados };
   
   let itensArray = [];
@@ -39,10 +36,8 @@ function normalizarDia(dados) {
 }
 
 function conectarFirebase() {
-  const caminho = semanaAtualChave === "atual" ? "programacao" : `historicos/${semanaAtualChave}`;
-  db.ref(caminho).on("value", (snapshot) => {
-    const dados = snapshot.val() || {};
-    setoresProgramacao = dados;
+  db.ref("programacao").on("value", (snapshot) => {
+    setoresProgramacao = snapshot.val() || {};
     const chaves = Object.keys(setoresProgramacao);
     if (!setorAtivo && chaves.length > 0) setorAtivo = chaves[0];
     if (chaves.length > 0 && !setoresProgramacao[setorAtivo]) setorAtivo = chaves[0];
@@ -53,16 +48,8 @@ function conectarFirebase() {
 
 conectarFirebase();
 
-function carregarHistoricoSemana(valorSemana) {
-  semanaAtualChave = valorSemana || "atual";
-  const info = document.getElementById("info-semana");
-  if (info) info.innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
-  conectarFirebase();
-}
-
 function salvarNoFirebase() {
-  const caminho = semanaAtualChave === "atual" ? "programacao" : `historicos/${semanaAtualChave}`;
-  db.ref(caminho).set(setoresProgramacao);
+  db.ref("programacao").set(setoresProgramacao);
 }
 
 function renderizarSubAbas() {

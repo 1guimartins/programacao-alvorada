@@ -3,34 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Líderes</title>
-  <link rel="stylesheet" href="style.css">
-
+  <title>Panificação Alvorada - Visão Geral</title>
+  <link rel="stylesheet" href="estilo.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-  <header class="header-bar">
-    <h1>🥐 Panificação Alvorada - Visão dos Líderes</h1>
+  <header>
+    <h1>🥐 Panificação Alvorada - Programação por Setores</h1>
   </header>
 
-  <div class="container">
-
-    <div class="historico-container">
-      <label for="seletor-semana-view"><strong>🔍 Consultar Histórico Semanal:</strong></label>
-      <input type="week" id="seletor-semana-view" onchange="carregarHistoricoView(this.value)">
-      <span class="historico-info" id="info-semana-view">Semana Atual</span>
+  <div class="filtros-container">
+    <div class="filtro-grupo">
+      <label for="filtro-modo">Exibir por:</label>
+      <select id="filtro-modo" onchange="alternarModoFiltro()">
+        <option value="todos">Toda a Semana</option>
+        <option value="dia">Dia Especifico</option>
+        <option value="periodo">Período (De / Até)</option>
+      </select>
     </div>
 
-    <div class="sub-tabs-container" id="sub-tabs-list-view"></div>
-
-    <div class="programacao-header-title" id="setor-titulo-view">
-      CARREGANDO PROGRAMAÇÃO...
+    <div class="filtro-grupo" id="grupo-dia-unico" style="display: none;">
+      <label for="filtro-data-unica">Data:</label>
+      <input type="date" id="filtro-data-unica" onchange="filtrarProgramacao()">
     </div>
 
-    <div id="setores-containers-view"></div>
+    <div class="filtro-grupo" id="grupo-periodo" style="display: none;">
+      <label for="filtro-data-inicio">De:</label>
+      <input type="date" id="filtro-data-inicio" onchange="filtrarProgramacao()">
+      <label for="filtro-data-fim">Até:</label>
+      <input type="date" id="filtro-data-fim" onchange="filtrarProgramacao()">
+    </div>
+
+    <button class="btn btn-orange" onclick="window.print()">🖨️ Imprimir Folha</button>
   </div>
+
+  <div class="sub-tabs" id="sub-tabs-list-view"></div>
+
+  <div class="titulo-setor-exibicao" id="setor-titulo-view">PROGRAMAÇÃO DE SETOR</div>
+
+  <div id="setores-containers-view"></div>
 
   <script src="view-script.js"></script>
 </body>
