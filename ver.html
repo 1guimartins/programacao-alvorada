@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Visão Geral</title>
+  <title>Panificação Alvorada - Visão Geral Líderes</title>
   <link rel="stylesheet" href="estilo.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -11,15 +11,15 @@
 <body>
 
   <header>
-    <h1>🥐 Panificação Alvorada - Programação por Setores</h1>
+    <h1>🥐 Panificação Alvorada - Consulta de Setores</h1>
   </header>
 
   <div class="filtros-container">
     <div class="filtro-grupo">
-      <label for="filtro-modo">Exibir por:</label>
+      <label for="filtro-modo">Visualizar por:</label>
       <select id="filtro-modo" onchange="alternarModoFiltro()">
         <option value="todos">Toda a Semana</option>
-        <option value="dia">Dia Especifico</option>
+        <option value="dia">Dia Específico</option>
         <option value="periodo">Período (De / Até)</option>
       </select>
     </div>
@@ -41,7 +41,7 @@
 
   <div class="sub-tabs" id="sub-tabs-list-view"></div>
 
-  <div class="titulo-setor-exibicao" id="setor-titulo-view">PROGRAMAÇÃO DE SETOR</div>
+  <div class="titulo-setor-exibicao" id="setor-titulo-view">CARREGANDO...</div>
 
   <div id="setores-containers-view"></div>
 

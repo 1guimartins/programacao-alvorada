@@ -2,247 +2,199 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  background-color: #f4f6f9;
-  color: #222;
+  background-color: #f0f2f5;
+  color: #333;
   padding: 15px;
 }
 
-/* Cabeçalho Alvorada */
+/* Cabeçalho Verde Alvorada */
 header {
   background-color: #00853B;
-  color: white;
-  padding: 12px 20px;
+  color: #ffffff;
+  padding: 15px 20px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 4px solid #FF6600;
+  border-bottom: 5px solid #FF6600;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 header h1 {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
-/* Painel de Filtros e Opções */
+/* Painel de Filtros */
 .filtros-container {
-  background: white;
-  padding: 12px 18px;
+  background: #ffffff;
+  padding: 15px;
   border-radius: 8px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   align-items: center;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e2e8f0;
 }
 
 .filtro-grupo {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  color: #444;
 }
 
 .filtro-grupo select, 
 .filtro-grupo input[type="date"] {
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
   outline: none;
   font-size: 0.9rem;
+  background-color: #fff;
 }
 
+/* Abas dos Setores */
 .sub-tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 15px;
   flex-wrap: wrap;
 }
 
 .sub-tab-btn {
-  background: #e9ecef;
-  border: 1px solid #ccc;
-  padding: 8px 16px;
+  background: #e2e8f0;
+  border: none;
+  padding: 10px 20px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
-  color: #333;
-  transition: all 0.2s;
+  color: #475569;
+  transition: all 0.2s ease-in-out;
 }
 
 .sub-tab-btn.active {
   background: #00853B;
-  color: white;
-  border-color: #00853B;
-}
-
-.actions-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .btn {
-  padding: 8px 14px;
+  padding: 9px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.2s;
   font-size: 0.9rem;
+  transition: opacity 0.2s;
 }
 
-.btn-success { background: #00853B; color: white; }
-.btn-orange { background: #FF6600; color: white; }
-.btn-danger { background: #dc3545; color: white; }
+.btn:hover {
+  opacity: 0.9;
+}
 
+.btn-orange { background: #FF6600; color: #ffffff; }
+
+/* Banner do Setor Ativo */
 .titulo-setor-exibicao {
   background: #1F69C1;
-  color: white;
+  color: #ffffff;
   text-align: center;
-  padding: 8px;
-  font-size: 1.2rem;
+  padding: 10px;
+  font-size: 1.25rem;
   font-weight: bold;
   text-transform: uppercase;
-  margin-bottom: 15px;
-  border-radius: 4px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
 }
 
-/* Grids dos Dias */
-#setores-containers, #setores-containers-view {
+/* Container dos Cards dos Dias */
+#setores-containers-view {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
 }
 
 .dia-card {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   overflow: hidden;
   border: 1px solid #1F69C1;
 }
 
 .dia-card-header {
   background: #1F69C1;
-  color: white;
-  padding: 8px 12px;
+  color: #ffffff;
+  padding: 10px 14px;
   font-weight: bold;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.95rem;
-}
-
-.dia-data-input {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 3px 6px;
-  border-radius: 4px;
-  width: 105px;
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: bold;
+  font-size: 1rem;
 }
 
 .dia-card-body {
-  padding: 8px 12px;
+  padding: 10px 14px;
 }
 
 .item-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.95rem;
 }
 
-.item-linha:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.item-left {
-  display: flex;
-  gap: 8px;
+.item-linha:last-child {
+  border-bottom: none;
 }
 
 .item-qtd {
-  font-weight: bold;
-  color: #000;
-  min-width: 50px;
+  font-weight: 800;
+  color: #1F69C1;
+  min-width: 65px;
+  display: inline-block;
 }
 
 .item-nome {
   text-transform: uppercase;
-}
-
-.btn-del-item {
-  background: transparent;
-  border: none;
-  color: #dc3545;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-.btn-add-item-card {
-  width: 100%;
-  margin-top: 8px;
-  background: #00853B;
-  color: white;
-  border: none;
-  padding: 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .item-vazio {
-  color: #888;
-  font-size: 0.85rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
   font-style: italic;
   text-align: center;
-  margin: 8px 0;
+  padding: 12px 0;
 }
 
-/* ========================================================
-   REGRAS EXCLUSIVAS DE IMPRESSÃO (1 FOLHA PAISAGEM)
-   ======================================================== */
+/* Regras de Impressão (Ajustado para 1 Folha Paisagem) */
 @media print {
   @page {
     size: landscape;
-    margin: 4mm;
+    margin: 5mm;
   }
 
   body {
-    background: white !important;
+    background: #ffffff !important;
     padding: 0 !important;
-    margin: 0 !important;
-    font-size: 9pt !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
-  header, 
-  nav, 
-  .filtros-container, 
-  .sub-tabs, 
-  .actions-bar, 
-  .btn, 
-  .btn-add-item-card, 
-  .btn-del-item, 
-  button, 
-  input {
+  header, .filtros-container, .sub-tabs {
     display: none !important;
   }
 
@@ -250,37 +202,24 @@ header h1 {
     background: #1F69C1 !important;
     color: white !important;
     font-size: 12pt !important;
-    margin-bottom: 6px !important;
-    padding: 4px !important;
+    margin-bottom: 10px !important;
+    padding: 5px !important;
   }
 
-  #setores-containers, #setores-containers-view {
+  #setores-containers-view {
     display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 4px !important;
-    width: 100% !important;
+    gap: 6px !important;
   }
 
   .dia-card {
     border: 1px solid #1F69C1 !important;
-    box-shadow: none !important;
     break-inside: avoid !important;
   }
 
   .dia-card-header {
     background: #1F69C1 !important;
     color: white !important;
-    padding: 2px 5px !important;
-    font-size: 8.5pt !important;
-  }
-
-  .dia-card-body {
-    padding: 3px !important;
-  }
-
-  .item-linha {
-    padding: 2px 0 !important;
-    border-bottom: 1px solid #ddd !important;
-    font-size: 8pt !important;
+    padding: 4px 8px !important;
   }
 }
