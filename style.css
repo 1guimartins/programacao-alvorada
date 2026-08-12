@@ -30,8 +30,8 @@ header h1 {
   font-weight: 700;
 }
 
-/* Containers de Filtros */
-.semana-container, .filtros-container {
+/* Barra de Seleção da Semana e Filtros */
+.semana-container {
   background: #ffffff;
   padding: 12px 20px;
   border-radius: 10px;
@@ -44,26 +44,47 @@ header h1 {
   border: 1px solid #e2e8f0;
 }
 
-.filtro-grupo {
+.semana-seletor {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #475569;
+  font-weight: 700;
+  color: #00853B;
 }
 
-.filtro-grupo select, 
-.filtro-grupo input {
+.semana-seletor select {
   padding: 8px 12px;
-  border: 1px solid #cbd5e1;
+  border: 2px solid #00853B;
   border-radius: 6px;
+  font-weight: 700;
+  color: #00853B;
+  background: #f0fdf4;
   outline: none;
-  font-size: 0.9rem;
-  background-color: #ffffff;
+  cursor: pointer;
 }
 
-/* Abas de Setores com rolagem suave no celular */
+/* Banner de Alerta para o Líder */
+.alerta-atualizacao {
+  background: #fef3c7;
+  border: 2px dashed #f59e0b;
+  color: #92400e;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  animation: pulseBg 2s infinite;
+}
+
+@keyframes pulseBg {
+  0% { background-color: #fef3c7; }
+  50% { background-color: #fde68a; }
+  100% { background-color: #fef3c7; }
+}
+
+/* Abas estilo pílula */
 .sub-tabs {
   display: flex;
   gap: 8px;
@@ -86,6 +107,19 @@ header h1 {
   transition: all 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  position: relative;
+}
+
+.sub-tab-btn.has-update::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
 }
 
 .sub-tab-btn:hover {
@@ -104,7 +138,7 @@ header h1 {
 .actions-bar {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -123,6 +157,7 @@ header h1 {
 .btn-success { background: #00853B; color: #ffffff; }
 .btn-orange { background: #FF6600; color: #ffffff; }
 .btn-danger { background: #ef4444; color: #ffffff; }
+.btn-blue { background: #1F69C1; color: #ffffff; }
 
 .titulo-setor-exibicao {
   background: #1F69C1;
@@ -137,7 +172,6 @@ header h1 {
   letter-spacing: 0.5px;
 }
 
-/* Grid Padrão Desktop (3 Colunas) */
 #setores-containers, #setores-containers-view {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -198,9 +232,22 @@ header h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 0;
+  padding: 6px 8px;
   border-bottom: 1px solid #f1f5f9;
   font-size: 0.9rem;
+  border-radius: 4px;
+}
+
+/* Efeito de Piscar para Itens Atualizados Recentemente */
+.item-linha.item-atualizado {
+  animation: piscarEfeito 1.2s infinite ease-in-out;
+  border: 1px solid #FF6600;
+}
+
+@keyframes piscarEfeito {
+  0% { background-color: #ffedd5; }
+  50% { background-color: #fed7aa; }
+  100% { background-color: #ffedd5; }
 }
 
 .item-qtd {
@@ -250,66 +297,8 @@ header h1 {
   margin: auto 0;
 }
 
-/* ========================================================
-   📱 REGRA PARA CELULAR / DISPOSITIVOS MÓVEIS (1 COLUNA)
-   ======================================================== */
 @media (max-width: 768px) {
-  body {
-    padding: 10px;
-  }
-
-  header h1 {
-    font-size: 1.1rem;
-  }
-
   #setores-containers, #setores-containers-view {
-    grid-template-columns: 1fr !important; /* Força 1 coluna por linha no celular */
-    gap: 12px !important;
-  }
-
-  .dia-card {
-    min-height: auto;
-  }
-
-  .dia-card-header {
-    font-size: 1rem;
-    padding: 10px 14px;
-  }
-
-  .item-linha {
-    font-size: 0.95rem;
-    padding: 8px 0;
-  }
-
-  .item-qtd {
-    font-size: 0.9rem;
-    padding: 4px 8px;
-  }
-}
-
-/* Regra de Impressão */
-@media print {
-  @page {
-    size: A4 landscape;
-    margin: 4mm;
-  }
-
-  body { background: #ffffff !important; padding: 0 !important; }
-  header, .semana-container, .filtros-container, .sub-tabs, .actions-bar, .btn, .btn-add-item-card, .btn-del-item {
-    display: none !important;
-  }
-
-  #setores-containers, #setores-containers-view {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 8px !important;
-  }
-
-  .dia-card { border: 1px solid #1F69C1 !important; break-inside: avoid !important; }
-  .dia-card-header {
-    background: #1F69C1 !important;
-    color: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    grid-template-columns: 1fr !important;
   }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Painel ADM</title>
+  <title>Panificação Alvorada - Gestão ADM</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -15,17 +15,22 @@
   </header>
 
   <div class="semana-container">
-    <div class="actions-bar" style="margin-bottom: 0;">
-      <button class="btn btn-success" onclick="criarNovaAba()">➕ Criar Novo Setor</button>
-      <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor Atual</button>
+    <div class="semana-seletor">
+      📅 Semana:
+      <select id="seletor-semana-adm" onchange="mudarSemanaADM(this.value)"></select>
     </div>
-    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir Folha</button>
+
+    <div class="actions-bar">
+      <button class="btn btn-blue" onclick="criarNovaSemanaRascunho()">🚀 Nova Semana (Rascunho)</button>
+      <button class="btn btn-success" onclick="criarNovaAba()">➕ Criar Setor</button>
+      <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor</button>
+    </div>
+
+    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir</button>
   </div>
 
   <div class="sub-tabs" id="sub-tabs-list"></div>
-
   <div class="titulo-setor-exibicao" id="setor-titulo">CARREGANDO...</div>
-
   <div id="setores-containers"></div>
 
   <script src="script.js"></script>

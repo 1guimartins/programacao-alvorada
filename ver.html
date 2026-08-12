@@ -15,13 +15,20 @@
   </header>
 
   <div class="semana-container">
-    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir Folha</button>
+    <div class="semana-seletor">
+      📅 Selecionar Semana:
+      <select id="seletor-semana-view" onchange="mudarSemanaView(this.value)"></select>
+    </div>
+    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir</button>
+  </div>
+
+  <div id="banner-alerta-lider" class="alerta-atualizacao" style="display: none;">
+    <span>🔔 <strong>Atenção Líder!</strong> Há atualizações recentes do ADM na programação do seu setor.</span>
+    <button class="btn btn-blue" onclick="limparNotificacoesSetor()">Entendi / Marcar Lido</button>
   </div>
 
   <div class="sub-tabs" id="sub-tabs-list-view"></div>
-
   <div class="titulo-setor-exibicao" id="setor-titulo-view">CARREGANDO...</div>
-
   <div id="setores-containers-view"></div>
 
   <script src="view-script.js"></script>
