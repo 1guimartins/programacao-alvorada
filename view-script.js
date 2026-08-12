@@ -15,18 +15,28 @@ const db = firebase.database();
 
 let setoresProgramacao = {};
 let setorAtivo = "";
+let semanaAtualChave = "atual";
 
-// Atualização em tempo real do Firebase
-db.ref("programacao").on("value", (snapshot) => {
-  const dados = snapshot.val();
-  if (dados) {
+function conectarFirebaseView() {
+  const caminho = semanaAtualChave === "atual" ? "programacao" : `historicos/${semanaAtualChave}`;
+  db.ref(caminho).on("value", (snapshot) => {
+    const dados = snapshot.val() || {};
     setoresProgramacao = dados;
     const chaves = Object.keys(setoresProgramacao);
     if (!setorAtivo && chaves.length > 0) setorAtivo = chaves[0];
+    if (chaves.length > 0 && !setoresProgramacao[setorAtivo]) setorAtivo = chaves[0];
     renderizarSubAbasView();
     renderizarGridsView();
-  }
-});
+  });
+}
+
+conectarFirebaseView();
+
+function carregarHistoricoView(valorSemana) {
+  semanaAtualChave = valorSemana || "atual";
+  document.getElementById("info-semana-view").innerText = valorSemana ? `Exibindo semana: ${valorSemana}` : "Semana Atual";
+  conectarFirebaseView();
+}
 
 function renderizarSubAbasView() {
   const container = document.getElementById("sub-tabs-list-view");
@@ -61,20 +71,27 @@ function renderizarGridsView() {
   const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 
   dias.forEach(dia => {
-    const itens = setoresProgramacao[setorAtivo][dia] || [];
+    const dadosDia = setoresProgramacao[setorAtivo][dia] || { data: "", itens: [] };
+    const itens = Array.isArray(dadosDia) ? dadosDia : (dadosDia.itens || []);
+    const dataVal = Array.isArray(dadosDia) ? "" : (dadosDia.data || "");
 
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
     let itensHTML = itens.map(item => `
       <div class="item-linha">
-        <span class="item-qtd">${item.qtd}</span>
-        <span class="item-nome">- ${item.nome}</span>
+        <div class="item-left">
+          <span class="item-qtd">${item.qtd}</span>
+          <span class="item-nome">- ${item.nome}</span>
+        </div>
       </div>
     `).join("");
 
     divDia.innerHTML = `
-      <div class="dia-card-header">${dia}</div>
+      <div class="dia-card-header">
+        <span>${dia}</span>
+        ${dataVal ? `<span style="font-size:0.8rem; font-weight:normal;">${dataVal}</span>` : ""}
+      </div>
       <div class="dia-card-body">${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}</div>
     `;
 
