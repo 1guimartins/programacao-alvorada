@@ -30,7 +30,7 @@ header h1 {
   font-weight: 700;
 }
 
-/* Container Superior de Filtros */
+/* Barra de Filtros / Ações */
 .semana-container, .filtros-container {
   background: #ffffff;
   padding: 12px 20px;
@@ -63,11 +63,13 @@ header h1 {
   background-color: #ffffff;
 }
 
-/* Abas Arredondadas dos Setores */
+/* Abas de Setores com Rolagem Horizontal se houver muitas */
 .sub-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
   flex-wrap: wrap;
 }
 
@@ -81,7 +83,7 @@ header h1 {
   font-size: 0.9rem;
   color: #475569;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  white-space: nowrap;
 }
 
 .sub-tab-btn:hover {
@@ -97,7 +99,6 @@ header h1 {
   box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
 }
 
-/* Botões */
 .actions-bar {
   display: flex;
   gap: 10px;
@@ -121,7 +122,6 @@ header h1 {
 .btn-orange { background: #FF6600; color: #ffffff; }
 .btn-danger { background: #ef4444; color: #ffffff; }
 
-/* Título Azul do Setor */
 .titulo-setor-exibicao {
   background: #1F69C1;
   color: #ffffff;
@@ -135,11 +135,14 @@ header h1 {
   letter-spacing: 0.5px;
 }
 
-/* Grid de 7 Dias */
+/* GRID ORGANIZADO EM 3 COLUNAS POR LINHA
+   Linha 1: Seg, Ter, Qua
+   Linha 2: Qui, Sex, Sáb
+   Linha 3: Dom */
 #setores-containers, #setores-containers-view {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
   width: 100%;
 }
 
@@ -151,33 +154,34 @@ header h1 {
   border: 1px solid #1F69C1;
   display: flex;
   flex-direction: column;
+  min-height: 180px;
 }
 
 .dia-card-header {
   background: #1F69C1;
   color: #ffffff;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font-weight: 700;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .dia-data-input {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: #ffffff;
-  padding: 2px 4px;
+  padding: 2px 6px;
   border-radius: 4px;
-  width: 90px;
+  width: 100px;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
 .dia-card-body {
-  padding: 8px;
+  padding: 10px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -189,13 +193,17 @@ header h1 {
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+}
+
+.item-left {
+  display: flex;
+  gap: 8px;
 }
 
 .item-qtd {
   font-weight: 800;
   color: #1F69C1;
-  margin-right: 6px;
 }
 
 .item-nome {
@@ -222,18 +230,18 @@ header h1 {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
 .item-vazio {
   color: #94a3b8;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-style: italic;
   text-align: center;
   margin: 10px 0;
 }
 
-/* Impressão A4 Paisagem */
+/* Configuração de Impressão */
 @media print {
   @page {
     size: A4 landscape;
@@ -247,11 +255,11 @@ header h1 {
 
   #setores-containers, #setores-containers-view {
     display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    gap: 4px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
   }
 
-  .dia-card { border: 1px solid #1F69C1 !important; }
+  .dia-card { border: 1px solid #1F69C1 !important; break-inside: avoid !important; }
   .dia-card-header {
     background: #1F69C1 !important;
     color: #ffffff !important;

@@ -39,8 +39,15 @@ function conectarFirebase() {
   db.ref("programacao").on("value", (snapshot) => {
     setoresProgramacao = snapshot.val() || {};
     const chaves = Object.keys(setoresProgramacao);
-    if (!setorAtivo && chaves.length > 0) setorAtivo = chaves[0];
-    if (chaves.length > 0 && !setoresProgramacao[setorAtivo]) setorAtivo = chaves[0];
+    
+    if (chaves.length > 0) {
+      if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+        setorAtivo = chaves[0];
+      }
+    } else {
+      setorAtivo = "";
+    }
+
     renderizarSubAbas();
     renderizarGrids();
   });
@@ -70,8 +77,8 @@ function renderizarSubAbas() {
   });
 
   const titulo = document.getElementById("setor-titulo");
-  if (titulo && setorAtivo) {
-    titulo.innerText = "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ");
+  if (titulo) {
+    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ") : "NENHUM SETOR SELECIONADO";
   }
 }
 
@@ -145,25 +152,36 @@ function removerItem(dia, index) {
   }
 }
 
+// CRIAÇÃO DE NOVAS ABAS (SEM LIMITE)
 function criarNovaAba() {
-  const nome = prompt("Digite o nome do novo setor/aba:");
-  if (nome) {
-    const chave = nome.toUpperCase().replace(/\s+/g, "_");
+  const nome = prompt("Digite o nome do novo setor:");
+  if (nome && nome.trim() !== "") {
+    // Sanitiza a chave para evitar caracteres inválidos no Firebase
+    const chave = nome.trim().toUpperCase().replace(/[\.\#\$\[\]]/g, "").replace(/\s+/g, "_");
+    
+    if (setoresProgramacao[chave]) {
+      alert("Este setor já existe!");
+      return;
+    }
+
     setoresProgramacao[chave] = {
       SEGUNDA: { data: "", itens: [] }, TERÇA: { data: "", itens: [] },
       QUARTA: { data: "", itens: [] }, QUINTA: { data: "", itens: [] },
       SEXTA: { data: "", itens: [] }, SÁBADO: { data: "", itens: [] },
       DOMINGO: { data: "", itens: [] }
     };
+    
     setorAtivo = chave;
     salvarNoFirebase();
   }
 }
 
 function excluirAbaAtual() {
-  if (confirm(`Excluir a aba "${setorAtivo}"?`)) {
+  if (!setorAtivo) return;
+  if (confirm(`Deseja realmente excluir o setor "${setorAtivo.replace(/_/g, " ")}"?`)) {
     delete setoresProgramacao[setorAtivo];
-    setorAtivo = Object.keys(setoresProgramacao)[0] || "";
+    const chaves = Object.keys(setoresProgramacao);
+    setorAtivo = chaves.length > 0 ? chaves[0] : "";
     salvarNoFirebase();
   }
 }
