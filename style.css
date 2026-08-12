@@ -156,73 +156,115 @@ body {
   border-radius: 3px;
 }
 
-/* REGRAS DE IMPRESSÃO - ESTRITAMENTE 1 FOLHA A4 */
+/* ===================================================
+   CONFIGURAÇÃO DE IMPRESSÃO EM PAISAGEM (1 FOLHA A4)
+   =================================================== */
 @media print {
+  /* Força a impressora a usar A4 Paisagem com margens mínimas */
   @page {
-    size: A4 portrait;
-    margin: 3mm;
+    size: A4 landscape;
+    margin: 5mm;
   }
 
   html, body {
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: white !important;
-    font-size: 10px !important;
+    font-size: 9px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    overflow: hidden !important;
   }
 
-  .no-print, header, nav, button, .actions-header-bar, .kpi-container, .category-buttons {
+  /* Esconde abas, botões do topo e botões "+ Add item" */
+  .no-print, header, nav, button, 
+  .sub-tabs-container, .nav-tabs, 
+  .btn-action, .btn-add-tab, .btn-del-tab, 
+  .dia-card button, input {
     display: none !important;
   }
 
-  .container, .print-area {
+  .container {
     width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
+  /* Título Azul da Aba Ativa */
   .programacao-header-title {
     background-color: #0066cc !important;
     color: white !important;
-    font-size: 10pt !important;
-    padding: 3px !important;
-    margin-bottom: 4px !important;
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    padding: 4px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    border-radius: 4px !important;
   }
 
+  /* Organiza os dias em 4 colunas em Paisagem */
   #setores-containers {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 4px !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
   }
 
+  /* Cartões dos Dias da Semana */
   .dia-card {
-    border: 1px solid #0066cc !important;
+    border: 1.5px solid #0066cc !important;
+    border-radius: 4px !important;
+    background: white !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    margin-bottom: 0 !important;
   }
 
   .dia-card-header {
     background-color: #0066cc !important;
     color: white !important;
-    font-size: 8pt !important;
-    padding: 2px 4px !important;
+    font-size: 8.5pt !important;
+    font-weight: bold !important;
+    padding: 3px 5px !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
   }
 
   .dia-card-body {
-    padding: 2px 4px !important;
+    padding: 4px 6px !important;
   }
 
+  /* Linhas de Itens */
   .item-linha {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     padding: 2px 0 !important;
+    border-bottom: 1px dashed #ddd !important;
   }
 
-  .item-nome, .item-qtd {
+  .item-linha:last-child {
+    border-bottom: none !important;
+  }
+
+  .item-nome {
     font-size: 7.5pt !important;
+    font-weight: 600 !weight;
+    color: #000 !important;
   }
 
-  /* Domingo ocupa largura total na parte inferior */
-  .dia-card:nth-child(7) {
-    grid-column: span 2 !important;
+  .item-qtd {
+    font-size: 7.5pt !important;
+    font-weight: bold !important;
+    color: #0066cc !important;
+  }
+
+  .item-vazio {
+    font-size: 7pt !important;
+    color: #888 !important;
+    text-align: center !important;
+    padding: 2px 0 !important;
   }
 }
