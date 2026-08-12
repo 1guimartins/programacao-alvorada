@@ -100,12 +100,15 @@ function renderizarGridsView() {
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
-    let itensHTML = objDia.itens.map(item => `
-      <div class="item-linha">
-        <span class="item-qtd">${item.qtd}</span>
-        <span class="item-nome">${item.nome}</span>
-      </div>
-    `).join("");
+    let itensHTML = objDia.itens.map(item => {
+      const temQtd = item.qtd && item.qtd.trim() !== "";
+      return `
+        <div class="item-linha">
+          ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
+          <span class="item-nome">${item.nome}</span>
+        </div>
+      `;
+    }).join("");
 
     divDia.innerHTML = `
       <div class="dia-card-header">

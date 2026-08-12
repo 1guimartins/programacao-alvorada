@@ -100,13 +100,16 @@ function renderizarGrids() {
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
-    let itensHTML = objDia.itens.map((item, index) => `
-      <div class="item-linha">
-        <span class="item-qtd">${item.qtd}</span>
-        <span class="item-nome">${item.nome}</span>
-        <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
-      </div>
-    `).join("");
+    let itensHTML = objDia.itens.map((item, index) => {
+      const temQtd = item.qtd && item.qtd.trim() !== "";
+      return `
+        <div class="item-linha">
+          ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
+          <span class="item-nome">${item.nome}</span>
+          <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
+        </div>
+      `;
+    }).join("");
 
     divDia.innerHTML = `
       <div class="dia-card-header">
@@ -123,22 +126,60 @@ function renderizarGrids() {
   });
 }
 
+// LÓGICA DE SALVAR DATA E PREENCHER AUTOMÁTICO SE FOR SEGUNDA-FEIRA
 function salvarDataDia(dia, valorData) {
   if (!setoresProgramacao[setorAtivo]) return;
+
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.data = valorData;
   db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
+
+  // Se o usuário preencheu a Segunda-Feira no formato DD/MM/AAAA
+  if (dia === "SEGUNDA" && valorData.includes("/")) {
+    const partes = valorData.split("/");
+    if (partes.length === 3) {
+      const diaNum = parseInt(partes[0], 10);
+      const mesNum = parseInt(partes[1], 10) - 1;
+      let anoNum = parseInt(partes[2], 10);
+      if (anoNum < 100) anoNum += 2000;
+
+      const dataBase = new Date(anoNum, mesNum, diaNum);
+
+      if (!isNaN(dataBase.getTime())) {
+        const diasSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+
+        diasSemana.forEach((d, index) => {
+          if (index > 0) { // Aplica para Terça em diante
+            const proximaData = new Date(dataBase);
+            proximaData.setDate(dataBase.getDate() + index);
+
+            const dStr = String(proximaData.getDate()).padStart(2, '0');
+            const mStr = String(proximaData.getMonth() + 1).padStart(2, '0');
+            const aStr = proximaData.getFullYear();
+            const dataFormatada = `${dStr}/${mStr}/${aStr}`;
+
+            const objProximo = normalizarDia(setoresProgramacao[setorAtivo][d]);
+            objProximo.data = dataFormatada;
+            db.ref(`programacao/${setorAtivo}/${d}`).set(objProximo);
+          }
+        });
+      }
+    }
+  }
 }
 
+// ADICIONAR ITEM COM QUANTIDADE OPCIONAL
 function adicionarItem(dia) {
-  const qtd = prompt("Digite a quantidade (ex: 16 rec, 120 kg):");
-  if (!qtd) return;
+  // Se clicar OK sem digitar nada, 'qtd' será string vazia ""
+  let qtd = prompt("Digite a quantidade (ex: 16 rec, 120 kg) ou deixe EM BRANCO e clique OK:");
+  if (qtd === null) return; // Se clicar em Cancelar, sai sem fazer nada
+
   const nome = prompt("Digite o nome do produto:");
-  if (!nome) return;
+  if (!nome || nome.trim() === "") return;
 
   if (!setoresProgramacao[setorAtivo]) return;
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-  objDia.itens.push({ qtd, nome });
+  objDia.itens.push({ qtd: qtd.trim(), nome: nome.trim() });
 
   db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 }
