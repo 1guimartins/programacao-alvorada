@@ -8,276 +8,262 @@
 body {
   background-color: #f4f6f9;
   color: #333;
+  padding: 20px;
 }
 
-.header-bar {
-  background-color: #0f5c2e;
+header {
+  background-color: #0d6efd;
   color: white;
-  padding: 14px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-}
-
-.header-bar h1 {
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 15px auto;
-  padding: 0 12px;
-}
-
-/* ===================================================
-   BOTÕES DE AÇÃO GRANDES E VISTOSOS (TOPO)
-   =================================================== */
-.main-action-bar {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
-
-.btn-main {
-  padding: 12px 22px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  border: none;
+  padding: 15px 20px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  margin-bottom: 20px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-main:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.2);
-}
-
-.btn-primary {
-  background-color: #0066cc;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #ffffff;
-  color: #333;
-  border: 2px solid #ccc;
-}
-
-.btn-print {
-  background-color: #0088cc;
-  color: white;
-}
-
-/* HISTÓRICO DE SEMANAS */
-.historico-container {
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.historico-container input[type="week"] {
-  padding: 6px 10px;
-  border-radius: 5px;
-  border: 1px solid #bbb;
-  font-weight: bold;
-}
-
-.historico-info {
-  font-size: 0.85rem;
-  color: #0066cc;
-  font-weight: bold;
-}
-
-/* NAVEGAÇÃO DE ABAS */
-.sub-tabs-wrapper {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.sub-tabs-container {
+header h1 {
+  font-size: 1.5rem;
+}
+
+.semana-container {
+  background: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.semana-container input, .semana-container select {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.sub-tabs {
   display: flex;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
 }
 
 .sub-tab-btn {
-  padding: 10px 18px;
-  background-color: #e2e8f0;
-  color: #333;
+  background: #e9ecef;
   border: none;
-  border-radius: 25px;
+  padding: 8px 16px;
+  border-radius: 20px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  transition: 0.2s;
+  font-weight: 600;
+  color: #495057;
+  transition: all 0.2s;
 }
 
 .sub-tab-btn.active {
-  background-color: #0066cc;
+  background: #0d6efd;
   color: white;
-  box-shadow: 0 2px 6px rgba(0,102,204,0.3);
 }
 
-.aba-actions {
+.actions-bar {
   display: flex;
-  gap: 6px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.btn-aba-act {
-  padding: 8px 12px;
+.btn {
+  padding: 8px 14px;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
-}
-
-.btn-add-aba { background-color: #28a745; color: white; }
-.btn-del-aba { background-color: #dc3545; color: white; }
-
-/* TÍTULO AZUL DO SETOR */
-.programacao-header-title {
-  background-color: #0066cc;
-  color: white;
-  text-align: center;
-  padding: 12px;
   font-weight: bold;
-  font-size: 1.15rem;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  transition: background 0.2s;
 }
 
-/* GRID DOS CARDS */
+.btn-success { background: #198754; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-primary { background: #0d6efd; color: white; }
+
 #setores-containers, #setores-containers-view {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-@media (min-width: 650px) {
-  #setores-containers, #setores-containers-view {
-    grid-template-columns: 1fr 1fr;
-  }
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
 }
 
 .dia-card {
-  background: #ffffff;
-  border: 1.5px solid #0066cc;
+  background: white;
   border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border: 1px solid #e0e0e0;
 }
 
 .dia-card-header {
-  background-color: #0066cc;
+  background: #0d6efd;
   color: white;
-  padding: 8px 12px;
+  padding: 10px 15px;
   font-weight: bold;
-  font-size: 0.9rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* INPUT DE DATA NO CABEÇALHO DO DIA */
 .dia-data-input {
   background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.5);
+  border: none;
   color: white;
-  font-size: 0.8rem;
-  padding: 2px 6px;
+  padding: 3px 6px;
   border-radius: 4px;
-  width: 105px;
+  width: 100px;
   text-align: center;
+  font-size: 0.85rem;
 }
 
-.dia-data-input::placeholder {
-  color: rgba(255,255,255,0.7);
-}
+.dia-data-input::placeholder { color: #ddd; }
 
 .dia-card-body {
-  padding: 10px 12px;
+  padding: 12px;
 }
 
 .item-linha {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 6px 0;
-  border-bottom: 1px dashed #eee;
-}
-
-.item-linha:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .item-left {
   display: flex;
-  align-items: center;
   gap: 8px;
 }
 
 .item-qtd {
   font-weight: bold;
-  color: #0066cc;
-  font-size: 0.85rem;
-  background: #e6f0fa;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.item-nome {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #333;
+  color: #0d6efd;
 }
 
 .btn-del-item {
-  background: none;
+  background: transparent;
   border: none;
   color: #dc3545;
+  font-size: 1.2rem;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 1rem;
+  line-height: 1;
 }
 
 .btn-add-item-card {
   width: 100%;
-  margin-top: 8px;
-  padding: 6px;
-  background-color: #28a745;
+  margin-top: 10px;
+  background: #198754;
   color: white;
   border: none;
+  padding: 8px;
   border-radius: 4px;
-  font-weight: bold;
-  font-size: 0.8rem;
   cursor: pointer;
+  font-weight: bold;
 }
 
 .item-vazio {
   color: #888;
   font-size: 0.85rem;
-  padding: 6px 0;
+  font-style: italic;
   text-align: center;
+  margin: 10px 0;
+}
+
+/* ========================================================
+   REGRAS EXCLUSIVAS DE IMPRESSÃO (FORÇAR 1 FOLHA PAISAGEM)
+   ======================================================== */
+@media print {
+  @page {
+    size: landscape;
+    margin: 4mm;
+  }
+
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 10px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Esconder todos os botões, menus e seletores */
+  header, 
+  nav, 
+  .semana-container, 
+  .sub-tabs, 
+  .actions-bar, 
+  .btn, 
+  .btn-add-item-card, 
+  .btn-del-item, 
+  button, 
+  input[type="button"] {
+    display: none !important;
+  }
+
+  /* Título fixo no topo da impressão */
+  #setor-titulo, #setor-titulo-view {
+    display: block !important;
+    text-align: center;
+    font-size: 14pt !important;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #000 !important;
+  }
+
+  /* Layout em Grid de 4 colunas compacto */
+  #setores-containers, #setores-containers-view {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4px !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dia-card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    border-radius: 3px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .dia-card-header {
+    background: #0d6efd !important;
+    color: white !important;
+    padding: 2px 6px !important;
+    font-size: 9pt !important;
+  }
+
+  .dia-data-input {
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-weight: bold;
+    font-size: 8pt !important;
+    text-align: right !important;
+  }
+
+  .dia-card-body {
+    padding: 4px !important;
+  }
+
+  .item-linha {
+    padding: 2px 0 !important;
+    border-bottom: 1px dashed #ccc !important;
+    font-size: 8.5pt !important;
+  }
+
+  .item-qtd {
+    color: #000 !important;
+  }
+
+  .item-vazio {
+    font-size: 8pt !important;
+    margin: 4px 0 !important;
+  }
 }

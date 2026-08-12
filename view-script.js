@@ -20,9 +20,19 @@ let semanaAtualChave = "atual";
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
   if (Array.isArray(dados)) return { data: "", itens: dados };
+  
+  let itensArray = [];
+  if (dados.itens) {
+    if (Array.isArray(dados.itens)) {
+      itensArray = dados.itens;
+    } else if (typeof dados.itens === 'object') {
+      itensArray = Object.keys(dados.itens).map(k => dados.itens[k]);
+    }
+  }
+
   return {
     data: dados.data || "",
-    itens: Array.isArray(dados.itens) ? dados.itens : []
+    itens: itensArray
   };
 }
 

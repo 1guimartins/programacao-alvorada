@@ -17,13 +17,24 @@ let setoresProgramacao = {};
 let setorAtivo = "";
 let semanaAtualChave = "atual";
 
-// Função utilitária para garantir estrutura segura em qualquer formato de dado
+// Função para normalizar os dados vindos do Firebase (seja Objeto ou Array)
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
+  
   if (Array.isArray(dados)) return { data: "", itens: dados };
+  
+  let itensArray = [];
+  if (dados.itens) {
+    if (Array.isArray(dados.itens)) {
+      itensArray = dados.itens;
+    } else if (typeof dados.itens === 'object') {
+      itensArray = Object.keys(dados.itens).map(k => dados.itens[k]);
+    }
+  }
+
   return {
     data: dados.data || "",
-    itens: Array.isArray(dados.itens) ? dados.itens : []
+    itens: itensArray
   };
 }
 
@@ -118,6 +129,7 @@ function renderizarGrids() {
 }
 
 function salvarDataDia(dia, valorData) {
+  if (!setoresProgramacao[setorAtivo]) setoresProgramacao[setorAtivo] = {};
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.data = valorData;
   setoresProgramacao[setorAtivo][dia] = objDia;
@@ -130,6 +142,7 @@ function adicionarItem(dia) {
   const nome = prompt("Digite o nome do produto:");
   if (!nome) return;
 
+  if (!setoresProgramacao[setorAtivo]) setoresProgramacao[setorAtivo] = {};
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.itens.push({ qtd, nome });
   setoresProgramacao[setorAtivo][dia] = objDia;
