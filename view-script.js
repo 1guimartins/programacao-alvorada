@@ -35,18 +35,21 @@ function normalizarDia(dados) {
   };
 }
 
-function conectarFirebaseView() {
-  db.ref("programacao").on("value", (snapshot) => {
-    setoresProgramacao = snapshot.val() || {};
-    const chaves = Object.keys(setoresProgramacao);
-    if (!setorAtivo && chaves.length > 0) setorAtivo = chaves[0];
-    if (chaves.length > 0 && !setoresProgramacao[setorAtivo]) setorAtivo = chaves[0];
-    renderizarSubAbasView();
-    filtrarProgramacao();
-  });
-}
+db.ref("programacao").on("value", (snapshot) => {
+  setoresProgramacao = snapshot.val() || {};
+  const chaves = Object.keys(setoresProgramacao);
+  
+  if (chaves.length > 0) {
+    if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+      setorAtivo = chaves[0];
+    }
+  } else {
+    setorAtivo = "";
+  }
 
-conectarFirebaseView();
+  renderizarSubAbasView();
+  renderizarGridsView();
+});
 
 function renderizarSubAbasView() {
   const container = document.getElementById("sub-tabs-list-view");
@@ -60,87 +63,49 @@ function renderizarSubAbasView() {
     btn.onclick = () => {
       setorAtivo = nomeAba;
       renderizarSubAbasView();
-      filtrarProgramacao();
+      renderizarGridsView();
     };
     container.appendChild(btn);
   });
 
-  const tituloView = document.getElementById("setor-titulo-view");
-  if (tituloView && setorAtivo) {
-    tituloView.innerText = "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ");
+  const titulo = document.getElementById("setor-titulo-view");
+  if (titulo) {
+    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ") : "NENHUM SETOR SELECIONADO";
   }
 }
 
-function alternarModoFiltro() {
-  const modo = document.getElementById("filtro-modo").value;
-  document.getElementById("grupo-dia-unico").style.display = modo === "dia" ? "flex" : "none";
-  document.getElementById("grupo-periodo").style.display = modo === "periodo" ? "flex" : "none";
-  filtrarProgramacao();
-}
-
-function converterDataParaISO(dataString) {
-  if (!dataString) return "";
-  const partes = dataString.split("/");
-  if (partes.length === 3) {
-    return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
-  }
-  return dataString;
-}
-
-function filtrarProgramacao() {
+function renderizarGridsView() {
   const container = document.getElementById("setores-containers-view");
   if (!container) return;
   container.innerHTML = "";
 
   if (!setorAtivo || !setoresProgramacao[setorAtivo]) return;
 
-  const modo = document.getElementById("filtro-modo").value;
-  const dataUnica = document.getElementById("filtro-data-unica").value;
-  const dataInicio = document.getElementById("filtro-data-inicio").value;
-  const dataFim = document.getElementById("filtro-data-fim").value;
-
   const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 
   dias.forEach(dia => {
     const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-    const dataDiaISO = converterDataParaISO(objDia.data);
 
-    let exibir = true;
+    const divDia = document.createElement("div");
+    divDia.className = "dia-card";
 
-    if (modo === "dia" && dataUnica) {
-      exibir = (dataDiaISO === dataUnica);
-    } else if (modo === "periodo" && dataInicio && dataFim) {
-      exibir = (dataDiaISO >= dataInicio && dataDiaISO <= dataFim);
-    }
+    let itensHTML = objDia.itens.map(item => `
+      <div class="item-linha">
+        <span class="item-qtd">${item.qtd}</span>
+        <span class="item-nome">${item.nome}</span>
+      </div>
+    `).join("");
 
-    if (exibir) {
-      const divDia = document.createElement("div");
-      divDia.className = "dia-card";
+    divDia.innerHTML = `
+      <div class="dia-card-header">
+        <span>${dia}</span>
+        <span class="dia-data-badge">${objDia.data || "---"}</span>
+      </div>
+      <div class="dia-card-body">
+        ${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}
+      </div>
+    `;
 
-      let itensHTML = objDia.itens.map(item => `
-        <div class="item-linha">
-          <div class="item-left">
-            <span class="item-qtd">${item.qtd}</span>
-            <span class="item-nome">${item.nome}</span>
-          </div>
-        </div>
-      `).join("");
-
-      divDia.innerHTML = `
-        <div class="dia-card-header">
-          <span>${dia}</span>
-          ${objDia.data ? `<span style="font-size:0.75rem;">${objDia.data}</span>` : ""}
-        </div>
-        <div class="dia-card-body">
-          ${itensHTML || "<p class='item-vazio'>Sem itens</p>"}
-        </div>
-      `;
-
-      container.appendChild(divDia);
-    }
+    container.appendChild(divDia);
   });
-
-  if (container.children.length === 0) {
-    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; font-size:1rem; padding: 20px;'>Nenhuma programação encontrada para este filtro.</p>";
-  }
 }

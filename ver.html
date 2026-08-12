@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Visão Geral Líderes</title>
-  <link rel="stylesheet" href="estilo.css">
+  <title>Panificação Alvorada - Consulta de Setores</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -15,27 +15,6 @@
   </header>
 
   <div class="semana-container">
-    <div class="filtro-grupo">
-      <label for="filtro-modo">Filtrar por:</label>
-      <select id="filtro-modo" onchange="alternarModoFiltro()">
-        <option value="todos">Toda a Semana</option>
-        <option value="dia">Dia Específico</option>
-        <option value="periodo">Período (De / Até)</option>
-      </select>
-    </div>
-
-    <div class="filtro-grupo" id="grupo-dia-unico" style="display: none;">
-      <label for="filtro-data-unica">Data:</label>
-      <input type="date" id="filtro-data-unica" onchange="filtrarProgramacao()">
-    </div>
-
-    <div class="filtro-grupo" id="grupo-periodo" style="display: none;">
-      <label for="filtro-data-inicio">De:</label>
-      <input type="date" id="filtro-data-inicio" onchange="filtrarProgramacao()">
-      <label for="filtro-data-fim">Até:</label>
-      <input type="date" id="filtro-data-fim" onchange="filtrarProgramacao()">
-    </div>
-
     <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir Folha</button>
   </div>
 
