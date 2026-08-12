@@ -106,8 +106,8 @@ function renderizarGrids() {
         <input type="text" class="dia-data-input" placeholder="DD/MM/AAAA" value="${objDia.data}" onchange="salvarDataDia('${dia}', this.value)">
       </div>
       <div class="dia-card-body">
-        ${itensHTML || "<p class='item-vazio'>Nenhum item adicionado</p>"}
-        <button class="btn-add-item-card" onclick="adicionarItem('${dia}')">➕ Add Item em ${dia}</button>
+        ${itensHTML || "<p class='item-vazio'>Sem itens</p>"}
+        <button class="btn-add-item-card" onclick="adicionarItem('${dia}')">➕ Add Item</button>
       </div>
     `;
 

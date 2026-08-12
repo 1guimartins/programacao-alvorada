@@ -2,44 +2,45 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 body {
-  background-color: #f0f2f5;
-  color: #333;
-  padding: 15px;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  padding: 16px;
 }
 
-/* Cabeçalho Verde Alvorada */
+/* Header Estilo Alvorada */
 header {
-  background-color: #00853B;
+  background: linear-gradient(135deg, #00853B, #00662d);
   color: #ffffff;
-  padding: 15px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  padding: 16px 24px;
+  border-radius: 10px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 5px solid #FF6600;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-bottom: 4px solid #FF6600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 header h1 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
-/* Painel de Filtros */
-.filtros-container {
+/* Barra de Filtros e Controles */
+.filtros-container, .semana-container {
   background: #ffffff;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 16px;
   align-items: center;
   border: 1px solid #e2e8f0;
 }
@@ -48,178 +49,279 @@ header h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #444;
+  color: #475569;
 }
 
 .filtro-grupo select, 
-.filtro-grupo input[type="date"] {
+.filtro-grupo input {
   padding: 8px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   outline: none;
   font-size: 0.9rem;
-  background-color: #fff;
+  background-color: #ffffff;
 }
 
-/* Abas dos Setores */
+/* Abas de Setores */
 .sub-tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 8px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
 .sub-tab-btn {
-  background: #e2e8f0;
-  border: none;
-  padding: 10px 20px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 18px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.9rem;
   color: #475569;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.sub-tab-btn:hover {
+  background: #f8fafc;
+  border-color: #00853B;
+  color: #00853B;
 }
 
 .sub-tab-btn.active {
   background: #00853B;
   color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  border-color: #00853B;
+  box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
+}
+
+/* Botões Principais */
+.actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .btn {
-  padding: 9px 16px;
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-  transition: opacity 0.2s;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.btn:hover {
-  opacity: 0.9;
-}
-
+.btn-success { background: #00853B; color: #ffffff; }
 .btn-orange { background: #FF6600; color: #ffffff; }
+.btn-danger { background: #ef4444; color: #ffffff; }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-/* Banner do Setor Ativo */
+/* Título Destaque do Setor */
 .titulo-setor-exibicao {
   background: #1F69C1;
   color: #ffffff;
   text-align: center;
   padding: 10px;
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.15rem;
+  font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 20px;
-  border-radius: 6px;
+  margin-bottom: 16px;
+  border-radius: 8px;
   letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(31, 105, 193, 0.2);
 }
 
-/* Container dos Cards dos Dias */
-#setores-containers-view {
+/* Layout em Grid - 7 Colunas para os Dias da Semana */
+#setores-containers, #setores-containers-view {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
 }
 
+/* Card do Dia */
 .dia-card {
   background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
   overflow: hidden;
   border: 1px solid #1F69C1;
+  display: flex;
+  flex-direction: column;
 }
 
 .dia-card-header {
   background: #1F69C1;
   color: #ffffff;
-  padding: 10px 14px;
-  font-weight: bold;
+  padding: 8px 10px;
+  font-weight: 700;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
+.dia-data-input {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 2px 4px;
+  border-radius: 4px;
+  width: 90px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dia-data-input::placeholder { color: #e2e8f0; }
+
 .dia-card-body {
-  padding: 10px 14px;
+  padding: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .item-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 6px 0;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.95rem;
+  font-size: 0.82rem;
 }
 
-.item-linha:last-child {
-  border-bottom: none;
+.item-linha:last-child { border-bottom: none; }
+
+.item-left {
+  display: flex;
+  gap: 6px;
+  overflow: hidden;
 }
 
 .item-qtd {
   font-weight: 800;
   color: #1F69C1;
-  min-width: 65px;
-  display: inline-block;
+  white-space: nowrap;
 }
 
 .item-nome {
   text-transform: uppercase;
   font-weight: 600;
-  color: #1e293b;
+  color: #334155;
+  word-break: break-word;
 }
+
+.btn-del-item {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  font-weight: bold;
+}
+
+.btn-add-item-card {
+  width: 100%;
+  margin-top: auto;
+  background: #00853B;
+  color: #ffffff;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.78rem;
+  transition: background 0.2s;
+}
+
+.btn-add-item-card:hover { background: #00662d; }
 
 .item-vazio {
   color: #94a3b8;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-style: italic;
   text-align: center;
-  padding: 12px 0;
+  margin: 10px 0;
 }
 
-/* Regras de Impressão (Ajustado para 1 Folha Paisagem) */
+/* ========================================================
+   REGRAS DE IMPRESSÃO (PERFEITO PARA 1 FOLHA A4 PAISAGEM)
+   ======================================================== */
 @media print {
   @page {
-    size: landscape;
-    margin: 5mm;
+    size: A4 landscape;
+    margin: 4mm;
   }
 
   body {
     background: #ffffff !important;
     padding: 0 !important;
+    font-size: 8pt !important;
   }
 
-  header, .filtros-container, .sub-tabs {
+  header, 
+  nav, 
+  .filtros-container, 
+  .semana-container, 
+  .sub-tabs, 
+  .actions-bar, 
+  .btn, 
+  .btn-add-item-card, 
+  .btn-del-item, 
+  button, 
+  input {
     display: none !important;
   }
 
   .titulo-setor-exibicao {
     background: #1F69C1 !important;
-    color: white !important;
-    font-size: 12pt !important;
-    margin-bottom: 10px !important;
-    padding: 5px !important;
+    color: #ffffff !important;
+    font-size: 11pt !important;
+    margin-bottom: 6px !important;
+    padding: 4px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  #setores-containers-view {
+  #setores-containers, #setores-containers-view {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 6px !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 4px !important;
+    width: 100% !important;
   }
 
   .dia-card {
     border: 1px solid #1F69C1 !important;
-    break-inside: avoid !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    page-break-inside: avoid !important;
   }
 
   .dia-card-header {
     background: #1F69C1 !important;
-    color: white !important;
-    padding: 4px 8px !important;
+    color: #ffffff !important;
+    padding: 2px 4px !important;
+    font-size: 8pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  .dia-card-body { padding: 4px !important; }
+
+  .item-linha {
+    padding: 2px 0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    font-size: 7.5pt !important;
+  }
+
+  .item-qtd { color: #1F69C1 !important; }
 }

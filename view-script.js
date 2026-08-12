@@ -119,18 +119,20 @@ function filtrarProgramacao() {
 
       let itensHTML = objDia.itens.map(item => `
         <div class="item-linha">
-          <span class="item-qtd">${item.qtd}</span>
-          <span class="item-nome">${item.nome}</span>
+          <div class="item-left">
+            <span class="item-qtd">${item.qtd}</span>
+            <span class="item-nome">${item.nome}</span>
+          </div>
         </div>
       `).join("");
 
       divDia.innerHTML = `
         <div class="dia-card-header">
           <span>${dia}</span>
-          ${objDia.data ? `<span>${objDia.data}</span>` : ""}
+          ${objDia.data ? `<span style="font-size:0.75rem;">${objDia.data}</span>` : ""}
         </div>
         <div class="dia-card-body">
-          ${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}
+          ${itensHTML || "<p class='item-vazio'>Sem itens</p>"}
         </div>
       `;
 
@@ -139,6 +141,6 @@ function filtrarProgramacao() {
   });
 
   if (container.children.length === 0) {
-    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; font-size:1rem; padding: 20px;'>Nenhum resultado encontrado para o filtro selecionado.</p>";
+    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; font-size:1rem; padding: 20px;'>Nenhuma programação encontrada para este filtro.</p>";
   }
 }
