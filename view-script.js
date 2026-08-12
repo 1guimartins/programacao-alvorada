@@ -17,6 +17,7 @@ let semanasData = {};
 let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
+let historicoNotificacoes = [];
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -43,20 +44,34 @@ db.ref("semanas").on("value", (snapshot) => {
   semanasData = snapshot.val() || {};
   const listaSemanas = Object.keys(semanasData);
 
-  if (listaSemanas.length > 0 && (!semanaAtiva || !semanasData[semanaAtiva])) {
-    semanaAtiva = listaSemanas[0];
+  // Filtra apenas semanas que foram publicadas pelo ADM
+  const semanasPublicadas = listaSemanas.filter(k => semanasData[k].publicada === true);
+
+  if (semanasPublicadas.length > 0) {
+    if (!semanaAtiva || !semanasData[semanaAtiva] || !semanasData[semanaAtiva].publicada) {
+      semanaAtiva = semanasPublicadas[0];
+    }
+  } else {
+    semanaAtiva = "";
   }
 
-  carregarSeletorSemanasView();
+  carregarSeletorSemanasView(semanasPublicadas);
   escutarSetoresView();
 });
 
-function carregarSeletorSemanasView() {
+function carregarSeletorSemanasView(semanasPublicadas) {
   const select = document.getElementById("seletor-semana-view");
   if (!select) return;
   select.innerHTML = "";
 
-  Object.keys(semanasData).forEach(key => {
+  if (semanasPublicadas.length === 0) {
+    const opt = document.createElement("option");
+    opt.innerText = "Aguardando publicação do ADM...";
+    select.appendChild(opt);
+    return;
+  }
+
+  semanasPublicadas.forEach(key => {
     const opt = document.createElement("option");
     opt.value = key;
     opt.innerText = semanasData[key].nome || key;
@@ -71,10 +86,22 @@ function mudarSemanaView(novaSemana) {
 }
 
 function escutarSetoresView() {
-  db.ref(`semanas/${semanaAtiva}/programacao`).on("value", (snapshot) => {
-    setoresProgramacao = snapshot.val() || {};
-    const chaves = Object.keys(setoresProgramacao);
+  if (!semanaAtiva) {
+    document.getElementById("setores-containers-view").innerHTML = "<p class='item-vazio'>Nenhuma programação foi publicada ainda.</p>";
+    return;
+  }
+
+  db.ref(`semanas/${semanaAtiva}`).on("value", (snapshot) => {
+    const dadosSemana = snapshot.val() || {};
+    setoresProgramacao = dadosSemana.programacao || {};
     
+    // Carrega o Histórico do Sininho
+    const rawHistorico = dadosSemana.historico || {};
+    historicoNotificacoes = Object.keys(rawHistorico).map(k => rawHistorico[k]).reverse();
+
+    atualizarSininho();
+
+    const chaves = Object.keys(setoresProgramacao);
     if (chaves.length > 0) {
       if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
         setorAtivo = chaves[0];
@@ -85,32 +112,44 @@ function escutarSetoresView() {
 
     renderizarSubAbasView();
     renderizarGridsView();
-    verificarAtualizacaoSetor();
   });
 }
 
-function setorTemAtualizacao(chaveSetor) {
-  if (!setoresProgramacao[chaveSetor]) return false;
-  const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
-  
-  for (let d of dias) {
-    const obj = normalizarDia(setoresProgramacao[chaveSetor][d]);
-    if (obj.itens.some(item => item.atualizado === true)) {
-      return true;
-    }
+function atualizarSininho() {
+  const badge = document.getElementById("sininho-contador");
+  if (!badge) return;
+
+  if (historicoNotificacoes.length > 0) {
+    badge.innerText = historicoNotificacoes.length;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
   }
-  return false;
 }
 
-function verificarAtualizacaoSetor() {
-  const banner = document.getElementById("banner-alerta-lider");
-  if (!banner) return;
+function abrirModalHistorico() {
+  const modal = document.getElementById("modal-historico");
+  const body = document.getElementById("modal-body-historico");
+  if (!modal || !body) return;
 
-  if (setorTemAtualizacao(setorAtivo)) {
-    banner.style.display = "flex";
+  if (historicoNotificacoes.length === 0) {
+    body.innerHTML = "<p class='item-vazio'>Nenhuma atualização gravada nesta semana.</p>";
   } else {
-    banner.style.display = "none";
+    body.innerHTML = historicoNotificacoes.map(item => `
+      <div class="notificacao-item">
+        <strong>📍 Setor ${item.setor} (${item.dia})</strong><br>
+        <span>${item.detalhe}</span>
+        <span class="notificacao-hora">🕒 ${item.dataHora}</span>
+      </div>
+    `).join("");
   }
+
+  modal.style.display = "flex";
+}
+
+function fecharModalHistorico() {
+  const modal = document.getElementById("modal-historico");
+  if (modal) modal.style.display = "none";
 }
 
 function renderizarSubAbasView() {
@@ -120,14 +159,12 @@ function renderizarSubAbasView() {
 
   Object.keys(setoresProgramacao).forEach(chaveAba => {
     const btn = document.createElement("button");
-    const temNovaAlt = setorTemAtualizacao(chaveAba);
-    btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""} ${temNovaAlt ? "has-update" : ""}`;
+    btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""}`;
     btn.innerText = formatarNomeExibicao(chaveAba);
     btn.onclick = () => {
       setorAtivo = chaveAba;
       renderizarSubAbasView();
       renderizarGridsView();
-      verificarAtualizacaoSetor();
     };
     container.appendChild(btn);
   });
@@ -158,7 +195,7 @@ function renderizarGridsView() {
     let itensHTML = objDia.itens.map(item => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       return `
-        <div class="item-linha ${item.atualizado ? 'item-atualizado' : ''}">
+        <div class="item-linha ${item.alteradoEmSemanaPublicada ? 'item-atualizado' : ''}">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
         </div>
@@ -177,28 +214,4 @@ function renderizarGridsView() {
 
     container.appendChild(divDia);
   });
-}
-
-function limparNotificacoesSetor() {
-  if (!setorAtivo || !setoresProgramacao[setorAtivo]) return;
-
-  const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
-
-  dias.forEach(dia => {
-    const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-    let mudou = false;
-
-    objDia.itens.forEach(item => {
-      if (item.atualizado) {
-        delete item.atualizado;
-        mudou = true;
-      }
-    });
-
-    if (mudou) {
-      db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
-    }
-  });
-
-  document.getElementById("banner-alerta-lider").style.display = "none";
 }

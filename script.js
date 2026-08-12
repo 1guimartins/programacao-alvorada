@@ -44,15 +44,18 @@ db.ref("semanas").on("value", (snapshot) => {
   const listaSemanas = Object.keys(semanasData);
 
   if (listaSemanas.length === 0) {
-    // Se não existir nenhuma semana, cria a Semana Atual Padrão
     const chaveAtual = "SEMANA_ATUAL";
-    db.ref(`semanas/${chaveAtual}/nome`).set("Semana Atual");
+    db.ref(`semanas/${chaveAtual}`).set({
+      nome: "Semana Atual",
+      publicada: false
+    });
     semanaAtiva = chaveAtual;
   } else if (!semanaAtiva || !semanasData[semanaAtiva]) {
     semanaAtiva = listaSemanas[0];
   }
 
   carregarSeletorSemanas();
+  atualizarBadgeStatus();
   escutarSetoresDaSemana();
 });
 
@@ -70,8 +73,23 @@ function carregarSeletorSemanas() {
   });
 }
 
+function atualizarBadgeStatus() {
+  const badge = document.getElementById("status-semana-badge");
+  if (!badge || !semanasData[semanaAtiva]) return;
+
+  const estaPublicada = semanasData[semanaAtiva].publicada || false;
+  if (estaPublicada) {
+    badge.innerText = "Publicada para Líderes";
+    badge.className = "badge-status status-publicado";
+  } else {
+    badge.innerText = "Rascunho (Privado)";
+    badge.className = "badge-status status-rascunho";
+  }
+}
+
 function mudarSemanaADM(novaSemana) {
   semanaAtiva = novaSemana;
+  atualizarBadgeStatus();
   escutarSetoresDaSemana();
 }
 
@@ -136,7 +154,7 @@ function renderizarGrids() {
     let itensHTML = objDia.itens.map((item, index) => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       return `
-        <div class="item-linha ${item.atualizado ? 'item-atualizado' : ''}">
+        <div class="item-linha ${item.alteradoEmSemanaPublicada ? 'item-atualizado' : ''}">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
@@ -206,37 +224,70 @@ function adicionarItem(dia) {
   if (!nome || nome.trim() === "") return;
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-  
-  // Marca com flag 'atualizado: true' e registra hora da alteração
-  objDia.itens.push({ 
-    qtd: qtd.trim(), 
-    nome: nome.trim(), 
-    atualizado: true,
-    dataAtualizacao: Date.now()
-  });
+  const estaPublicada = semanasData[semanaAtiva]?.publicada || false;
 
+  const novoItem = {
+    qtd: qtd.trim(),
+    nome: nome.trim(),
+    alteradoEmSemanaPublicada: estaPublicada
+  };
+
+  objDia.itens.push(novoItem);
   db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
+
+  // Se a semana já estiver no ar e o ADM fizer alteração, gera o Histórico do Sininho!
+  if (estaPublicada) {
+    gerarNotificacaoHistorico(setorAtivo, dia, `Item Adicionado: ${qtd ? qtd + ' ' : ''}${nome.toUpperCase()}`);
+  }
 }
 
 function removerItem(dia, index) {
   if (confirm("Deseja remover este item?")) {
     const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
+    const itemRemovido = objDia.itens[index];
     objDia.itens.splice(index, 1);
     db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
+
+    const estaPublicada = semanasData[semanaAtiva]?.publicada || false;
+    if (estaPublicada) {
+      gerarNotificacaoHistorico(setorAtivo, dia, `Item Removido: ${itemRemovido.nome.toUpperCase()}`);
+    }
+  }
+}
+
+function gerarNotificacaoHistorico(setor, dia, acao) {
+  const dataHora = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  const novaNotificacao = {
+    setor: formatarNomeExibicao(setor),
+    dia: dia,
+    detalhe: acao,
+    dataHora: dataHora,
+    timestamp: Date.now()
+  };
+
+  db.ref(`semanas/${semanaAtiva}/historico`).push(novaNotificacao);
+}
+
+function publicarProgramacao() {
+  if (confirm("Deseja liberar e PUBLICAR a programação desta semana para os líderes?")) {
+    db.ref(`semanas/${semanaAtiva}/publicada`).set(true).then(() => {
+      alert("Programação publicada com sucesso! Os líderes já conseguem visualizar.");
+    });
   }
 }
 
 function criarNovaSemanaRascunho() {
-  const nomeSemana = prompt("Digite um nome para a Nova Semana (ex: Semana 17/08 a 23/08):");
+  const nomeSemana = prompt("Digite o nome da Nova Semana (ex: Semana 17/08 a 23/08):");
   if (!nomeSemana) return;
 
   const chave = "SEMANA_" + Date.now();
   db.ref(`semanas/${chave}`).set({
     nome: nomeSemana,
+    publicada: false,
     programacao: {}
   }).then(() => {
     semanaAtiva = chave;
-    alert("Nova semana em Rascunho criada com sucesso!");
+    alert("Nova semana criada em Rascunho!");
   });
 }
 

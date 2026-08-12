@@ -11,7 +11,7 @@
 <body>
 
   <header>
-    <h1>⚙️ Panificação Alvorada - Gestão ADM</h1>
+    <h1>⚙️ Panificação Alvorada - Gestão ADM <span id="status-semana-badge" class="badge-status status-rascunho">Em Edição</span></h1>
   </header>
 
   <div class="semana-container">
@@ -21,6 +21,7 @@
     </div>
 
     <div class="actions-bar">
+      <button class="btn btn-publicar" onclick="publicarProgramacao()">📢 Publicar Programação para os Líderes</button>
       <button class="btn btn-blue" onclick="criarNovaSemanaRascunho()">🚀 Nova Semana (Rascunho)</button>
       <button class="btn btn-success" onclick="criarNovaAba()">➕ Criar Setor</button>
       <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor</button>
