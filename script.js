@@ -35,7 +35,15 @@ function normalizarDia(dados) {
   };
 }
 
-// Escutar atualizações do Firebase em tempo real
+function formatarNomeExibicao(nome) {
+  if (!nome) return "";
+  return nome
+    .replace(/_BARRA_/g, " / ")
+    .replace(/-BARRA-/g, " / ")
+    .replace(/BARRA/g, " / ")
+    .replace(/_/g, " ");
+}
+
 db.ref("programacao").on("value", (snapshot) => {
   setoresProgramacao = snapshot.val() || {};
   const chaves = Object.keys(setoresProgramacao);
@@ -60,8 +68,7 @@ function renderizarSubAbas() {
   Object.keys(setoresProgramacao).forEach(chaveAba => {
     const btn = document.createElement("button");
     btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""}`;
-    // Substitui traços/sublinhados por espaços e barras para exibição bonita
-    btn.innerText = chaveAba.replace(/_/g, " ").replace(/-BARRA-/g, " / ");
+    btn.innerText = formatarNomeExibicao(chaveAba);
     btn.onclick = () => {
       setorAtivo = chaveAba;
       renderizarSubAbas();
@@ -73,7 +80,7 @@ function renderizarSubAbas() {
   const titulo = document.getElementById("setor-titulo");
   if (titulo) {
     titulo.innerText = setorAtivo 
-      ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ").replace(/-BARRA-/g, " / ") 
+      ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) 
       : "NENHUM SETOR SELECIONADO";
   }
 }
@@ -144,13 +151,11 @@ function removerItem(dia, index) {
   }
 }
 
-// FUNÇÃO DE CRIAR SETOR (TRATA CARACTERES ESPECIAIS / BARRAS E PONTOS)
 function criarNovaAba() {
   const nome = prompt("Digite o nome do novo setor:");
   if (nome && nome.trim() !== "") {
-    // Trata caracteres proibidos pelo Firebase ( / . # $ [ ] )
     let chave = nome.trim().toUpperCase()
-      .replace(/\//g, "-BARRA-")
+      .replace(/\//g, "_BARRA_")
       .replace(/[\.\#\$\[\]]/g, "")
       .replace(/\s+/g, "_");
 
@@ -164,7 +169,6 @@ function criarNovaAba() {
       DOMINGO: { data: "", itens: [] }
     };
 
-    // Grava diretamente na rota do setor para evitar erros de sobrescrita
     db.ref(`programacao/${chave}`).set(novoSetor).then(() => {
       setorAtivo = chave;
     }).catch(err => {
@@ -175,7 +179,7 @@ function criarNovaAba() {
 
 function excluirAbaAtual() {
   if (!setorAtivo) return;
-  const nomeExibicao = setorAtivo.replace(/_/g, " ").replace(/-BARRA-/g, " / ");
+  const nomeExibicao = formatarNomeExibicao(setorAtivo);
   if (confirm(`Deseja realmente excluir o setor "${nomeExibicao}"?`)) {
     db.ref(`programacao/${setorAtivo}`).remove().then(() => {
       setorAtivo = "";

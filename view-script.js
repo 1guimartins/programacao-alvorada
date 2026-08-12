@@ -35,6 +35,15 @@ function normalizarDia(dados) {
   };
 }
 
+function formatarNomeExibicao(nome) {
+  if (!nome) return "";
+  return nome
+    .replace(/_BARRA_/g, " / ")
+    .replace(/-BARRA-/g, " / ")
+    .replace(/BARRA/g, " / ")
+    .replace(/_/g, " ");
+}
+
 db.ref("programacao").on("value", (snapshot) => {
   setoresProgramacao = snapshot.val() || {};
   const chaves = Object.keys(setoresProgramacao);
@@ -56,12 +65,12 @@ function renderizarSubAbasView() {
   if (!container) return;
   container.innerHTML = "";
 
-  Object.keys(setoresProgramacao).forEach(nomeAba => {
+  Object.keys(setoresProgramacao).forEach(chaveAba => {
     const btn = document.createElement("button");
-    btn.className = `sub-tab-btn ${nomeAba === setorAtivo ? "active" : ""}`;
-    btn.innerText = nomeAba.replace(/_/g, " ");
+    btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""}`;
+    btn.innerText = formatarNomeExibicao(chaveAba);
     btn.onclick = () => {
-      setorAtivo = nomeAba;
+      setorAtivo = chaveAba;
       renderizarSubAbasView();
       renderizarGridsView();
     };
@@ -70,7 +79,9 @@ function renderizarSubAbasView() {
 
   const titulo = document.getElementById("setor-titulo-view");
   if (titulo) {
-    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ") : "NENHUM SETOR SELECIONADO";
+    titulo.innerText = setorAtivo 
+      ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) 
+      : "NENHUM SETOR SELECIONADO";
   }
 }
 

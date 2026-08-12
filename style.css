@@ -63,14 +63,15 @@ header h1 {
   background-color: #ffffff;
 }
 
-/* Abas Arredondadas */
+/* Abas de Setores com rolagem suave no celular */
 .sub-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
   overflow-x: auto;
-  padding-bottom: 6px;
-  flex-wrap: wrap;
+  padding-bottom: 8px;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sub-tab-btn {
@@ -84,6 +85,7 @@ header h1 {
   color: #475569;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sub-tab-btn:hover {
@@ -99,6 +101,12 @@ header h1 {
   box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
 }
 
+.actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .btn {
   padding: 8px 16px;
   border: none;
@@ -112,7 +120,9 @@ header h1 {
   gap: 6px;
 }
 
+.btn-success { background: #00853B; color: #ffffff; }
 .btn-orange { background: #FF6600; color: #ffffff; }
+.btn-danger { background: #ef4444; color: #ffffff; }
 
 .titulo-setor-exibicao {
   background: #1F69C1;
@@ -127,7 +137,7 @@ header h1 {
   letter-spacing: 0.5px;
 }
 
-/* Grid em 3 Colunas (Seg-Qua / Qui-Sáb / Dom) */
+/* Grid Padrão Desktop (3 Colunas) */
 #setores-containers, #setores-containers-view {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -157,6 +167,18 @@ header h1 {
   font-size: 0.9rem;
 }
 
+.dia-data-input {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: 100px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .dia-data-badge {
   background: rgba(255, 255, 255, 0.25);
   padding: 2px 8px;
@@ -178,7 +200,7 @@ header h1 {
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .item-qtd {
@@ -188,7 +210,8 @@ header h1 {
   padding: 2px 6px;
   border-radius: 4px;
   border: 1px solid #bfdbfe;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .item-nome {
@@ -197,15 +220,74 @@ header h1 {
   color: #334155;
 }
 
+.btn-del-item {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.btn-add-item-card {
+  width: 100%;
+  margin-top: auto;
+  background: #00853B;
+  color: #ffffff;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
 .item-vazio {
   color: #94a3b8;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-style: italic;
   text-align: center;
   margin: auto 0;
 }
 
-/* Ajuste de Impressão */
+/* ========================================================
+   📱 REGRA PARA CELULAR / DISPOSITIVOS MÓVEIS (1 COLUNA)
+   ======================================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+  }
+
+  #setores-containers, #setores-containers-view {
+    grid-template-columns: 1fr !important; /* Força 1 coluna por linha no celular */
+    gap: 12px !important;
+  }
+
+  .dia-card {
+    min-height: auto;
+  }
+
+  .dia-card-header {
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+
+  .item-linha {
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
+
+  .item-qtd {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+}
+
+/* Regra de Impressão */
 @media print {
   @page {
     size: A4 landscape;
@@ -213,11 +295,11 @@ header h1 {
   }
 
   body { background: #ffffff !important; padding: 0 !important; }
-  header, .semana-container, .sub-tabs, .btn {
+  header, .semana-container, .filtros-container, .sub-tabs, .actions-bar, .btn, .btn-add-item-card, .btn-del-item {
     display: none !important;
   }
 
-  #setores-containers-view {
+  #setores-containers, #setores-containers-view {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 8px !important;
