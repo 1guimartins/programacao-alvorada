@@ -23,44 +23,23 @@ body {
 
 .container {
   max-width: 1200px;
-  margin: 10px auto;
+  margin: 12px auto;
   padding: 0 10px;
 }
 
-/* NAVEGAÇÃO PRINCIPAL */
-.nav-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.tab-btn {
-  padding: 8px 14px;
-  border: none;
-  background: #e0e0e0;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.tab-btn.active {
-  background: #0f5c2e;
-  color: white;
-}
-
-/* SUB-ABAS (SETORES) */
+/* NAVEGAÇÃO DE ABAS */
 .sub-tabs-container {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   margin-bottom: 10px;
 }
 
 .sub-tab-btn {
-  padding: 8px 14px;
-  background: #0066cc;
-  color: white;
+  padding: 8px 16px;
+  background-color: #e0e0e0;
+  color: #333;
   border: none;
   border-radius: 20px;
   cursor: pointer;
@@ -70,81 +49,70 @@ body {
 }
 
 .sub-tab-btn.active {
-  background: #004080;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.btn-action, .btn-add-tab, .btn-del-tab {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
+  background-color: #0066cc;
   color: white;
-  font-size: 0.85rem;
 }
 
-.blue-btn { background: #0066cc; }
-.btn-add-tab { background: #28a745; }
-.btn-del-tab { background: #dc3545; }
-
-/* TÍTULO DO PAINEL */
+/* TÍTULO AZUL IGUAL AO ADM */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
   text-align: center;
-  padding: 8px;
+  padding: 10px;
   font-weight: bold;
   font-size: 1.1rem;
-  margin-bottom: 10px;
+  margin: 10px 0 15px 0;
   border-radius: 4px;
   text-transform: uppercase;
 }
 
-/* ESTRUTURA DE GRIDS (2 COLUNAS) */
+/* ESTRUTURA EM 2 COLUNAS (OU 1 COLUNA EM TELAS PEQUENAS) */
 #setores-containers, #setores-containers-view {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
+@media (min-width: 600px) {
+  #setores-containers, #setores-containers-view {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+/* CARDS EM QUADRADOS AZUIS */
 .dia-card {
   background: white;
-  border: 1.5px solid #0066cc !important;
+  border: 1.5px solid #0066cc;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .dia-card-header {
-  background-color: #0066cc !important;
-  color: white !important;
-  padding: 6px 10px !important;
-  font-weight: bold !important;
+  background-color: #0066cc;
+  color: white;
+  padding: 8px 10px;
+  font-weight: bold;
   font-size: 0.9rem;
   text-transform: uppercase;
   text-align: center;
 }
 
 .dia-card-body {
-  padding: 6px 8px;
+  padding: 8px 10px;
 }
 
 .item-linha {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6px 4px;
+  gap: 8px;
+  padding: 6px 0;
   border-bottom: 1px solid #eee;
 }
 
 .item-linha:last-child {
   border-bottom: none;
-}
-
-.item-nome {
-  font-weight: 500;
-  font-size: 0.85rem;
 }
 
 .item-qtd {
@@ -154,117 +122,18 @@ body {
   background: #e6f0fa;
   padding: 2px 6px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
-/* ===================================================
-   CONFIGURAÇÃO DE IMPRESSÃO EM PAISAGEM (1 FOLHA A4)
-   =================================================== */
-@media print {
-  /* Força a impressora a usar A4 Paisagem com margens mínimas */
-  @page {
-    size: A4 landscape;
-    margin: 5mm;
-  }
+.item-nome {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #222;
+}
 
-  html, body {
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-    font-size: 9px !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    overflow: hidden !important;
-  }
-
-  /* Esconde abas, botões do topo e botões "+ Add item" */
-  .no-print, header, nav, button, 
-  .sub-tabs-container, .nav-tabs, 
-  .btn-action, .btn-add-tab, .btn-del-tab, 
-  .dia-card button, input {
-    display: none !important;
-  }
-
-  .container {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Título Azul da Aba Ativa */
-  .programacao-header-title {
-    background-color: #0066cc !important;
-    color: white !important;
-    font-size: 11pt !important;
-    font-weight: bold !important;
-    padding: 4px !important;
-    margin-bottom: 6px !important;
-    text-align: center !important;
-    border-radius: 4px !important;
-  }
-
-  /* Organiza os dias em 4 colunas em Paisagem */
-  #setores-containers {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 6px !important;
-    width: 100% !important;
-  }
-
-  /* Cartões dos Dias da Semana */
-  .dia-card {
-    border: 1.5px solid #0066cc !important;
-    border-radius: 4px !important;
-    background: white !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .dia-card-header {
-    background-color: #0066cc !important;
-    color: white !important;
-    font-size: 8.5pt !important;
-    font-weight: bold !important;
-    padding: 3px 5px !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-  }
-
-  .dia-card-body {
-    padding: 4px 6px !important;
-  }
-
-  /* Linhas de Itens */
-  .item-linha {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 2px 0 !important;
-    border-bottom: 1px dashed #ddd !important;
-  }
-
-  .item-linha:last-child {
-    border-bottom: none !important;
-  }
-
-  .item-nome {
-    font-size: 7.5pt !important;
-    font-weight: 600 !weight;
-    color: #000 !important;
-  }
-
-  .item-qtd {
-    font-size: 7.5pt !important;
-    font-weight: bold !important;
-    color: #0066cc !important;
-  }
-
-  .item-vazio {
-    font-size: 7pt !important;
-    color: #888 !important;
-    text-align: center !important;
-    padding: 2px 0 !important;
-  }
+.item-vazio {
+  color: #888;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 6px 0;
 }

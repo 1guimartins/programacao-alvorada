@@ -16,6 +16,7 @@ const db = firebase.database();
 let setoresProgramacao = {};
 let setorAtivo = "";
 
+// Atualização em tempo real do Firebase
 db.ref("programacao").on("value", (snapshot) => {
   const dados = snapshot.val();
   if (dados) {
@@ -67,14 +68,14 @@ function renderizarGridsView() {
 
     let itensHTML = itens.map(item => `
       <div class="item-linha">
-        <span class="item-nome">${item.nome}</span>
         <span class="item-qtd">${item.qtd}</span>
+        <span class="item-nome">${item.nome}</span>
       </div>
     `).join("");
 
     divDia.innerHTML = `
       <div class="dia-card-header">${dia}</div>
-      <div class="dia-card-body">${itensHTML || "<p style='color:#999; font-size:0.8rem; text-align:center; padding:4px;'>Nenhum item programado.</p>"}</div>
+      <div class="dia-card-body">${itensHTML || "<p class='item-vazio'>Nenhum item programado.</p>"}</div>
     `;
 
     container.appendChild(divDia);
