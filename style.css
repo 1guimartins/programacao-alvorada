@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -10,6 +10,7 @@ body {
   color: #333;
 }
 
+/* Cabeçalho Verde */
 .header-bar {
   background-color: #0f5c2e;
   color: white;
@@ -27,7 +28,7 @@ body {
   padding: 0 10px;
 }
 
-/* NAVEGAÇÃO DE ABAS */
+/* ABAS DE NAVEGAÇÃO DOS SETORES */
 .sub-tabs-container {
   display: flex;
   gap: 8px;
@@ -41,7 +42,7 @@ body {
   background-color: #e0e0e0;
   color: #333;
   border: none;
-  border-radius: 20px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   font-size: 0.85rem;
@@ -49,11 +50,11 @@ body {
 }
 
 .sub-tab-btn.active {
-  background-color: #0066cc;
+  background-color: #0f5c2e;
   color: white;
 }
 
-/* TÍTULO AZUL IGUAL AO ADM */
+/* TÍTULO AZUL DO SETOR */
 .programacao-header-title {
   background-color: #0066cc;
   color: white;
@@ -61,28 +62,28 @@ body {
   padding: 10px;
   font-weight: bold;
   font-size: 1.1rem;
-  margin: 10px 0 15px 0;
+  margin-bottom: 12px;
   border-radius: 4px;
   text-transform: uppercase;
 }
 
-/* ESTRUTURA EM 2 COLUNAS (OU 1 COLUNA EM TELAS PEQUENAS) */
-#setores-containers, #setores-containers-view {
+/* ESTRUTURA DOS QUADRADOS (CARDS) */
+#setores-containers-view, #setores-containers {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
 
+/* 2 Colunas em telas maiores (PC/Tablet) */
 @media (min-width: 600px) {
-  #setores-containers, #setores-containers-view {
+  #setores-containers-view, #setores-containers {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
   }
 }
 
-/* CARDS EM QUADRADOS AZUIS */
+/* CARD DE CADA DIA DA SEMANA */
 .dia-card {
-  background: white;
+  background: #ffffff;
   border: 1.5px solid #0066cc;
   border-radius: 6px;
   overflow: hidden;
@@ -92,15 +93,15 @@ body {
 .dia-card-header {
   background-color: #0066cc;
   color: white;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font-weight: bold;
   font-size: 0.9rem;
   text-transform: uppercase;
-  text-align: center;
+  text-align: left;
 }
 
 .dia-card-body {
-  padding: 8px 10px;
+  padding: 8px 12px;
 }
 
 .item-linha {
@@ -117,23 +118,19 @@ body {
 
 .item-qtd {
   font-weight: bold;
-  color: #0066cc;
+  color: #000;
   font-size: 0.85rem;
-  background: #e6f0fa;
-  padding: 2px 6px;
-  border-radius: 3px;
   white-space: nowrap;
 }
 
 .item-nome {
   font-weight: 600;
   font-size: 0.85rem;
-  color: #222;
+  color: #333;
 }
 
 .item-vazio {
   color: #888;
   font-size: 0.85rem;
-  text-align: center;
   padding: 6px 0;
 }

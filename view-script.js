@@ -69,7 +69,7 @@ function renderizarGridsView() {
     let itensHTML = itens.map(item => `
       <div class="item-linha">
         <span class="item-qtd">${item.qtd}</span>
-        <span class="item-nome">${item.nome}</span>
+        <span class="item-nome">- ${item.nome}</span>
       </div>
     `).join("");
 
