@@ -35,41 +35,35 @@ function normalizarDia(dados) {
   };
 }
 
-function conectarFirebase() {
-  db.ref("programacao").on("value", (snapshot) => {
-    setoresProgramacao = snapshot.val() || {};
-    const chaves = Object.keys(setoresProgramacao);
-    
-    if (chaves.length > 0) {
-      if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
-        setorAtivo = chaves[0];
-      }
-    } else {
-      setorAtivo = "";
+// Escutar atualizações do Firebase em tempo real
+db.ref("programacao").on("value", (snapshot) => {
+  setoresProgramacao = snapshot.val() || {};
+  const chaves = Object.keys(setoresProgramacao);
+  
+  if (chaves.length > 0) {
+    if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+      setorAtivo = chaves[0];
     }
+  } else {
+    setorAtivo = "";
+  }
 
-    renderizarSubAbas();
-    renderizarGrids();
-  });
-}
-
-conectarFirebase();
-
-function salvarNoFirebase() {
-  db.ref("programacao").set(setoresProgramacao);
-}
+  renderizarSubAbas();
+  renderizarGrids();
+});
 
 function renderizarSubAbas() {
   const container = document.getElementById("sub-tabs-list");
   if (!container) return;
   container.innerHTML = "";
 
-  Object.keys(setoresProgramacao).forEach(nomeAba => {
+  Object.keys(setoresProgramacao).forEach(chaveAba => {
     const btn = document.createElement("button");
-    btn.className = `sub-tab-btn ${nomeAba === setorAtivo ? "active" : ""}`;
-    btn.innerText = nomeAba.replace(/_/g, " ");
+    btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""}`;
+    // Substitui traços/sublinhados por espaços e barras para exibição bonita
+    btn.innerText = chaveAba.replace(/_/g, " ").replace(/-BARRA-/g, " / ");
     btn.onclick = () => {
-      setorAtivo = nomeAba;
+      setorAtivo = chaveAba;
       renderizarSubAbas();
       renderizarGrids();
     };
@@ -78,7 +72,9 @@ function renderizarSubAbas() {
 
   const titulo = document.getElementById("setor-titulo");
   if (titulo) {
-    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ") : "NENHUM SETOR SELECIONADO";
+    titulo.innerText = setorAtivo 
+      ? "PROGRAMAÇÃO DE " + setorAtivo.replace(/_/g, " ").replace(/-BARRA-/g, " / ") 
+      : "NENHUM SETOR SELECIONADO";
   }
 }
 
@@ -121,11 +117,10 @@ function renderizarGrids() {
 }
 
 function salvarDataDia(dia, valorData) {
-  if (!setoresProgramacao[setorAtivo]) setoresProgramacao[setorAtivo] = {};
+  if (!setoresProgramacao[setorAtivo]) return;
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.data = valorData;
-  setoresProgramacao[setorAtivo][dia] = objDia;
-  salvarNoFirebase();
+  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 }
 
 function adicionarItem(dia) {
@@ -134,50 +129,56 @@ function adicionarItem(dia) {
   const nome = prompt("Digite o nome do produto:");
   if (!nome) return;
 
-  if (!setoresProgramacao[setorAtivo]) setoresProgramacao[setorAtivo] = {};
+  if (!setoresProgramacao[setorAtivo]) return;
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.itens.push({ qtd, nome });
-  setoresProgramacao[setorAtivo][dia] = objDia;
-  salvarNoFirebase();
+
+  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 }
 
 function removerItem(dia, index) {
   if (confirm("Deseja remover este item?")) {
     const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
     objDia.itens.splice(index, 1);
-    setoresProgramacao[setorAtivo][dia] = objDia;
-    salvarNoFirebase();
+    db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
   }
 }
 
+// FUNÇÃO DE CRIAR SETOR (TRATA CARACTERES ESPECIAIS / BARRAS E PONTOS)
 function criarNovaAba() {
   const nome = prompt("Digite o nome do novo setor:");
   if (nome && nome.trim() !== "") {
-    const chave = nome.trim().toUpperCase().replace(/[\.\#\$\[\]]/g, "").replace(/\s+/g, "_");
-    
-    if (setoresProgramacao[chave]) {
-      alert("Este setor já existe!");
-      return;
-    }
+    // Trata caracteres proibidos pelo Firebase ( / . # $ [ ] )
+    let chave = nome.trim().toUpperCase()
+      .replace(/\//g, "-BARRA-")
+      .replace(/[\.\#\$\[\]]/g, "")
+      .replace(/\s+/g, "_");
 
-    setoresProgramacao[chave] = {
-      SEGUNDA: { data: "", itens: [] }, TERÇA: { data: "", itens: [] },
-      QUARTA: { data: "", itens: [] }, QUINTA: { data: "", itens: [] },
-      SEXTA: { data: "", itens: [] }, SÁBADO: { data: "", itens: [] },
+    const novoSetor = {
+      SEGUNDA: { data: "", itens: [] },
+      TERÇA: { data: "", itens: [] },
+      QUARTA: { data: "", itens: [] },
+      QUINTA: { data: "", itens: [] },
+      SEXTA: { data: "", itens: [] },
+      SÁBADO: { data: "", itens: [] },
       DOMINGO: { data: "", itens: [] }
     };
-    
-    setorAtivo = chave;
-    salvarNoFirebase();
+
+    // Grava diretamente na rota do setor para evitar erros de sobrescrita
+    db.ref(`programacao/${chave}`).set(novoSetor).then(() => {
+      setorAtivo = chave;
+    }).catch(err => {
+      alert("Erro ao criar setor no Firebase: " + err.message);
+    });
   }
 }
 
 function excluirAbaAtual() {
   if (!setorAtivo) return;
-  if (confirm(`Deseja realmente excluir o setor "${setorAtivo.replace(/_/g, " ")}"?`)) {
-    delete setoresProgramacao[setorAtivo];
-    const chaves = Object.keys(setoresProgramacao);
-    setorAtivo = chaves.length > 0 ? chaves[0] : "";
-    salvarNoFirebase();
+  const nomeExibicao = setorAtivo.replace(/_/g, " ").replace(/-BARRA-/g, " / ");
+  if (confirm(`Deseja realmente excluir o setor "${nomeExibicao}"?`)) {
+    db.ref(`programacao/${setorAtivo}`).remove().then(() => {
+      setorAtivo = "";
+    });
   }
 }
