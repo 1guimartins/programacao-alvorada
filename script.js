@@ -40,16 +40,14 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-// Carrega as Semanas Cadastradas
 db.ref("semanas_v2").on("value", (snapshot) => {
   semanasData = snapshot.val() || {};
   const listaSemanas = Object.keys(semanasData);
 
   if (listaSemanas.length === 0) {
-    // Cria uma semana padrão inicial caso não exista nenhuma
     const idPadrao = "SEMANA_PADRAO";
     db.ref(`semanas_v2/${idPadrao}`).set({
-      nome: "Semana 10/08 a 16/08",
+      nome: "Semana Atual",
       publicado: false,
       programacao: {}
     });
@@ -138,7 +136,7 @@ function renderizarGrids() {
   container.innerHTML = "";
 
   if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
-    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 30px;'>Nenhum setor selecionado nesta semana. Clique em '➕ Criar Setor' para começar.</p>";
+    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 30px;'>Nenhum setor selecionado nesta semana.</p>";
     return;
   }
 
@@ -153,10 +151,12 @@ function renderizarGrids() {
     let itensHTML = objDia.itens.map((item, index) => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       const temTipo = item.tipo && item.tipo.trim() !== "";
+      const classeTipo = temTipo ? `tipo-${item.tipo.toUpperCase()}` : '';
+
       return `
         <div class="item-linha">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
-          ${temTipo ? `<span class="item-tipo">${item.tipo}</span>` : ''}
+          ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
         </div>
@@ -225,17 +225,21 @@ function adicionarItem(dia) {
   const ehBolosSecos = setorAtivo && setorAtivo.toUpperCase().includes("BOLOS") && setorAtivo.toUpperCase().includes("SECOS");
 
   if (ehBolosSecos) {
-    const respQtd = prompt("1/3 - Digite a QUANTIDADE (ex: 2 REC, 5 CX, 10):");
+    // Digitação rápida por seleção pré-definida
+    const opcoesQtd = ["1 REC", "2 REC", "3 REC", "4 REC", "5 REC", "6 REC", "7 REC", "8 REC", "9 REC", "10 REC"];
+    const opcoesTipo = ["PLACA", "CASEIRO", "CREMOSO", "INGLÊS", "REDONDO", "COBERTURA"];
+
+    let respQtd = prompt(`Selecione ou digite a QUANTIDADE DE RECEITAS:\nOpções: ${opcoesQtd.join(", ")}`, "1 REC");
     if (respQtd === null) return;
-    qtd = respQtd.trim();
+    qtd = respQtd.trim().toUpperCase();
 
-    const respTipo = prompt("2/3 - Digite o TIPO DO BOLO (ex: PLACA, CASEIRO, INGLÊS, MINI):");
+    let respTipo = prompt(`Selecione ou digite o TIPO DO BOLO:\nOpções: ${opcoesTipo.join(", ")}`, "PLACA");
     if (respTipo === null) return;
-    tipo = respTipo.trim();
+    tipo = respTipo.trim().toUpperCase();
 
-    const respNome = prompt("3/3 - Digite o SABOR DO BOLO (ex: CENOURA, CHOCOLATE, FUBÁ):");
+    let respNome = prompt("Digite o SABOR DO BOLO (ex: CENOURA, CHOCOLATE, FUBÁ):");
     if (!respNome || respNome.trim() === "") return;
-    nome = respNome.trim();
+    nome = respNome.trim().toUpperCase();
   } else {
     let respQtd = prompt("Digite a quantidade ou deixe em branco:");
     if (respQtd === null) return;
@@ -243,7 +247,7 @@ function adicionarItem(dia) {
 
     let respNome = prompt("Digite o nome do produto:");
     if (!respNome || respNome.trim() === "") return;
-    nome = respNome.trim();
+    nome = respNome.trim().toUpperCase();
   }
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
@@ -260,9 +264,9 @@ function adicionarItem(dia) {
 
   if (estaPublicado) {
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
-    const textoTipo = tipo ? `[${tipo.toUpperCase()}] ` : '';
+    const textoTipo = tipo ? `[${tipo}] ` : '';
     db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
-      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome.toUpperCase()}`,
+      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome}`,
       hora: hora
     });
   }
@@ -278,7 +282,7 @@ function removerItem(dia, index) {
     if (estaPublicado && removido) {
       const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
       db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
-        texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome.toUpperCase()}`,
+        texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome}`,
         hora: hora
       });
     }
@@ -288,12 +292,12 @@ function removerItem(dia, index) {
 function alternarPublicacao() {
   const novoStatus = !estaPublicado;
   db.ref(`semanas_v2/${semanaAtiva}/publicado`).set(novoStatus).then(() => {
-    alert(novoStatus ? "Programação PUBLICADA para esta semana!" : "Programação alterada para RASCUNHO.");
+    alert(novoStatus ? "Programação PUBLICADA com sucesso!" : "Programação mudou para RASCUNHO.");
   });
 }
 
 function criarNovaSemana() {
-  const nomeSemana = prompt("Digite o identificador da semana (ex: Semana 17/08 a 23/08):");
+  const nomeSemana = prompt("Digite o nome/período da semana (ex: Semana 10/08 a 16/08):");
   if (!nomeSemana || nomeSemana.trim() === "") return;
 
   const idSemana = "SEMANA_" + Date.now();
@@ -304,7 +308,6 @@ function criarNovaSemana() {
     programacao: {}
   }).then(() => {
     semanaAtiva = idSemana;
-    alert(`Semana "${nomeSemana}" criada com sucesso!`);
   });
 }
 
@@ -312,10 +315,9 @@ function excluirSemanaAtual() {
   if (!semanaAtiva || !semanasData[semanaAtiva]) return;
 
   const nomeExibicao = semanasData[semanaAtiva].nome || "esta semana";
-  if (confirm(`⚠️ ATENÇÃO: Deseja realmente EXCLUIR toda a programação da "${nomeExibicao}"?`)) {
+  if (confirm(`Deseja realmente EXCLUIR toda a "${nomeExibicao}"?`)) {
     db.ref(`semanas_v2/${semanaAtiva}`).remove().then(() => {
       semanaAtiva = "";
-      alert("Semana excluída!");
     });
   }
 }

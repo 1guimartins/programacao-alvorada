@@ -45,7 +45,6 @@ db.ref("semanas_v2").on("value", (snapshot) => {
   semanasData = snapshot.val() || {};
   const listaSemanas = Object.keys(semanasData);
 
-  // Filtra apenas semanas marcadas como PUBLICADAS pelo ADM
   const publicadas = listaSemanas.filter(k => semanasData[k].publicado === true);
 
   if (publicadas.length > 0) {
@@ -159,10 +158,12 @@ function renderizarGridsView() {
     let itensHTML = objDia.itens.map(item => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       const temTipo = item.tipo && item.tipo.trim() !== "";
+      const classeTipo = temTipo ? `tipo-${item.tipo.toUpperCase()}` : '';
+
       return `
         <div class="item-linha ${item.novo ? 'item-novo' : ''}">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
-          ${temTipo ? `<span class="item-tipo">${item.tipo}</span>` : ''}
+          ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
         </div>
       `;
