@@ -13,6 +13,8 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
+let semanasData = {};
+let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
 let estaPublicado = false;
@@ -39,20 +41,66 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-db.ref("status_publicacao").on("value", (snapshot) => {
-  estaPublicado = snapshot.val() || false;
-  renderizarGridsView();
+db.ref("semanas_v2").on("value", (snapshot) => {
+  semanasData = snapshot.val() || {};
+  const listaSemanas = Object.keys(semanasData);
+
+  // Filtra apenas semanas marcadas como PUBLICADAS pelo ADM
+  const publicadas = listaSemanas.filter(k => semanasData[k].publicado === true);
+
+  if (publicadas.length > 0) {
+    if (!semanaAtiva || !semanasData[semanaAtiva] || !semanasData[semanaAtiva].publicado) {
+      semanaAtiva = publicadas[0];
+    }
+  } else {
+    semanaAtiva = "";
+  }
+
+  carregarSeletorSemanasView(publicadas);
+  atualizarDadosView();
 });
 
-db.ref("historico_notificacoes").on("value", (snapshot) => {
-  const data = snapshot.val() || {};
-  historico = Object.keys(data).map(k => data[k]).reverse();
-});
+function carregarSeletorSemanasView(publicadas) {
+  const select = document.getElementById("seletor-semana-view");
+  if (!select) return;
+  select.innerHTML = "";
 
-db.ref("programacao").on("value", (snapshot) => {
-  setoresProgramacao = snapshot.val() || {};
+  if (publicadas.length === 0) {
+    const opt = document.createElement("option");
+    opt.innerText = "Aguardando publicação do ADM...";
+    select.appendChild(opt);
+    return;
+  }
+
+  publicadas.forEach(key => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.innerText = semanasData[key].nome || key;
+    if (key === semanaAtiva) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function mudarSemanaView(novaSemana) {
+  semanaAtiva = novaSemana;
+  setorAtivo = "";
+  atualizarDadosView();
+}
+
+function atualizarDadosView() {
+  if (!semanaAtiva || !semanasData[semanaAtiva]) {
+    document.getElementById("setores-containers-view").innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 40px;'>🔒 Nenhuma programação está publicada no momento.</p>";
+    return;
+  }
+
+  const dadosSemana = semanasData[semanaAtiva];
+  estaPublicado = dadosSemana.publicado || false;
+  setoresProgramacao = dadosSemana.programacao || {};
+
+  const rawHistorico = dadosSemana.historico_notificacoes || {};
+  historico = Object.keys(rawHistorico).map(k => rawHistorico[k]).reverse();
+
   const chaves = Object.keys(setoresProgramacao);
-  
   if (chaves.length > 0) {
     if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
       setorAtivo = chaves[0];
@@ -63,7 +111,7 @@ db.ref("programacao").on("value", (snapshot) => {
 
   renderizarSubAbasView();
   renderizarGridsView();
-});
+}
 
 function renderizarSubAbasView() {
   const container = document.getElementById("sub-tabs-list-view");
@@ -94,7 +142,7 @@ function renderizarGridsView() {
   container.innerHTML = "";
 
   if (!estaPublicado) {
-    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 40px; font-size: 1.1rem;'>🔒 A programação está sendo atualizada pelo ADM. Aguarde a publicação.</p>";
+    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 40px;'>🔒 A programação desta semana está em rascunho pelo ADM.</p>";
     return;
   }
 
@@ -140,7 +188,7 @@ function abrirModal() {
   if (!modal || !lista) return;
 
   if (historico.length === 0) {
-    lista.innerHTML = "<p class='item-vazio'>Sem histórico de alterações.</p>";
+    lista.innerHTML = "<p class='item-vazio'>Sem histórico de alterações nesta semana.</p>";
   } else {
     lista.innerHTML = historico.map(h => `
       <div style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.85rem;">

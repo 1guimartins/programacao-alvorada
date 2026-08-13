@@ -15,11 +15,19 @@
   </header>
 
   <div class="semana-container">
-    <div class="actions-bar">
-      <button class="btn btn-success" onclick="alternarPublicacao()">📢 Publicar para Líderes</button>
-      <button class="btn btn-blue" onclick="criarNovaAba()">➕ Criar Setor</button>
-      <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor</button>
+    <div class="semana-seletor">
+      📅 <strong>Semana:</strong>
+      <select id="seletor-semana-adm" onchange="mudarSemanaADM(this.value)"></select>
     </div>
+
+    <div class="actions-bar">
+      <button class="btn btn-blue" onclick="criarNovaSemana()">🚀 Nova Semana</button>
+      <button class="btn btn-success" onclick="alternarPublicacao()">📢 Publicar para Líderes</button>
+      <button class="btn btn-success" style="background:#0284c7;" onclick="criarNovaAba()">➕ Criar Setor</button>
+      <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor</button>
+      <button class="btn btn-danger" style="background:#991b1b;" onclick="excluirSemanaAtual()">🗑️ Excluir Semana Inteira</button>
+    </div>
+
     <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir</button>
   </div>
 

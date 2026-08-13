@@ -13,6 +13,8 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
+let semanasData = {};
+let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
 let estaPublicado = false;
@@ -38,19 +40,63 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-db.ref("status_publicacao").on("value", (snapshot) => {
-  estaPublicado = snapshot.val() || false;
+// Carrega as Semanas Cadastradas
+db.ref("semanas_v2").on("value", (snapshot) => {
+  semanasData = snapshot.val() || {};
+  const listaSemanas = Object.keys(semanasData);
+
+  if (listaSemanas.length === 0) {
+    // Cria uma semana padrão inicial caso não exista nenhuma
+    const idPadrao = "SEMANA_PADRAO";
+    db.ref(`semanas_v2/${idPadrao}`).set({
+      nome: "Semana 10/08 a 16/08",
+      publicado: false,
+      programacao: {}
+    });
+    semanaAtiva = idPadrao;
+  } else if (!semanaAtiva || !semanasData[semanaAtiva]) {
+    semanaAtiva = listaSemanas[0];
+  }
+
+  carregarSeletorSemanas();
+  atualizarDadosSemanaAtiva();
+});
+
+function carregarSeletorSemanas() {
+  const select = document.getElementById("seletor-semana-adm");
+  if (!select) return;
+  select.innerHTML = "";
+
+  Object.keys(semanasData).forEach(key => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.innerText = semanasData[key].nome || key;
+    if (key === semanaAtiva) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function mudarSemanaADM(novaSemana) {
+  semanaAtiva = novaSemana;
+  setorAtivo = "";
+  atualizarDadosSemanaAtiva();
+}
+
+function atualizarDadosSemanaAtiva() {
+  if (!semanaAtiva || !semanasData[semanaAtiva]) return;
+
+  const dadosSemana = semanasData[semanaAtiva];
+  estaPublicado = dadosSemana.publicado || false;
+
   const badge = document.getElementById("status-badge");
   if (badge) {
     badge.innerText = estaPublicado ? "Publicado" : "Rascunho";
     badge.className = `status-badge ${estaPublicado ? 'bg-publicado' : 'bg-rascunho'}`;
   }
-});
 
-db.ref("programacao").on("value", (snapshot) => {
-  setoresProgramacao = snapshot.val() || {};
+  setoresProgramacao = dadosSemana.programacao || {};
   const chaves = Object.keys(setoresProgramacao);
-  
+
   if (chaves.length > 0) {
     if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
       setorAtivo = chaves[0];
@@ -61,7 +107,7 @@ db.ref("programacao").on("value", (snapshot) => {
 
   renderizarSubAbas();
   renderizarGrids();
-});
+}
 
 function renderizarSubAbas() {
   const container = document.getElementById("sub-tabs-list");
@@ -91,7 +137,10 @@ function renderizarGrids() {
   if (!container) return;
   container.innerHTML = "";
 
-  if (!setorAtivo || !setoresProgramacao[setorAtivo]) return;
+  if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 30px;'>Nenhum setor selecionado nesta semana. Clique em '➕ Criar Setor' para começar.</p>";
+    return;
+  }
 
   const dias = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 
@@ -134,7 +183,7 @@ function salvarDataDia(dia, valorData) {
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.data = valorData;
-  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
+  db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
 
   if (dia === "SEGUNDA" && valorData.includes("/")) {
     const partes = valorData.split("/");
@@ -160,7 +209,7 @@ function salvarDataDia(dia, valorData) {
 
             const objProximo = normalizarDia(setoresProgramacao[setorAtivo][d]);
             objProximo.data = `${dStr}/${mStr}/${aStr}`;
-            db.ref(`programacao/${setorAtivo}/${d}`).set(objProximo);
+            db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${d}`).set(objProximo);
           }
         });
       }
@@ -207,12 +256,12 @@ function adicionarItem(dia) {
   };
 
   objDia.itens.push(novoItem);
-  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
+  db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
 
   if (estaPublicado) {
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
     const textoTipo = tipo ? `[${tipo.toUpperCase()}] ` : '';
-    db.ref("historico_notificacoes").push({
+    db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
       texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome.toUpperCase()}`,
       hora: hora
     });
@@ -224,11 +273,11 @@ function removerItem(dia, index) {
     const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
     const removido = objDia.itens[index];
     objDia.itens.splice(index, 1);
-    db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
+    db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
 
     if (estaPublicado && removido) {
       const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
-      db.ref("historico_notificacoes").push({
+      db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
         texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome.toUpperCase()}`,
         hora: hora
       });
@@ -238,9 +287,37 @@ function removerItem(dia, index) {
 
 function alternarPublicacao() {
   const novoStatus = !estaPublicado;
-  db.ref("status_publicacao").set(novoStatus).then(() => {
-    alert(novoStatus ? "Programação PUBLICADA com sucesso!" : "Programação mudou para RASCUNHO.");
+  db.ref(`semanas_v2/${semanaAtiva}/publicado`).set(novoStatus).then(() => {
+    alert(novoStatus ? "Programação PUBLICADA para esta semana!" : "Programação alterada para RASCUNHO.");
   });
+}
+
+function criarNovaSemana() {
+  const nomeSemana = prompt("Digite o identificador da semana (ex: Semana 17/08 a 23/08):");
+  if (!nomeSemana || nomeSemana.trim() === "") return;
+
+  const idSemana = "SEMANA_" + Date.now();
+  
+  db.ref(`semanas_v2/${idSemana}`).set({
+    nome: nomeSemana.trim(),
+    publicado: false,
+    programacao: {}
+  }).then(() => {
+    semanaAtiva = idSemana;
+    alert(`Semana "${nomeSemana}" criada com sucesso!`);
+  });
+}
+
+function excluirSemanaAtual() {
+  if (!semanaAtiva || !semanasData[semanaAtiva]) return;
+
+  const nomeExibicao = semanasData[semanaAtiva].nome || "esta semana";
+  if (confirm(`⚠️ ATENÇÃO: Deseja realmente EXCLUIR toda a programação da "${nomeExibicao}"?`)) {
+    db.ref(`semanas_v2/${semanaAtiva}`).remove().then(() => {
+      semanaAtiva = "";
+      alert("Semana excluída!");
+    });
+  }
 }
 
 function criarNovaAba() {
@@ -255,7 +332,7 @@ function criarNovaAba() {
       DOMINGO: { data: "", itens: [] }
     };
 
-    db.ref(`programacao/${chave}`).set(novoSetor).then(() => {
+    db.ref(`semanas_v2/${semanaAtiva}/programacao/${chave}`).set(novoSetor).then(() => {
       setorAtivo = chave;
     });
   }
@@ -264,7 +341,7 @@ function criarNovaAba() {
 function excluirAbaAtual() {
   if (!setorAtivo) return;
   if (confirm(`Deseja realmente excluir o setor "${formatarNomeExibicao(setorAtivo)}"?`)) {
-    db.ref(`programacao/${setorAtivo}`).remove().then(() => {
+    db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}`).remove().then(() => {
       setorAtivo = "";
     });
   }
