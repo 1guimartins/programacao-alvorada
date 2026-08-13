@@ -153,12 +153,16 @@ function renderizarGrids() {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       const temTipo = item.tipo && item.tipo.trim() !== "";
       const classeTipo = temTipo ? `tipo-${item.tipo.toUpperCase()}` : '';
+      const temProduzido = item.produzido !== undefined && item.produzido !== '';
 
       return `
         <div class="item-linha">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
           ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
+          
+          ${temProduzido ? `<span class="badge-contagem-lider">Feito: ${item.produzido}</span>` : ''}
+
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
         </div>
       `;
@@ -228,7 +232,7 @@ function adicionarItem(dia) {
     document.getElementById("modal-bolo").style.display = "flex";
     setTimeout(() => document.getElementById("input-sabor").focus(), 100);
   } else {
-    let respQtd = prompt("Digite a quantidade (ex: 10 kg, 5 und):");
+    let respQtd = prompt("Digite a quantidade:");
     if (respQtd === null) return;
     let respNome = prompt("Digite o nome do produto:");
     if (!respNome || respNome.trim() === "") return;

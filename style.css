@@ -185,7 +185,7 @@ header h1 {
   margin-bottom: 4px;
 }
 
-/* Badge Azul de Receita */
+/* Badge de Receita */
 .item-qtd {
   font-weight: 800;
   color: #1F69C1;
@@ -310,8 +310,40 @@ header h1 {
   margin-top: 8px;
 }
 
+/* Campo para os Líderes preencherem a quantidade */
+.input-contagem-lider {
+  width: 60px;
+  padding: 3px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1e293b;
+  background-color: #f8fafc;
+  outline: none;
+}
+
+.input-contagem-lider:focus {
+  border-color: #00853B;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 133, 59, 0.2);
+}
+
+/* Badge de exibição para a ADM */
+.badge-contagem-lider {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  font-weight: 800;
+  font-size: 0.82rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
-  #setores-containers {
+  #setores-containers, #setores-containers-view {
     grid-template-columns: 1fr !important;
   }
 }

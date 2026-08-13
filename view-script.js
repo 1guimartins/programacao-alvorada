@@ -155,16 +155,29 @@ function renderizarGridsView() {
     const divDia = document.createElement("div");
     divDia.className = "dia-card";
 
-    let itensHTML = objDia.itens.map(item => {
+    let itensHTML = objDia.itens.map((item, index) => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       const temTipo = item.tipo && item.tipo.trim() !== "";
       const classeTipo = temTipo ? `tipo-${item.tipo.toUpperCase()}` : '';
+      const valorProduzido = item.produzido !== undefined ? item.produzido : '';
 
       return `
-        <div class="item-linha ${item.novo ? 'item-novo' : ''}">
-          ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
-          ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
-          <span class="item-nome">${item.nome}</span>
+        <div class="item-linha ${item.novo ? 'item-novo' : ''}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; flex: 1; overflow: hidden;">
+            ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
+            ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
+            <span class="item-nome">${item.nome}</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <input 
+              type="number" 
+              class="input-contagem-lider" 
+              placeholder="Qtd" 
+              value="${valorProduzido}" 
+              onchange="atualizarContagemLider('${dia}', ${index}, this.value)"
+            />
+          </div>
         </div>
       `;
     }).join("");
@@ -181,6 +194,15 @@ function renderizarGridsView() {
 
     container.appendChild(divDia);
   });
+}
+
+function atualizarContagemLider(dia, index, valor) {
+  if (!semanaAtiva || !setorAtivo) return;
+
+  db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}/itens/${index}/produzido`).set(valor)
+    .catch((err) => {
+      alert("Erro ao salvar quantidade: " + err.message);
+    });
 }
 
 function abrirModal() {
