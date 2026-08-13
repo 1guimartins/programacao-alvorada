@@ -13,11 +13,10 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
-let semanasData = {};
-let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
-let historicoNotificacoes = [];
+let estaPublicado = false;
+let historico = [];
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -40,117 +39,31 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-db.ref("semanas").on("value", (snapshot) => {
-  semanasData = snapshot.val() || {};
-  const listaSemanas = Object.keys(semanasData);
-
-  // Filtra apenas semanas que foram publicadas pelo ADM
-  const semanasPublicadas = listaSemanas.filter(k => semanasData[k].publicada === true);
-
-  if (semanasPublicadas.length > 0) {
-    if (!semanaAtiva || !semanasData[semanaAtiva] || !semanasData[semanaAtiva].publicada) {
-      semanaAtiva = semanasPublicadas[0];
-    }
-  } else {
-    semanaAtiva = "";
-  }
-
-  carregarSeletorSemanasView(semanasPublicadas);
-  escutarSetoresView();
+db.ref("status_publicacao").on("value", (snapshot) => {
+  estaPublicado = snapshot.val() || false;
+  renderizarGridsView();
 });
 
-function carregarSeletorSemanasView(semanasPublicadas) {
-  const select = document.getElementById("seletor-semana-view");
-  if (!select) return;
-  select.innerHTML = "";
+db.ref("historico_notificacoes").on("value", (snapshot) => {
+  const data = snapshot.val() || {};
+  historico = Object.keys(data).map(k => data[k]).reverse();
+});
 
-  if (semanasPublicadas.length === 0) {
-    const opt = document.createElement("option");
-    opt.innerText = "Aguardando publicação do ADM...";
-    select.appendChild(opt);
-    return;
-  }
-
-  semanasPublicadas.forEach(key => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.innerText = semanasData[key].nome || key;
-    if (key === semanaAtiva) opt.selected = true;
-    select.appendChild(opt);
-  });
-}
-
-function mudarSemanaView(novaSemana) {
-  semanaAtiva = novaSemana;
-  escutarSetoresView();
-}
-
-function escutarSetoresView() {
-  if (!semanaAtiva) {
-    document.getElementById("setores-containers-view").innerHTML = "<p class='item-vazio'>Nenhuma programação foi publicada ainda.</p>";
-    return;
-  }
-
-  db.ref(`semanas/${semanaAtiva}`).on("value", (snapshot) => {
-    const dadosSemana = snapshot.val() || {};
-    setoresProgramacao = dadosSemana.programacao || {};
-    
-    // Carrega o Histórico do Sininho
-    const rawHistorico = dadosSemana.historico || {};
-    historicoNotificacoes = Object.keys(rawHistorico).map(k => rawHistorico[k]).reverse();
-
-    atualizarSininho();
-
-    const chaves = Object.keys(setoresProgramacao);
-    if (chaves.length > 0) {
-      if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
-        setorAtivo = chaves[0];
-      }
-    } else {
-      setorAtivo = "";
+db.ref("programacao").on("value", (snapshot) => {
+  setoresProgramacao = snapshot.val() || {};
+  const chaves = Object.keys(setoresProgramacao);
+  
+  if (chaves.length > 0) {
+    if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+      setorAtivo = chaves[0];
     }
-
-    renderizarSubAbasView();
-    renderizarGridsView();
-  });
-}
-
-function atualizarSininho() {
-  const badge = document.getElementById("sininho-contador");
-  if (!badge) return;
-
-  if (historicoNotificacoes.length > 0) {
-    badge.innerText = historicoNotificacoes.length;
-    badge.style.display = "inline-block";
   } else {
-    badge.style.display = "none";
-  }
-}
-
-function abrirModalHistorico() {
-  const modal = document.getElementById("modal-historico");
-  const body = document.getElementById("modal-body-historico");
-  if (!modal || !body) return;
-
-  if (historicoNotificacoes.length === 0) {
-    body.innerHTML = "<p class='item-vazio'>Nenhuma atualização gravada nesta semana.</p>";
-  } else {
-    body.innerHTML = historicoNotificacoes.map(item => `
-      <div class="notificacao-item">
-        <strong>📍 Setor ${item.setor} (${item.dia})</strong><br>
-        <span>${item.detalhe}</span>
-        <span class="notificacao-hora">🕒 ${item.dataHora}</span>
-      </div>
-    `).join("");
+    setorAtivo = "";
   }
 
-  modal.style.display = "flex";
-}
-
-function fecharModalHistorico() {
-  const modal = document.getElementById("modal-historico");
-  if (modal) modal.style.display = "none";
-}
+  renderizarSubAbasView();
+  renderizarGridsView();
+});
 
 function renderizarSubAbasView() {
   const container = document.getElementById("sub-tabs-list-view");
@@ -171,9 +84,7 @@ function renderizarSubAbasView() {
 
   const titulo = document.getElementById("setor-titulo-view");
   if (titulo) {
-    titulo.innerText = setorAtivo 
-      ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) 
-      : "NENHUM SETOR SELECIONADO";
+    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) : "NENHUM SETOR SELECIONADO";
   }
 }
 
@@ -181,6 +92,11 @@ function renderizarGridsView() {
   const container = document.getElementById("setores-containers-view");
   if (!container) return;
   container.innerHTML = "";
+
+  if (!estaPublicado) {
+    container.innerHTML = "<p class='item-vazio' style='grid-column: 1/-1; padding: 40px; font-size: 1.1rem;'>🔒 A programação está sendo atualizada pelo ADM. Aguarde a publicação.</p>";
+    return;
+  }
 
   if (!setorAtivo || !setoresProgramacao[setorAtivo]) return;
 
@@ -195,7 +111,7 @@ function renderizarGridsView() {
     let itensHTML = objDia.itens.map(item => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       return `
-        <div class="item-linha ${item.alteradoEmSemanaPublicada ? 'item-atualizado' : ''}">
+        <div class="item-linha ${item.novo ? 'item-novo' : ''}">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
         </div>
@@ -214,4 +130,27 @@ function renderizarGridsView() {
 
     container.appendChild(divDia);
   });
+}
+
+function abrirModal() {
+  const modal = document.getElementById("modal-notificacoes");
+  const lista = document.getElementById("modal-lista");
+  if (!modal || !lista) return;
+
+  if (historico.length === 0) {
+    lista.innerHTML = "<p class='item-vazio'>Sem histórico de alterações.</p>";
+  } else {
+    lista.innerHTML = historico.map(h => `
+      <div style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.85rem;">
+        <strong>${h.texto}</strong>
+        <div style="color: #94a3b8; font-size: 0.75rem;">🕒 ${h.hora}</div>
+      </div>
+    `).join("");
+  }
+
+  modal.style.display = "flex";
+}
+
+function fecharModal() {
+  document.getElementById("modal-notificacoes").style.display = "none";
 }

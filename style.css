@@ -1,57 +1,257 @@
-/* Botão de Publicar Semana (Verde chamativo) */
-.btn-publicar {
-  background: #16a34a !important;
-  color: #ffffff !important;
-  font-weight: 800;
-  box-shadow: 0 0 10px rgba(22, 163, 74, 0.4);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-/* Badge de Status no Cabeçalho do ADM */
-.badge-status {
+body {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  padding: 16px;
+}
+
+header {
+  background: linear-gradient(135deg, #00853B, #00662d);
+  color: #ffffff;
+  padding: 16px 24px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #FF6600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+header h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.status-badge {
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 700;
-  margin-left: 10px;
-  display: inline-block;
+  margin-left: 8px;
 }
-.status-rascunho { background: #fef08a; color: #854d0e; }
-.status-publicado { background: #bbf7d0; color: #166534; }
+.bg-rascunho { background: #fef08a; color: #854d0e; }
+.bg-publicado { background: #bbf7d0; color: #166534; }
 
-/* Ícone de Sininho com Contador */
-.sininho-container {
-  position: relative;
+.semana-container {
+  background: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+}
+
+.actions-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-success { background: #00853B; color: #ffffff; }
+.btn-orange { background: #FF6600; color: #ffffff; }
+.btn-danger { background: #ef4444; color: #ffffff; }
+.btn-blue { background: #1F69C1; color: #ffffff; }
+
+.sub-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sub-tab-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #475569;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sub-tab-btn.active {
+  background: #00853B;
+  color: #ffffff;
+  border-color: #00853B;
+  box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
+}
+
+.titulo-setor-exibicao {
+  background: #1F69C1;
+  color: #ffffff;
+  text-align: center;
+  padding: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+#setores-containers, #setores-containers-view {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.dia-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  overflow: hidden;
+  border: 1px solid #1F69C1;
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+}
+
+.dia-card-header {
+  background: #1F69C1;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.dia-data-input {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: 100px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.dia-data-badge {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.dia-card-body {
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-linha {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 12px;
-  border-radius: 20px;
-  transition: all 0.2s;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
 }
 
-.sininho-container:hover {
-  background: rgba(255, 255, 255, 0.3);
+.item-linha.item-novo {
+  animation: piscar 1.5s infinite;
 }
 
-.sininho-icon {
-  font-size: 1.3rem;
+@keyframes piscar {
+  0% { background: #ffedd5; }
+  50% { background: #fed7aa; }
+  100% { background: #ffedd5; }
 }
 
-.sininho-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.75rem;
+.item-qtd {
   font-weight: 800;
-  border: 2px solid #00853B;
+  color: #1F69C1;
+  background: #eff6ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #bfdbfe;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
-/* Modal do Histórico de Notificações */
+.item-nome {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #334155;
+}
+
+.btn-del-item {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.btn-add-item-card {
+  width: 100%;
+  margin-top: auto;
+  background: #00853B;
+  color: #ffffff;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.item-vazio {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-style: italic;
+  text-align: center;
+  margin: auto 0;
+}
+
+/* Sininho & Modal */
+.sininho-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -59,61 +259,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .modal-content {
-  background: #ffffff;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 12px;
+  background: #fff;
   padding: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  width: 90%;
+  max-width: 450px;
   max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-}
-
-.modal-header h3 {
-  color: #1e293b;
-  font-size: 1.1rem;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  color: #64748b;
-}
-
-.modal-body {
   overflow-y: auto;
-  flex: 1;
 }
 
-.notificacao-item {
-  padding: 10px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.88rem;
-}
-
-.notificacao-item:last-child {
-  border-bottom: none;
-}
-
-.notificacao-hora {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  display: block;
-  margin-top: 4px;
+@media (max-width: 768px) {
+  #setores-containers, #setores-containers-view {
+    grid-template-columns: 1fr !important;
+  }
 }

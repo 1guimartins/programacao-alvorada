@@ -13,10 +13,9 @@ if (!firebase.apps.length) {
 }
 const db = firebase.database();
 
-let semanasData = {};
-let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
+let estaPublicado = false;
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -39,77 +38,32 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-db.ref("semanas").on("value", (snapshot) => {
-  semanasData = snapshot.val() || {};
-  const listaSemanas = Object.keys(semanasData);
-
-  if (listaSemanas.length === 0) {
-    const chaveAtual = "SEMANA_ATUAL";
-    db.ref(`semanas/${chaveAtual}`).set({
-      nome: "Semana Atual",
-      publicada: false
-    });
-    semanaAtiva = chaveAtual;
-  } else if (!semanaAtiva || !semanasData[semanaAtiva]) {
-    semanaAtiva = listaSemanas[0];
+// Escuta o Status de Publicação
+db.ref("status_publicacao").on("value", (snapshot) => {
+  estaPublicado = snapshot.val() || false;
+  const badge = document.getElementById("status-badge");
+  if (badge) {
+    badge.innerText = estaPublicado ? "Publicado" : "Rascunho";
+    badge.className = `status-badge ${estaPublicado ? 'bg-publicado' : 'bg-rascunho'}`;
   }
-
-  carregarSeletorSemanas();
-  atualizarBadgeStatus();
-  escutarSetoresDaSemana();
 });
 
-function carregarSeletorSemanas() {
-  const select = document.getElementById("seletor-semana-adm");
-  if (!select) return;
-  select.innerHTML = "";
-
-  Object.keys(semanasData).forEach(key => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.innerText = semanasData[key].nome || key;
-    if (key === semanaAtiva) opt.selected = true;
-    select.appendChild(opt);
-  });
-}
-
-function atualizarBadgeStatus() {
-  const badge = document.getElementById("status-semana-badge");
-  if (!badge || !semanasData[semanaAtiva]) return;
-
-  const estaPublicada = semanasData[semanaAtiva].publicada || false;
-  if (estaPublicada) {
-    badge.innerText = "Publicada para Líderes";
-    badge.className = "badge-status status-publicado";
-  } else {
-    badge.innerText = "Rascunho (Privado)";
-    badge.className = "badge-status status-rascunho";
-  }
-}
-
-function mudarSemanaADM(novaSemana) {
-  semanaAtiva = novaSemana;
-  atualizarBadgeStatus();
-  escutarSetoresDaSemana();
-}
-
-function escutarSetoresDaSemana() {
-  db.ref(`semanas/${semanaAtiva}/programacao`).on("value", (snapshot) => {
-    setoresProgramacao = snapshot.val() || {};
-    const chaves = Object.keys(setoresProgramacao);
-    
-    if (chaves.length > 0) {
-      if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
-        setorAtivo = chaves[0];
-      }
-    } else {
-      setorAtivo = "";
+// Escuta a Programação Principal Original
+db.ref("programacao").on("value", (snapshot) => {
+  setoresProgramacao = snapshot.val() || {};
+  const chaves = Object.keys(setoresProgramacao);
+  
+  if (chaves.length > 0) {
+    if (!setorAtivo || !setoresProgramacao[setorAtivo]) {
+      setorAtivo = chaves[0];
     }
+  } else {
+    setorAtivo = "";
+  }
 
-    renderizarSubAbas();
-    renderizarGrids();
-  });
-}
+  renderizarSubAbas();
+  renderizarGrids();
+});
 
 function renderizarSubAbas() {
   const container = document.getElementById("sub-tabs-list");
@@ -130,9 +84,7 @@ function renderizarSubAbas() {
 
   const titulo = document.getElementById("setor-titulo");
   if (titulo) {
-    titulo.innerText = setorAtivo 
-      ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) 
-      : "NENHUM SETOR SELECIONADO";
+    titulo.innerText = setorAtivo ? "PROGRAMAÇÃO DE " + formatarNomeExibicao(setorAtivo) : "NENHUM SETOR SELECIONADO";
   }
 }
 
@@ -154,7 +106,7 @@ function renderizarGrids() {
     let itensHTML = objDia.itens.map((item, index) => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
       return `
-        <div class="item-linha ${item.alteradoEmSemanaPublicada ? 'item-atualizado' : ''}">
+        <div class="item-linha">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
@@ -182,8 +134,9 @@ function salvarDataDia(dia, valorData) {
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
   objDia.data = valorData;
-  db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
+  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 
+  // Preenchimento automático da Segunda-Feira
   if (dia === "SEGUNDA" && valorData.includes("/")) {
     const partes = valorData.split("/");
     if (partes.length === 3) {
@@ -208,7 +161,7 @@ function salvarDataDia(dia, valorData) {
 
             const objProximo = normalizarDia(setoresProgramacao[setorAtivo][d]);
             objProximo.data = `${dStr}/${mStr}/${aStr}`;
-            db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${d}`).set(objProximo);
+            db.ref(`programacao/${setorAtivo}/${d}`).set(objProximo);
           }
         });
       }
@@ -224,70 +177,46 @@ function adicionarItem(dia) {
   if (!nome || nome.trim() === "") return;
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-  const estaPublicada = semanasData[semanaAtiva]?.publicada || false;
-
-  const novoItem = {
-    qtd: qtd.trim(),
+  
+  const novoItem = { 
+    qtd: qtd.trim(), 
     nome: nome.trim(),
-    alteradoEmSemanaPublicada: estaPublicada
+    novo: estaPublicado // Marca como novo se já estiver publicado
   };
 
   objDia.itens.push(novoItem);
-  db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
+  db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 
-  // Se a semana já estiver no ar e o ADM fizer alteração, gera o Histórico do Sininho!
-  if (estaPublicada) {
-    gerarNotificacaoHistorico(setorAtivo, dia, `Item Adicionado: ${qtd ? qtd + ' ' : ''}${nome.toUpperCase()}`);
+  if (estaPublicado) {
+    const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+    db.ref("historico_notificacoes").push({
+      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${nome.toUpperCase()}`,
+      hora: hora
+    });
   }
 }
 
 function removerItem(dia, index) {
   if (confirm("Deseja remover este item?")) {
     const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-    const itemRemovido = objDia.itens[index];
+    const removido = objDia.itens[index];
     objDia.itens.splice(index, 1);
-    db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
+    db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 
-    const estaPublicada = semanasData[semanaAtiva]?.publicada || false;
-    if (estaPublicada) {
-      gerarNotificacaoHistorico(setorAtivo, dia, `Item Removido: ${itemRemovido.nome.toUpperCase()}`);
+    if (estaPublicado && removido) {
+      const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+      db.ref("historico_notificacoes").push({
+        texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome.toUpperCase()}`,
+        hora: hora
+      });
     }
   }
 }
 
-function gerarNotificacaoHistorico(setor, dia, acao) {
-  const dataHora = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
-  const novaNotificacao = {
-    setor: formatarNomeExibicao(setor),
-    dia: dia,
-    detalhe: acao,
-    dataHora: dataHora,
-    timestamp: Date.now()
-  };
-
-  db.ref(`semanas/${semanaAtiva}/historico`).push(novaNotificacao);
-}
-
-function publicarProgramacao() {
-  if (confirm("Deseja liberar e PUBLICAR a programação desta semana para os líderes?")) {
-    db.ref(`semanas/${semanaAtiva}/publicada`).set(true).then(() => {
-      alert("Programação publicada com sucesso! Os líderes já conseguem visualizar.");
-    });
-  }
-}
-
-function criarNovaSemanaRascunho() {
-  const nomeSemana = prompt("Digite o nome da Nova Semana (ex: Semana 17/08 a 23/08):");
-  if (!nomeSemana) return;
-
-  const chave = "SEMANA_" + Date.now();
-  db.ref(`semanas/${chave}`).set({
-    nome: nomeSemana,
-    publicada: false,
-    programacao: {}
-  }).then(() => {
-    semanaAtiva = chave;
-    alert("Nova semana criada em Rascunho!");
+function alternarPublicacao() {
+  const novoStatus = !estaPublicado;
+  db.ref("status_publicacao").set(novoStatus).then(() => {
+    alert(novoStatus ? "Programação PUBLICADA com sucesso!" : "Programação mudou para RASCUNHO.");
   });
 }
 
@@ -303,7 +232,7 @@ function criarNovaAba() {
       DOMINGO: { data: "", itens: [] }
     };
 
-    db.ref(`semanas/${semanaAtiva}/programacao/${chave}`).set(novoSetor).then(() => {
+    db.ref(`programacao/${chave}`).set(novoSetor).then(() => {
       setorAtivo = chave;
     });
   }
@@ -312,7 +241,7 @@ function criarNovaAba() {
 function excluirAbaAtual() {
   if (!setorAtivo) return;
   if (confirm(`Deseja realmente excluir o setor "${formatarNomeExibicao(setorAtivo)}"?`)) {
-    db.ref(`semanas/${semanaAtiva}/programacao/${setorAtivo}`).remove().then(() => {
+    db.ref(`programacao/${setorAtivo}`).remove().then(() => {
       setorAtivo = "";
     });
   }
