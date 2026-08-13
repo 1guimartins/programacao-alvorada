@@ -18,6 +18,7 @@ let semanaAtiva = "";
 let setoresProgramacao = {};
 let setorAtivo = "";
 let estaPublicado = false;
+let diaSelecionadoModal = "";
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -218,38 +219,44 @@ function salvarDataDia(dia, valorData) {
 }
 
 function adicionarItem(dia) {
-  let qtd = "";
-  let tipo = "";
-  let nome = "";
-
   const ehBolosSecos = setorAtivo && setorAtivo.toUpperCase().includes("BOLOS") && setorAtivo.toUpperCase().includes("SECOS");
 
   if (ehBolosSecos) {
-    // Digitação rápida por seleção pré-definida
-    const opcoesQtd = ["1 REC", "2 REC", "3 REC", "4 REC", "5 REC", "6 REC", "7 REC", "8 REC", "9 REC", "10 REC"];
-    const opcoesTipo = ["PLACA", "CASEIRO", "CREMOSO", "INGLÊS", "REDONDO", "COBERTURA"];
-
-    let respQtd = prompt(`Selecione ou digite a QUANTIDADE DE RECEITAS:\nOpções: ${opcoesQtd.join(", ")}`, "1 REC");
-    if (respQtd === null) return;
-    qtd = respQtd.trim().toUpperCase();
-
-    let respTipo = prompt(`Selecione ou digite o TIPO DO BOLO:\nOpções: ${opcoesTipo.join(", ")}`, "PLACA");
-    if (respTipo === null) return;
-    tipo = respTipo.trim().toUpperCase();
-
-    let respNome = prompt("Digite o SABOR DO BOLO (ex: CENOURA, CHOCOLATE, FUBÁ):");
-    if (!respNome || respNome.trim() === "") return;
-    nome = respNome.trim().toUpperCase();
+    diaSelecionadoModal = dia;
+    document.getElementById("modal-dia-nome").innerText = dia;
+    document.getElementById("input-sabor").value = "";
+    document.getElementById("modal-bolo").style.display = "flex";
+    setTimeout(() => document.getElementById("input-sabor").focus(), 100);
   } else {
-    let respQtd = prompt("Digite a quantidade ou deixe em branco:");
+    let respQtd = prompt("Digite a quantidade (ex: 10 kg, 5 und):");
     if (respQtd === null) return;
-    qtd = respQtd.trim();
-
     let respNome = prompt("Digite o nome do produto:");
     if (!respNome || respNome.trim() === "") return;
-    nome = respNome.trim().toUpperCase();
+
+    salvarItemBanco(dia, respQtd.trim(), "", respNome.trim().toUpperCase());
+  }
+}
+
+function fecharModalBolo() {
+  document.getElementById("modal-bolo").style.display = "none";
+  diaSelecionadoModal = "";
+}
+
+function confirmarAdicaoBolo() {
+  const qtd = document.getElementById("select-qtd").value;
+  const tipo = document.getElementById("select-tipo").value;
+  const sabor = document.getElementById("input-sabor").value.trim().toUpperCase();
+
+  if (!sabor) {
+    alert("Por favor, digite o sabor do bolo!");
+    return;
   }
 
+  salvarItemBanco(diaSelecionadoModal, qtd, tipo, sabor);
+  fecharModalBolo();
+}
+
+function salvarItemBanco(dia, qtd, tipo, nome) {
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
 
   const novoItem = { 

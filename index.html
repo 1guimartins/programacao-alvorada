@@ -11,29 +11,75 @@
 <body>
 
   <header>
-    <h1>⚙️ Gestão ADM <span id="status-badge" class="status-badge bg-rascunho">Rascunho</span></h1>
+    <h1>⚙️ Panificação Alvorada - Gestão ADM <span id="status-badge" class="status-badge bg-rascunho">Rascunho</span></h1>
   </header>
 
   <div class="semana-container">
     <div class="semana-seletor">
-      📅 <strong>Semana:</strong>
+      <label for="seletor-semana-adm">📅 <strong>Semana:</strong></label>
       <select id="seletor-semana-adm" onchange="mudarSemanaADM(this.value)"></select>
     </div>
 
     <div class="actions-bar">
-      <button class="btn btn-blue" onclick="criarNovaSemana()">🚀 Nova Semana</button>
-      <button class="btn btn-success" onclick="alternarPublicacao()">📢 Publicar para Líderes</button>
-      <button class="btn btn-success" style="background:#0284c7;" onclick="criarNovaAba()">➕ Criar Setor</button>
+      <button class="btn btn-success" onclick="alternarPublicacao()">📢 Publicar / Alternar Status</button>
+      <button class="btn btn-blue" onclick="criarNovaSemana()">🚀 Nova Semana (Rascunho)</button>
+      <button class="btn btn-success" onclick="criarNovaAba()">➕ Criar Setor</button>
       <button class="btn btn-danger" onclick="excluirAbaAtual()">🗑️ Excluir Setor</button>
-      <button class="btn btn-danger" style="background:#991b1b;" onclick="excluirSemanaAtual()">🗑️ Excluir Semana Inteira</button>
+      <button class="btn btn-danger" onclick="excluirSemanaAtual()">❌ Excluir Semana</button>
     </div>
 
     <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir</button>
   </div>
 
   <div class="sub-tabs" id="sub-tabs-list"></div>
+
   <div class="titulo-setor-exibicao" id="setor-titulo">CARREGANDO...</div>
+
   <div id="setores-containers"></div>
+
+  <div id="modal-bolo" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">🍰 Adicionar Bolo Seco (<span id="modal-dia-nome"></span>)</div>
+      
+      <div class="form-group">
+        <label for="select-qtd">Quantidade de Receitas:</label>
+        <select id="select-qtd">
+          <option value="1 rec">1 REC</option>
+          <option value="2 rec" selected>2 REC</option>
+          <option value="3 rec">3 REC</option>
+          <option value="4 rec">4 REC</option>
+          <option value="5 rec">5 REC</option>
+          <option value="6 rec">6 REC</option>
+          <option value="7 rec">7 REC</option>
+          <option value="8 rec">8 REC</option>
+          <option value="9 rec">9 REC</option>
+          <option value="10 rec">10 REC</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="select-tipo">Tipo do Bolo:</label>
+        <select id="select-tipo">
+          <option value="PLACA">PLACA (Cinza)</option>
+          <option value="CASEIRO">CASEIRO (Verde)</option>
+          <option value="CREMOSO">CREMOSO (Amarelo)</option>
+          <option value="INGLÊS">INGLÊS (Laranja)</option>
+          <option value="REDONDO">REDONDO (Roxo)</option>
+          <option value="COBERTURA">COBERTURA (Marrom)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="input-sabor">Sabor do Bolo:</label>
+        <input type="text" id="input-sabor" placeholder="Ex: CENOURA, CHOCOLATE, FUBÁ..." autocomplete="off">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="fecharModalBolo()">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmarAdicaoBolo()">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
