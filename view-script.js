@@ -110,9 +110,11 @@ function renderizarGridsView() {
 
     let itensHTML = objDia.itens.map(item => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
+      const temTipo = item.tipo && item.tipo.trim() !== "";
       return `
         <div class="item-linha ${item.novo ? 'item-novo' : ''}">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
+          ${temTipo ? `<span class="item-tipo">${item.tipo}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
         </div>
       `;

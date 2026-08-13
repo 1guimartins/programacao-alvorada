@@ -38,7 +38,6 @@ function formatarNomeExibicao(nome) {
   return nome.replace(/_BARRA_/g, " / ").replace(/-BARRA-/g, " / ").replace(/BARRA/g, " / ").replace(/_/g, " ");
 }
 
-// Escuta o Status de Publicação
 db.ref("status_publicacao").on("value", (snapshot) => {
   estaPublicado = snapshot.val() || false;
   const badge = document.getElementById("status-badge");
@@ -48,7 +47,6 @@ db.ref("status_publicacao").on("value", (snapshot) => {
   }
 });
 
-// Escuta a Programação Principal Original
 db.ref("programacao").on("value", (snapshot) => {
   setoresProgramacao = snapshot.val() || {};
   const chaves = Object.keys(setoresProgramacao);
@@ -105,9 +103,11 @@ function renderizarGrids() {
 
     let itensHTML = objDia.itens.map((item, index) => {
       const temQtd = item.qtd && item.qtd.trim() !== "";
+      const temTipo = item.tipo && item.tipo.trim() !== "";
       return `
         <div class="item-linha">
           ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
+          ${temTipo ? `<span class="item-tipo">${item.tipo}</span>` : ''}
           <span class="item-nome">${item.nome}</span>
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})" style="margin-left: auto;">&times;</button>
         </div>
@@ -136,7 +136,6 @@ function salvarDataDia(dia, valorData) {
   objDia.data = valorData;
   db.ref(`programacao/${setorAtivo}/${dia}`).set(objDia);
 
-  // Preenchimento automático da Segunda-Feira
   if (dia === "SEGUNDA" && valorData.includes("/")) {
     const partes = valorData.split("/");
     if (partes.length === 3) {
@@ -170,18 +169,41 @@ function salvarDataDia(dia, valorData) {
 }
 
 function adicionarItem(dia) {
-  let qtd = prompt("Digite a quantidade ou deixe em branco:");
-  if (qtd === null) return;
+  let qtd = "";
+  let tipo = "";
+  let nome = "";
 
-  const nome = prompt("Digite o nome do produto:");
-  if (!nome || nome.trim() === "") return;
+  const ehBolosSecos = setorAtivo && setorAtivo.toUpperCase().includes("BOLOS") && setorAtivo.toUpperCase().includes("SECOS");
+
+  if (ehBolosSecos) {
+    const respQtd = prompt("1/3 - Digite a QUANTIDADE (ex: 2 REC, 5 CX, 10):");
+    if (respQtd === null) return;
+    qtd = respQtd.trim();
+
+    const respTipo = prompt("2/3 - Digite o TIPO DO BOLO (ex: PLACA, CASEIRO, INGLÊS, MINI):");
+    if (respTipo === null) return;
+    tipo = respTipo.trim();
+
+    const respNome = prompt("3/3 - Digite o SABOR DO BOLO (ex: CENOURA, CHOCOLATE, FUBÁ):");
+    if (!respNome || respNome.trim() === "") return;
+    nome = respNome.trim();
+  } else {
+    let respQtd = prompt("Digite a quantidade ou deixe em branco:");
+    if (respQtd === null) return;
+    qtd = respQtd.trim();
+
+    let respNome = prompt("Digite o nome do produto:");
+    if (!respNome || respNome.trim() === "") return;
+    nome = respNome.trim();
+  }
 
   const objDia = normalizarDia(setoresProgramacao[setorAtivo][dia]);
-  
+
   const novoItem = { 
-    qtd: qtd.trim(), 
-    nome: nome.trim(),
-    novo: estaPublicado // Marca como novo se já estiver publicado
+    qtd: qtd,
+    tipo: tipo,
+    nome: nome,
+    novo: estaPublicado
   };
 
   objDia.itens.push(novoItem);
@@ -189,8 +211,9 @@ function adicionarItem(dia) {
 
   if (estaPublicado) {
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+    const textoTipo = tipo ? `[${tipo.toUpperCase()}] ` : '';
     db.ref("historico_notificacoes").push({
-      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${nome.toUpperCase()}`,
+      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome.toUpperCase()}`,
       hora: hora
     });
   }

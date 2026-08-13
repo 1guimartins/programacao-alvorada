@@ -193,6 +193,7 @@ header h1 {
   100% { background: #ffedd5; }
 }
 
+/* Badge Azul de Quantidade */
 .item-qtd {
   font-weight: 800;
   color: #1F69C1;
@@ -202,6 +203,19 @@ header h1 {
   border: 1px solid #bfdbfe;
   font-size: 0.85rem;
   white-space: nowrap;
+}
+
+/* Badge Laranja de Tipo (Placa, Caseiro, Inglês, etc.) */
+.item-tipo {
+  font-weight: 800;
+  color: #c2410c;
+  background: #ffedd5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #fed7aa;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  text-transform: uppercase;
 }
 
 .item-nome {
