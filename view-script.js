@@ -160,9 +160,10 @@ function renderizarGridsView() {
       const temTipo = item.tipo && item.tipo.trim() !== "";
       const classeTipo = temTipo ? `tipo-${item.tipo.toUpperCase()}` : '';
       const valorProduzido = item.produzido !== undefined ? item.produzido : '';
+      const classeNovo = item.novo ? 'item-novo' : '';
 
       return `
-        <div class="item-linha ${item.novo ? 'item-novo' : ''}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div class="item-linha ${classeNovo}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 6px; flex: 1; overflow: hidden;">
             ${temQtd ? `<span class="item-qtd">${item.qtd}</span>` : ''}
             ${temTipo ? `<span class="item-tipo ${classeTipo}">${item.tipo}</span>` : ''}
@@ -225,5 +226,6 @@ function abrirModal() {
 }
 
 function fecharModal() {
-  document.getElementById("modal-notificacoes").style.display = "none";
+  const modal = document.getElementById("modal-notificacoes");
+  if (modal) modal.style.display = "none";
 }
