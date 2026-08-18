@@ -19,6 +19,7 @@ let setoresProgramacao = {};
 let setorAtivo = "";
 let estaPublicado = false;
 let diaSelecionadoModal = "";
+let alteracoesPendentes = [];
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -78,6 +79,7 @@ function carregarSeletorSemanas() {
 function mudarSemanaADM(novaSemana) {
   semanaAtiva = novaSemana;
   setorAtivo = "";
+  alteracoesPendentes = [];
   atualizarDadosSemanaAtiva();
 }
 
@@ -267,18 +269,18 @@ function salvarItemBanco(dia, qtd, tipo, nome) {
     qtd: qtd,
     tipo: tipo,
     nome: nome,
-    novo: estaPublicado
+    novo: false
   };
 
   objDia.itens.push(novoItem);
   db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
 
   if (estaPublicado) {
-    const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
     const textoTipo = tipo ? `[${tipo}] ` : '';
-    db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
-      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome}`,
-      hora: hora
+    alteracoesPendentes.push({
+      setor: setorAtivo,
+      dia: dia,
+      texto: `Item adicionado em ${formatarNomeExibicao(setorAtivo)} (${dia}): ${qtd ? qtd + ' ' : ''}${textoTipo}${nome}`
     });
   }
 }
@@ -291,19 +293,52 @@ function removerItem(dia, index) {
     db.ref(`semanas_v2/${semanaAtiva}/programacao/${setorAtivo}/${dia}`).set(objDia);
 
     if (estaPublicado && removido) {
-      const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
-      db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
-        texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome}`,
-        hora: hora
+      alteracoesPendentes.push({
+        setor: setorAtivo,
+        dia: dia,
+        texto: `Item removido de ${formatarNomeExibicao(setorAtivo)} (${dia}): ${removido.nome}`
       });
     }
+  }
+}
+
+function notificarAtualizacao() {
+  if (!estaPublicado) {
+    alert("A semana ainda é um rascunho. Publique para enviar as notificações.");
+    return;
+  }
+
+  const hora = new Date().toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+
+  if (alteracoesPendentes.length > 0) {
+    alteracoesPendentes.forEach(alt => {
+      db.ref(`semanas_v2/${semanaAtiva}/historico_notificacoes`).push({
+        texto: alt.texto,
+        setor: alt.setor,
+        hora: hora
+      });
+    });
+
+    db.ref(`semanas_v2/${semanaAtiva}/ultimas_alteracoes`).set({
+      timestamp: Date.now(),
+      setoresAfetados: Array.from(new Set(alteracoesPendentes.map(a => a.setor)))
+    });
+
+    alteracoesPendentes = [];
+    alert("Todas as alterações foram enviadas e os líderes notificados!");
+  } else {
+    alert("Nenhuma alteração pendente para notificar.");
   }
 }
 
 function alternarPublicacao() {
   const novoStatus = !estaPublicado;
   db.ref(`semanas_v2/${semanaAtiva}/publicado`).set(novoStatus).then(() => {
-    alert(novoStatus ? "Programação PUBLICADA com sucesso!" : "Programação mudou para RASCUNHO.");
+    if (novoStatus) {
+      alert("Programação PUBLICADA com sucesso!");
+    } else {
+      alert("Programação alterada para RASCUNHO.");
+    }
   });
 }
 

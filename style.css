@@ -105,6 +105,10 @@ header h1 {
   color: #475569;
   white-space: nowrap;
   flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .sub-tab-btn.active {
@@ -112,6 +116,18 @@ header h1 {
   color: #ffffff;
   border-color: #00853B;
   box-shadow: 0 2px 6px rgba(0, 133, 59, 0.3);
+}
+
+/* Badge de Notificação no Botão da Aba */
+.tab-badge-alerta {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
 }
 
 .titulo-setor-exibicao {
@@ -248,7 +264,7 @@ header h1 {
   margin: auto 0;
 }
 
-/* Modal Generico */
+/* Modal Overlay Generico */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -292,16 +308,10 @@ header h1 {
   margin-top: 10px;
 }
 
-/* Destaque visual para itens adicionados recentemente */
+/* Destaque visual controlado para itens alterados recentemente */
 .item-novo {
   background-color: #fef9c3 !important;
   border: 1px solid #fde047 !important;
-  animation: piscarNovo 2s infinite alternate;
-}
-
-@keyframes piscarNovo {
-  0% { background-color: #fef9c3; }
-  100% { background-color: #fef08a; }
 }
 
 .input-contagem-lider {

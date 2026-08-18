@@ -19,6 +19,7 @@ let setoresProgramacao = {};
 let setorAtivo = "";
 let estaPublicado = false;
 let historico = [];
+let setoresNotificados = [];
 
 function normalizarDia(dados) {
   if (!dados) return { data: "", itens: [] };
@@ -96,6 +97,9 @@ function atualizarDadosView() {
   estaPublicado = dadosSemana.publicado || false;
   setoresProgramacao = dadosSemana.programacao || {};
 
+  const ultimasAlt = dadosSemana.ultimas_alteracoes || {};
+  setoresNotificados = ultimasAlt.setoresAfetados || [];
+
   const rawHistorico = dadosSemana.historico_notificacoes || {};
   historico = Object.keys(rawHistorico).map(k => rawHistorico[k]).reverse();
 
@@ -120,7 +124,10 @@ function renderizarSubAbasView() {
   Object.keys(setoresProgramacao).forEach(chaveAba => {
     const btn = document.createElement("button");
     btn.className = `sub-tab-btn ${chaveAba === setorAtivo ? "active" : ""}`;
-    btn.innerText = formatarNomeExibicao(chaveAba);
+    
+    const temAviso = setoresNotificados.includes(chaveAba);
+    btn.innerHTML = `${formatarNomeExibicao(chaveAba)} ${temAviso ? '<span class="tab-badge-alerta">🔴 NOVO</span>' : ''}`;
+
     btn.onclick = () => {
       setorAtivo = chaveAba;
       renderizarSubAbasView();
