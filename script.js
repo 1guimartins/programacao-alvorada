@@ -28,6 +28,8 @@ function carregarDados() {
       });
     });
   }
+
+  atualizarSelectSemanas();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -35,6 +37,33 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarAbas();
   renderizarQuadro();
 });
+
+function atualizarSelectSemanas() {
+  const semanaSelect = document.getElementById("semana-select");
+  if (!semanaSelect) return;
+
+  const valorSelecionadoAtual = semanaSelect.value;
+  semanaSelect.innerHTML = "";
+
+  const listaSemanas = Object.keys(bancoDados);
+
+  listaSemanas.forEach(semana => {
+    const option = document.createElement("option");
+    option.value = semana;
+    option.innerText = semana;
+    semanaSelect.appendChild(option);
+  });
+
+  if (listaSemanas.includes(valorSelecionadoAtual)) {
+    semanaSelect.value = valorSelecionadoAtual;
+  } else if (listaSemanas.length > 0) {
+    semanaSelect.value = listaSemanas[0];
+  }
+}
+
+function trocarSemana() {
+  renderizarQuadro();
+}
 
 function renderizarAbas() {
   const container = document.getElementById("nav-setores-adm");
@@ -54,6 +83,31 @@ function renderizarAbas() {
   });
 }
 
+// FORMATA E CALCULA OS DIAS DA SEMANA COM DATA (EX: SEGUNDA (17/08))
+function obterDatasDaSemana(semanaNome) {
+  const datasFormatadas = {};
+  const match = semanaNome.match(/(\d{1,2}\/\d{1,2})/);
+
+  if (match) {
+    const [diaStr, mesStr] = match[1].split("/");
+    const anoAtual = new Date().getFullYear();
+    const dataInicial = new Date(anoAtual, parseInt(mesStr) - 1, parseInt(diaStr));
+
+    diasDaSemana.forEach((dia, index) => {
+      const dataDia = new Date(dataInicial);
+      dataDia.setDate(dataInicial.getDate() + index);
+
+      const d = String(dataDia.getDate()).padStart(2, "0");
+      const m = String(dataDia.getMonth() + 1).padStart(2, "0");
+      datasFormatadas[dia] = `${dia} (${d}/${m})`;
+    });
+  } else {
+    diasDaSemana.forEach(dia => datasFormatadas[dia] = dia);
+  }
+
+  return datasFormatadas;
+}
+
 function renderizarQuadro() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
@@ -69,6 +123,7 @@ function renderizarQuadro() {
   if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
 
   const dadosSetor = bancoDados[semanaAtual][setorAtivo];
+  const rotulosDias = obterDatasDaSemana(semanaAtual);
 
   diasDaSemana.forEach((dia) => {
     if (!dadosSetor[dia]) dadosSetor[dia] = [];
@@ -90,7 +145,7 @@ function renderizarQuadro() {
 
     card.innerHTML = `
       <div class="day-header">
-        <span>${dia}</span>
+        <span>${rotulosDias[dia]}</span>
         <span style="font-size: 0.75rem; opacity: 0.85;">${listaItens.length} itens</span>
       </div>
       <div class="day-items-list">
@@ -108,6 +163,66 @@ function removerItem(dia, index) {
   
   bancoDados[semanaAtual][setorAtivo][dia].splice(index, 1);
   renderizarQuadro();
+}
+
+// CRIAR NOVA SEMANA
+function criarNovaSemanaRascunho() {
+  const nomeNovaSemana = prompt("Digite o nome da nova semana (Ex: Semana 24/08 a 30/08):");
+  
+  if (nomeNovaSemana && nomeNovaSemana.trim() !== "") {
+    const nomeFormatado = nomeNovaSemana.trim();
+
+    if (bancoDados[nomeFormatado]) {
+      alert("Esta semana já existe!");
+      return;
+    }
+
+    bancoDados[nomeFormatado] = {};
+    setores.forEach(setor => {
+      bancoDados[nomeFormatado][setor] = {};
+      diasDaSemana.forEach(dia => {
+        bancoDados[nomeFormatado][setor][dia] = [];
+      });
+    });
+
+    atualizarSelectSemanas();
+    document.getElementById("semana-select").value = nomeFormatado;
+    renderizarQuadro();
+  }
+}
+
+// EXCLUIR SEMANA ATUAL
+function excluirSemanaAtual() {
+  const semanaSelect = document.getElementById("semana-select");
+  const semanaAtual = semanaSelect ? semanaSelect.value : "";
+
+  const listaSemanas = Object.keys(bancoDados);
+
+  if (listaSemanas.length <= 1) {
+    alert("Você não pode excluir a única semana existente!");
+    return;
+  }
+
+  if (confirm(`Tem certeza que deseja excluir a "${semanaAtual}"?`)) {
+    delete bancoDados[semanaAtual];
+    atualizarSelectSemanas();
+    renderizarQuadro();
+  }
+}
+
+// EXCLUIR SETOR ATUAL
+function excluirSetorAtual() {
+  if (setores.length <= 1) {
+    alert("Você não pode excluir o único setor existente!");
+    return;
+  }
+
+  if (confirm(`Tem certeza que deseja excluir o setor "${setorAtivo}"?`)) {
+    setores = setores.filter(s => s !== setorAtivo);
+    setorAtivo = setores[0];
+    renderizarAbas();
+    renderizarQuadro();
+  }
 }
 
 function alternarStatus() {
