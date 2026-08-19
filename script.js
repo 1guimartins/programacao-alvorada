@@ -283,7 +283,6 @@ function processarColagemExcel() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
 
-  // Garante inicialização correta das estruturas do banco
   if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
   if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
   if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
@@ -293,44 +292,61 @@ function processarColagemExcel() {
   const linhas = texto.split("\n");
   let categoriaAtual = "";
 
+  const categoriasValidas = ["PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
+
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
 
-    const colunas = linha.split("\t").map(col => col.trim()).filter(col => col !== "");
-    if (colunas.length === 0) return;
+    const colunasBrutas = linha.split("\t").map(col => col.trim());
+    const textoLinhaCompleto = colunasBrutas.join(" ").trim().toUpperCase();
 
-    const primeiraColuna = colunas[0];
-    const ehNumero = !isNaN(parseInt(primeiraColuna)) && isFinite(primeiraColuna);
-
-    // Se a primeira coluna NÃO é número, é uma linha de Cabeçalho/Categoria
-    if (!ehNumero) {
-      const textoCategoria = colunas.join(" ").trim().toUpperCase();
-      // Desconsidera se for nome de dia da semana para não virar categoria
-      const ehDia = diasDaSemana.some(d => textoCategoria.includes(d));
-      if (!ehDia) {
-        categoriaAtual = textoCategoria;
-      }
+    if (textoLinhaCompleto.includes("PROGRAMAÇÃO") || diasDaSemana.some(d => textoLinhaCompleto.includes(d))) {
       return;
     }
 
-    // Se for linha de produto (primeira coluna é um número)
-    const qtd = colunas[0];
+    const achouCat = categoriasValidas.find(cat => textoLinhaCompleto.includes(cat));
+    const primeiraColuna = colunasBrutas[0];
+    const ehNumeroPrimeira = !isNaN(parseInt(primeiraColuna)) && isFinite(primeiraColuna);
+
+    if (achouCat && !ehNumeroPrimeira) {
+      categoriaAtual = (achouCat === "INGLES") ? "INGLÊS" : achouCat;
+      return;
+    }
+
+    const colunas = colunasBrutas.filter(col => col !== "");
+    if (colunas.length === 0) return;
+
+    let qtd = "1";
     let tipo = "REC";
     let nome = "";
 
-    if (colunas.length >= 3) {
+    if (colunas.length >= 3 && !isNaN(parseInt(colunas[0]))) {
+      qtd = colunas[0];
       tipo = colunas[1];
       nome = colunas.slice(2).join(" ");
-    } else if (colunas.length === 2) {
+    }
+    else if (colunas.length === 2 && !isNaN(parseInt(colunas[0]))) {
+      qtd = colunas[0];
       nome = colunas[1];
     }
+    else {
+      let idxQtd = colunas.findIndex(c => /\d+/.test(c));
 
-    if (qtd !== "" && nome !== "") {
+      if (idxQtd !== -1) {
+        qtd = colunas[idxQtd];
+        colunas.splice(idxQtd, 1);
+        nome = colunas.join(" ");
+      } else {
+        nome = colunas.join(" ");
+      }
+    }
+
+    if (nome.trim() !== "") {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
         tipo: tipo,
         categoria: categoriaAtual,
-        nome: nome
+        nome: nome.trim()
       });
     }
   });
