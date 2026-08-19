@@ -296,18 +296,20 @@ function processarColagemExcel() {
     if (!linha.trim()) return;
 
     const colunas = linha.split("\t").map(col => col.trim());
+    const linhaTextoCompleto = colunas.join(" ").toUpperCase();
 
-    // Se a linha for exatamente um título de categoria isolado no Excel
-    if (colunas.length === 1) {
-      const textoUnico = colunas[0].toUpperCase();
-      const achouCat = categoriasValidas.find(cat => textoUnico === cat);
-      if (achouCat) {
-        categoriaAtual = achouCat === "INGLES" ? "INGLÊS" : achouCat;
-        return;
+    // 1. Identifica se a linha é um cabeçalho de categoria (ex: PLACA, CASEIRO, INGLÊS)
+    const categoriaEncontrada = categoriasValidas.find(cat => linhaTextoCompleto.includes(cat));
+
+    // Se a primeira coluna não é número ou a linha é um título de categoria
+    if (isNaN(parseInt(colunas[0])) || categoriaEncontrada) {
+      if (categoriaEncontrada) {
+        categoriaAtual = categoriaEncontrada === "INGLES" ? "INGLÊS" : categoriaEncontrada;
       }
+      return; // Pula a linha do cabeçalho para não incluir como produto
     }
 
-    // Processa linhas com Quantidade + REC + Sabor
+    // 2. Processa linha com dados do produto (Qtd | REC | Sabor)
     if (colunas.length >= 3) {
       const qtd = colunas[0];
       const tipo = colunas[1];
@@ -322,7 +324,7 @@ function processarColagemExcel() {
         });
       }
     } 
-    // Processa linhas com apenas Quantidade + Sabor
+    // 3. Processa linha com dados do produto (Qtd | Sabor)
     else if (colunas.length === 2) {
       const qtd = colunas[0];
       const nome = colunas[1];
