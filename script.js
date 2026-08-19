@@ -290,15 +290,19 @@ function processarColagemExcel() {
   const linhas = texto.split("\n");
   let categoriaAtual = "";
 
+  const categoriasValidas = ["PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
+
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
 
     const colunas = linha.split("\t").map(col => col.trim());
-    const linhaLimpa = colunas.join(" ").trim();
+    const linhaTextoCompleto = colunas.join(" ").toUpperCase();
 
-    if (colunas.length === 1 || isNaN(colunas[0])) {
-      if (!linhaLimpa.includes("FEIRA") && !linhaLimpa.includes("PROGRAMAÇÃO")) {
-        categoriaAtual = linhaLimpa;
+    const categoriaEncontrada = categoriasValidas.find(cat => linhaTextoCompleto.includes(cat));
+
+    if (colunas.length === 1 || isNaN(parseInt(colunas[0])) || categoriaEncontrada) {
+      if (categoriaEncontrada) {
+        categoriaAtual = categoriaEncontrada === "INGLES" ? "INGLÊS" : categoriaEncontrada;
       }
       return;
     }
@@ -308,7 +312,7 @@ function processarColagemExcel() {
       const tipo = colunas[1];
       const nome = colunas.slice(2).join(" ");
 
-      if (qtd !== "" && nome !== "") {
+      if (qtd !== "" && nome !== "" && !isNaN(parseInt(qtd))) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo,
@@ -321,7 +325,7 @@ function processarColagemExcel() {
       const qtd = colunas[0];
       const nome = colunas[1];
 
-      if (qtd !== "" && nome !== "" && !isNaN(qtd)) {
+      if (qtd !== "" && nome !== "" && !isNaN(parseInt(qtd))) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: "REC",
