@@ -148,7 +148,7 @@ function renderizarQuadro() {
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
       
-      // Monta a tag combinando a Quantidade e o Tipo (ex: "2 REC" ou "200 UND")
+      // Une Quantidade + Tipo (ex: "120 kg", "3 rec", "200 UND", "1 kit", "2 pct")
       const textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
       const exibeBadge = textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : '';
 
@@ -332,7 +332,7 @@ function processarColagemExcel() {
     }
     // Formato com 2 Colunas no Excel
     else if (colunas.length >= 2) {
-      if (/^\d+(\s*(UND|KG|G|PC|UN))?$/i.test(colunas[0])) {
+      if (/^\d+(\s*(UND|KG|G|PC|UN|REC|KIT|PCT))?$/i.test(colunas[0])) {
         qtd = colunas[0];
         nome = colunas.slice(1).join(" ");
       } else {
