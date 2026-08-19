@@ -357,3 +357,21 @@ function processarColagemExcel() {
   fecharModalExcel();
   renderizarQuadro();
 }
+function abrirModalExcel() {
+  const modal = document.getElementById('modal-excel');
+  if (modal) {
+    modal.classList.add('active');
+  }
+}
+
+function fecharModalExcel() {
+  const modal = document.getElementById('modal-excel');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function processarExcel() {
+  // Coloque aqui sua lógica de processamento se houver
+  fecharModalExcel();
+}
