@@ -121,25 +121,6 @@ function obterClasseCategoria(categoria) {
   return "cat-padrao";
 }
 
-function extrairCategoriaDoTexto(texto) {
-  if (!texto) return { categoria: "", nomeLimpo: "" };
-  
-  const categoriasConhecidas = ["PLACA E COBERTURA", "PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
-  let categoriaEncontrada = "";
-  let nomeLimpo = texto;
-
-  for (const cat of categoriasConhecidas) {
-    const regex = new RegExp(`\\b${cat}\\b`, "i");
-    if (regex.test(texto)) {
-      categoriaEncontrada = cat.toUpperCase();
-      nomeLimpo = texto.replace(regex, "").trim();
-      break;
-    }
-  }
-
-  return { categoria: categoriaEncontrada, nomeLimpo: nomeLimpo || texto };
-}
-
 function renderizarQuadro() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
@@ -333,27 +314,25 @@ function processarColagemExcel() {
 
     let qtd = "";
     let tipo = "";
-    let nomeBruto = "";
+    let nome = "";
 
     if (colunas.length >= 3) {
       qtd = colunas[0];
       tipo = colunas[1];
-      nomeBruto = colunas.slice(2).join(" ");
+      nome = colunas.slice(2).join(" ");
     } else if (colunas.length === 2) {
       qtd = colunas[0];
-      nomeBruto = colunas[1];
+      nome = colunas[1];
     } else {
-      nomeBruto = colunas[0] || "";
+      nome = colunas[0] || "";
     }
 
-    const { categoria, nomeLimpo } = extrairCategoriaDoTexto(nomeBruto);
-
-    if (nomeLimpo || qtd) {
+    if (nome || qtd) {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
         tipo: tipo,
-        categoria: categoria,
-        nome: nomeLimpo
+        categoria: "",
+        nome: nome
       });
     }
   });
