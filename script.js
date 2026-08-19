@@ -83,7 +83,6 @@ function renderizarAbas() {
   });
 }
 
-// FORMATA E CALCULA OS DIAS DA SEMANA COM DATA (EX: SEGUNDA (17/08))
 function obterDatasDaSemana(semanaNome) {
   const datasFormatadas = {};
   const match = semanaNome.match(/(\d{1,2}\/\d{1,2})/);
@@ -136,7 +135,7 @@ function renderizarQuadro() {
       <div class="item-row">
         <div class="item-left-info">
           <span class="badge-rec">${item.qtd}</span>
-          ${item.tipo ? `<span class="badge-tipo">${item.tipo}</span>` : ""}
+          ${item.tipo ? `<span class="badge-rec" style="background-color: #f1f5f9; color: #475569;">${item.tipo}</span>` : ""}
           <span class="item-nome">${item.nome}</span>
         </div>
         <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">×</button>
@@ -165,7 +164,6 @@ function removerItem(dia, index) {
   renderizarQuadro();
 }
 
-// CRIAR NOVA SEMANA
 function criarNovaSemanaRascunho() {
   const nomeNovaSemana = prompt("Digite o nome da nova semana (Ex: Semana 24/08 a 30/08):");
   
@@ -191,7 +189,6 @@ function criarNovaSemanaRascunho() {
   }
 }
 
-// EXCLUIR SEMANA ATUAL
 function excluirSemanaAtual() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "";
@@ -210,7 +207,6 @@ function excluirSemanaAtual() {
   }
 }
 
-// EXCLUIR SETOR ATUAL
 function excluirSetorAtual() {
   if (setores.length <= 1) {
     alert("Você não pode excluir o único setor existente!");
@@ -267,16 +263,41 @@ function processarColagemExcel() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
 
+  if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
+  if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
+  if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
+    bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
+  }
+
   const linhas = texto.split("\n");
-  linhas.forEach(linha => {
-    if (linha.trim()) {
-      const colunas = linha.split("\t");
-      if (colunas.length >= 2) {
-        const qtd = colunas[0].trim();
-        const nome = colunas[1].trim();
-        if (qtd && nome) {
-          bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({ qtd, nome });
-        }
+
+  linhas.forEach((linha) => {
+    if (!linha.trim()) return;
+
+    const colunas = linha.split("\t").map(col => col.trim());
+
+    if (colunas.length >= 3) {
+      const qtd = colunas[0];
+      const tipo = colunas[1];
+      const nome = colunas.slice(2).join(" ");
+
+      if (qtd !== "" && nome !== "") {
+        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
+          qtd: qtd,
+          tipo: tipo,
+          nome: nome
+        });
+      }
+    } else if (colunas.length === 2) {
+      const qtd = colunas[0];
+      const nome = colunas[1];
+
+      if (qtd !== "" && nome !== "" && !isNaN(qtd)) {
+        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
+          qtd: qtd,
+          tipo: "",
+          nome: nome
+        });
       }
     }
   });
