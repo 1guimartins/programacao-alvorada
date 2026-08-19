@@ -148,8 +148,9 @@ function renderizarQuadro() {
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
       
-      const exibeTipo = (item.tipo && item.tipo !== 'REC') ? ` ${item.tipo}` : '';
-      const exibeBadge = (item.qtd || exibeTipo) ? `<span class="badge-rec">${item.qtd}${exibeTipo}</span>` : '';
+      // Monta a tag combinando a Quantidade e o Tipo (ex: "2 REC" ou "200 UND")
+      const textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
+      const exibeBadge = textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : '';
 
       return `
         <div class="item-row">
@@ -331,7 +332,6 @@ function processarColagemExcel() {
     }
     // Formato com 2 Colunas no Excel
     else if (colunas.length >= 2) {
-      // Verifica se a primeira coluna é explicitamente uma quantidade isolada (ex: "200 UND" ou "200")
       if (/^\d+(\s*(UND|KG|G|PC|UN))?$/i.test(colunas[0])) {
         qtd = colunas[0];
         nome = colunas.slice(1).join(" ");
