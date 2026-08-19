@@ -148,9 +148,8 @@ function renderizarQuadro() {
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
       
-      // Une Quantidade + Tipo (ex: "120 kg", "3 rec", "200 UND", "1 kit", "2 pct")
-      const textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
-      const exibeBadge = textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : '';
+      const exibeTipo = (item.tipo && item.tipo !== 'REC') ? ` ${item.tipo}` : '';
+      const exibeBadge = (item.qtd || exibeTipo) ? `<span class="badge-rec">${item.qtd}${exibeTipo}</span>` : '';
 
       return `
         <div class="item-row">
@@ -324,30 +323,31 @@ function processarColagemExcel() {
     let tipo = "";
     let nome = "";
 
-    // Formato Bolos (3 colunas: Qtd | Tipo | Nome)
-    if (colunas.length >= 3 && !isNaN(parseInt(colunas[0])) && colunas[0].length <= 3) {
+    if (colunas.length >= 3 && !isNaN(parseInt(colunas[0]))) {
       qtd = colunas[0];
       tipo = colunas[1];
       nome = colunas.slice(2).join(" ");
     }
-    // Formato com 2 Colunas no Excel
-    else if (colunas.length >= 2) {
-      if (/^\d+(\s*(UND|KG|G|PC|UN|REC|KIT|PCT))?$/i.test(colunas[0])) {
-        qtd = colunas[0];
-        nome = colunas.slice(1).join(" ");
+    else if (colunas.length === 2 && !isNaN(parseInt(colunas[0]))) {
+      qtd = colunas[0];
+      nome = colunas[1];
+    }
+    else {
+      let idxQtd = colunas.findIndex(c => /\d+/.test(c));
+
+      if (idxQtd !== -1) {
+        qtd = colunas[idxQtd];
+        colunas.splice(idxQtd, 1);
+        nome = colunas.join(" ");
       } else {
         nome = colunas.join(" ");
       }
     }
-    // Apenas 1 coluna
-    else {
-      nome = colunas[0];
-    }
 
     if (nome.trim() !== "") {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-        qtd: qtd.trim(),
-        tipo: tipo.trim(),
+        qtd: qtd,
+        tipo: tipo,
         categoria: categoriaAtual,
         nome: nome.trim()
       });
@@ -356,22 +356,4 @@ function processarColagemExcel() {
 
   fecharModalExcel();
   renderizarQuadro();
-}
-function abrirModalExcel() {
-  const modal = document.getElementById('modal-excel');
-  if (modal) {
-    modal.classList.add('active');
-  }
-}
-
-function fecharModalExcel() {
-  const modal = document.getElementById('modal-excel');
-  if (modal) {
-    modal.classList.remove('active');
-  }
-}
-
-function processarExcel() {
-  // Coloque aqui sua lógica de processamento se houver
-  fecharModalExcel();
 }
