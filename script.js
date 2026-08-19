@@ -275,48 +275,62 @@ function fecharModalExcel() {
 }
 
 function processarColagemExcel() {
-  const textoInput = document.getElementById('excel-input') ? document.getElementById('excel-input').value : '';
-  const diaSelecionado = document.getElementById('dia-semana-select') ? document.getElementById('dia-semana-select').value : '';
+  const inputEl = document.getElementById('excel-input') || document.querySelector('textarea');
+  const selectEl = document.getElementById('dia-semana-select') || document.querySelector('select');
+
+  const textoInput = inputEl ? inputEl.value : '';
+  const diaSelecionado = selectEl ? selectEl.value : '';
 
   if (!textoInput.trim()) {
     alert('Por favor, cole os dados do Excel na caixa de texto.');
     return;
   }
 
-  // Normaliza o nome do setor ativo para evitar falha com acentos e barras
-  // Mantém a compatibilidade com 'BOLOS SECOS' e 'PANIFICAÇÃO'
-  let chaveSetor = setorAtivo;
+  // Identifica o setor ativo atual
+  let chaveSetor = typeof setorAtivo !== 'undefined' ? setorAtivo : '';
+  
   if (typeof obterChaveSetor === 'function') {
-    chaveSetor = obterChaveSetor(setorAtivo);
-  } else {
-    // Tratamento padrão de chave de setor para normalizar nomes
-    chaveSetor = setorAtivo
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toUpperCase()
-      .trim();
+    chaveSetor = obterChaveSetor(chaveSetor);
   }
 
-  // Garante a hierarquia de objetos no banco de dados
-  if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
-  if (!bancoDados[semanaAtual][chaveSetor]) bancoDados[semanaAtual][chaveSetor] = {};
-  if (!bancoDados[semanaAtual][chaveSetor][diaSelecionado]) {
-    bancoDados[semanaAtual][chaveSetor][diaSelecionado] = [];
+  // Inicializa a estrutura no banco se não existir
+  if (typeof bancoDados !== 'undefined' && typeof semanaAtual !== 'undefined') {
+    if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
+    if (!bancoDados[semanaAtual][chaveSetor]) bancoDados[semanaAtual][chaveSetor] = {};
+    if (!bancoDados[semanaAtual][chaveSetor][diaSelecionado]) {
+      bancoDados[semanaAtual][chaveSetor][diaSelecionado] = [];
+    }
   }
 
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
-    if (!linha.trim()) return;
+    const linhaLimpa = linha.trim();
+    if (!linhaLimpa) return;
 
-    // Divide por tabulação (padrão de cópia do Excel) ou múltiplos espaços
-    const colunas = linha.split(/\t|  +/).map(col => col.trim()).filter(col => col !== '');
+    let qtd = '';
+    let nome = '';
 
-    if (colunas.length >= 2) {
-      const qtd = colunas[0];
-      const nome = colunas.slice(1).join(' ');
+    // Separa por TAB (\t), 2 ou mais espaços, ou divide no primeiro espaço se houver "kg/g/un"
+    if (linhaLimpa.includes('\t')) {
+      const partes = linhaLimpa.split('\t');
+      qtd = partes[0].trim();
+      nome = partes.slice(1).join(' ').trim();
+    } else {
+      // Procura o primeiro padrão de quantidade (ex: "40 kg", "40kg", "10") e o restante como nome
+      const match = linhaLimpa.match(/^(\d+(?:\s*(?:kg|g|un|und|cx|pct))?)\s+(.+)$/i);
+      if (match) {
+        qtd = match[1].trim();
+        nome = match[2].trim();
+      } else {
+        // Separação genérica por espaços
+        const partes = linhaLimpa.split(/\s+/);
+        qtd = partes[0].trim();
+        nome = partes.slice(1).join(' ').trim();
+      }
+    }
 
-      // Adiciona o item na chave correta do setor
+    if (qtd && nome && typeof bancoDados !== 'undefined') {
       bancoDados[semanaAtual][chaveSetor][diaSelecionado].push({
         qtd: qtd,
         tipo: 'REC',
@@ -326,16 +340,20 @@ function processarColagemExcel() {
     }
   });
 
-  // Salva no localStorage se houver a função
   if (typeof salvarDados === 'function') {
     salvarDados();
   }
 
-  // Limpa o campo
-  if (document.getElementById('excel-input')) {
-    document.getElementById('excel-input').value = '';
+  if (inputEl) inputEl.value = '';
+
+  if (typeof fecharModalExcel === 'function') {
+    fecharModalExcel();
+  } else {
+    const modal = document.getElementById('modal-excel') || document.querySelector('.modal-overlay');
+    if (modal) modal.style.display = 'none';
   }
 
-  fecharModalExcel();
-  renderizarQuadro();
+  if (typeof renderizarQuadro === 'function') {
+    renderizarQuadro();
+  }
 }
