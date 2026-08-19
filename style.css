@@ -13,8 +13,8 @@ body {
 
 /* HEADER SUPERIOR */
 .header-banner {
-  background-color: #065f46;
-  color: white;
+  background-color: #064e3b;
+  color: #ffffff;
   padding: 10px 16px;
   display: flex;
   justify-content: space-between;
@@ -32,6 +32,7 @@ body {
 .header-title h1 {
   font-size: 1.1rem;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .actions-bar {
@@ -46,21 +47,25 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .semana-selector select {
   padding: 6px 10px;
   border-radius: 6px;
-  border: none;
-  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
   cursor: pointer;
 }
 
-/* ESTILOS BASE DOS BOTÕES COM CORES FORÇADAS (!important) */
+/* ESTILOS DE TODOS OS BOTÕES DO CABEÇALHO (CORES E TEXTOS VIBRANTES) */
 .btn {
   padding: 8px 14px;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.85rem;
   border: none;
   cursor: pointer;
@@ -68,8 +73,7 @@ body {
   align-items: center;
   gap: 6px;
   transition: opacity 0.2s, transform 0.1s;
-  background-color: #ffffff;
-  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .btn:hover {
@@ -77,38 +81,45 @@ body {
   transform: translateY(-1px);
 }
 
+/* 1. Publicar / Alternar Status */
 .btn-green {
-  background-color: #16a34a !important;
+  background-color: #15803d !important;
   color: #ffffff !important;
 }
 
+/* 2. Nova Semana */
 .btn-blue {
-  background-color: #2563eb !important;
+  background-color: #1d4ed8 !important;
   color: #ffffff !important;
 }
 
+/* 3. Criar Setor */
 .btn-teal {
-  background-color: #0d9488 !important;
+  background-color: #0f766e !important;
   color: #ffffff !important;
 }
 
+/* 4. Importar do Excel */
 .btn-indigo {
-  background-color: #4f46e5 !important;
+  background-color: #4338ca !important;
   color: #ffffff !important;
 }
 
+/* 5. Excluir Setor */
 .btn-red {
-  background-color: #dc2626 !important;
+  background-color: #b91c1c !important;
   color: #ffffff !important;
 }
 
+/* 6. Excluir Semana */
 .btn-red-dark {
-  background-color: #991b1b !important;
+  background-color: #7f1d1d !important;
   color: #ffffff !important;
 }
 
+/* 7. Imprimir */
 .btn-orange {
-  background-color: #ea580c !important;
+  background-color: #c2410c !important;
   color: #ffffff !important;
 }
 
@@ -125,7 +136,7 @@ body {
   padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid #cbd5e1;
-  background-color: white;
+  background-color: #ffffff;
   color: #334155;
   font-size: 0.75rem;
   font-weight: 700;
@@ -134,9 +145,9 @@ body {
 }
 
 .tab-setor.active {
-  background-color: #065f46;
-  color: white;
-  border-color: #065f46;
+  background-color: #064e3b;
+  color: #ffffff;
+  border-color: #064e3b;
 }
 
 /* CONTEÚDO PRINCIPAL */
@@ -145,8 +156,8 @@ body {
 }
 
 .sector-title-banner {
-  background-color: #2563eb;
-  color: white;
+  background-color: #1d4ed8;
+  color: #ffffff;
   text-align: center;
   padding: 8px;
   font-weight: 800;
@@ -176,7 +187,7 @@ body {
 }
 
 .day-card {
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 6px;
   border: 1px solid #cbd5e1;
   overflow: hidden;
@@ -185,8 +196,8 @@ body {
 }
 
 .day-header {
-  background-color: #2563eb;
-  color: white;
+  background-color: #1d4ed8;
+  color: #ffffff;
   padding: 6px 10px;
   font-weight: 700;
   font-size: 0.85rem;
@@ -259,7 +270,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(2px);
   z-index: 9999;
   display: flex;
@@ -268,9 +279,9 @@ body {
 }
 
 .modal-card {
-  background: white;
+  background: #ffffff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   width: 90%;
 }
