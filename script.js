@@ -147,11 +147,14 @@ function renderizarQuadro() {
 
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
+      
+      const exibeTipo = (item.tipo && item.tipo !== 'REC') ? ` ${item.tipo}` : '';
+      const exibeBadge = (item.qtd || exibeTipo) ? `<span class="badge-rec">${item.qtd}${exibeTipo}</span>` : '';
 
       return `
         <div class="item-row">
           <div class="item-left-info">
-            <span class="badge-rec">${item.qtd} ${item.tipo || 'REC'}</span>
+            ${exibeBadge}
             ${item.categoria ? `<span class="badge-categoria ${classeCor}">${item.categoria}</span>` : ""}
             <span class="item-nome">${item.nome}</span>
           </div>
@@ -316,8 +319,8 @@ function processarColagemExcel() {
     const colunas = colunasBrutas.filter(col => col !== "");
     if (colunas.length === 0) return;
 
-    let qtd = "1";
-    let tipo = "REC";
+    let qtd = "";
+    let tipo = "";
     let nome = "";
 
     if (colunas.length >= 3 && !isNaN(parseInt(colunas[0]))) {
