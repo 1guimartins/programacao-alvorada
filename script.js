@@ -72,7 +72,7 @@ function renderizarProgramacao() {
     let itemsHTML = items.map((item, index) => {
       let badgeHTML = "";
 
-      // Exibe a TAG de tipo (PLACA, REDONDO, etc.) APENAS se for o setor BOLOS SECOS
+      // Exibe a TAG de tipo (PLACA, REDONDO, etc.) APENAS no setor BOLOS SECOS
       if (ehBolosSecos && item.tipo) {
         let badgeClass = "badge-padrao";
         const t = item.tipo.toUpperCase();
@@ -89,7 +89,7 @@ function renderizarProgramacao() {
       return `
         <div class="item-row">
           <div class="item-info">
-            <span class="badge-rec">${item.qtd}</span>
+            <span class="badge-rec" style="min-width: 65px;">${item.qtd}</span>
             ${badgeHTML}
             <span class="item-nome">${item.nome}</span>
           </div>
@@ -182,16 +182,17 @@ function processarColagemExcel() {
   let contagemInclusoes = 0;
 
   const categoriasConhecidas = ["PLACA", "REDONDO", "CREMOSO", "INGLÊS", "COBERTURA", "CASEIRO"];
+  const unidadesConhecidas = ["KG", "KGS", "REC", "RECS", "UN", "UNS", "PCT", "PCTS"];
   const ehBolosSecos = setorAtivo === "BOLOS SECOS";
 
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
 
-    // As colunas copiadas do Excel vêm separadas por caractere TAB (\t)
+    // Separa por TAB (colunas copiadas do Excel)
     const colunas = linha.split("\t").map(c => c.trim()).filter(c => c !== "");
 
     if (ehBolosSecos) {
-      // REGRA PARA BOLOS SECOS (Reconhece Placa, Redondo, etc.)
+      // REGRA PARA BOLOS SECOS
       const linhaTextoUnificado = colunas.join(" ").toUpperCase();
       if (categoriasConhecidas.includes(linhaTextoUnificado)) {
         tipoAtual = linhaTextoUnificado;
@@ -222,21 +223,42 @@ function processarColagemExcel() {
         contagemInclusoes++;
       }
     } else {
-      // REGRA PARA QUALQUER OUTRO SETOR (Pré-Pesagem, Panificação, Salgados, etc.)
+      // REGRA PARA OUTROS SETORES (PANIFICAÇÃO, PRÉ-PESAGEM, ETC)
       let qtd = "";
       let nome = "";
 
       if (colunas.length >= 2) {
-        qtd = colunas[0]; // Ex: "120 Kg" ou "3 rec"
-        nome = colunas.slice(1).join(" ").toUpperCase(); // Ex: "MASSA DE PIZZA"
+        qtd = colunas[0];
+        nome = colunas.slice(1).join(" ").toUpperCase();
       } else if (colunas.length === 1) {
         nome = colunas[0].toUpperCase();
       }
 
-      if (nome !== "" && nome !== "REC") {
+      // TRATAMENTO DA UNIDADE (Se KG veio junto do Nome, joga para a QTD)
+      if (nome !== "") {
+        const partesNome = nome.split(" ");
+        const primeiraPalavra = partesNome[0].toUpperCase();
+
+        // Se a primeira palavra do nome for KG, KGS, REC, UN, etc.
+        if (unidadesConhecidas.includes(primeiraPalavra)) {
+          // Se qtd era só o número "50", vira "50 KG"
+          if (/^\d+$/.test(qtd.trim())) {
+            qtd = `${qtd.trim()} ${primeiraPalavra.toLowerCase()}`;
+          } else if (!qtd) {
+            qtd = `1 ${primeiraPalavra.toLowerCase()}`;
+          }
+          // Remove a unidade do início do nome
+          nome = partesNome.slice(1).join(" ");
+        } else if (/^\d+$/.test(qtd.trim())) {
+          // Caso padrão se for só número sem unidade
+          qtd = `${qtd.trim()} rec`;
+        }
+      }
+
+      if (nome !== "") {
         garantirEstruturaBanco(dia);
         bancoDados[setorAtivo][dia].push({
-          qtd: qtd || "1 rec",
+          qtd: qtd,
           tipo: "",
           nome: nome
         });
