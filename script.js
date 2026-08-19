@@ -5,7 +5,7 @@ let setores = [
 ];
 
 const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
-let setorAtivo = "PANIFICAÇÃO";
+let setorAtivo = "BOLOS SECOS";
 let bancoDados = {};
 
 function carregarDados() {
@@ -107,6 +107,20 @@ function obterDatasDaSemana(semanaNome) {
   return datasFormatadas;
 }
 
+function obterClasseCategoria(categoria) {
+  if (!categoria) return "cat-padrao";
+  const catUpper = categoria.toUpperCase().trim();
+
+  if (catUpper.includes("PLACA")) return "cat-placa";
+  if (catUpper.includes("COBERTURA")) return "cat-cobertura";
+  if (catUpper.includes("CASEIRO")) return "cat-caseiro";
+  if (catUpper.includes("INGLÊS") || catUpper.includes("INGLES")) return "cat-ingles";
+  if (catUpper.includes("CREMOSO")) return "cat-cremoso";
+  if (catUpper.includes("REDONDO")) return "cat-redondo";
+
+  return "cat-padrao";
+}
+
 function renderizarQuadro() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
@@ -131,16 +145,20 @@ function renderizarQuadro() {
     const card = document.createElement("div");
     card.className = "day-card";
 
-    let itensHTML = listaItens.map((item, index) => `
-      <div class="item-row">
-        <div class="item-left-info">
-          <span class="badge-rec">${item.qtd}</span>
-          ${item.tipo ? `<span class="badge-rec" style="background-color: #f1f5f9; color: #475569;">${item.tipo}</span>` : ""}
-          <span class="item-nome">${item.nome}</span>
+    let itensHTML = listaItens.map((item, index) => {
+      const classeCor = obterClasseCategoria(item.categoria);
+
+      return `
+        <div class="item-row">
+          <div class="item-left-info">
+            <span class="badge-rec">${item.qtd} ${item.tipo || 'REC'}</span>
+            ${item.categoria ? `<span class="badge-categoria ${classeCor}">${item.categoria}</span>` : ""}
+            <span class="item-nome">${item.nome}</span>
+          </div>
+          <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">×</button>
         </div>
-        <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">×</button>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     card.innerHTML = `
       <div class="day-header">
@@ -270,11 +288,20 @@ function processarColagemExcel() {
   }
 
   const linhas = texto.split("\n");
+  let categoriaAtual = "";
 
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
 
     const colunas = linha.split("\t").map(col => col.trim());
+    const linhaLimpa = colunas.join(" ").trim();
+
+    if (colunas.length === 1 || isNaN(colunas[0])) {
+      if (!linhaLimpa.includes("FEIRA") && !linhaLimpa.includes("PROGRAMAÇÃO")) {
+        categoriaAtual = linhaLimpa;
+      }
+      return;
+    }
 
     if (colunas.length >= 3) {
       const qtd = colunas[0];
@@ -285,17 +312,20 @@ function processarColagemExcel() {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo,
+          categoria: categoriaAtual,
           nome: nome
         });
       }
-    } else if (colunas.length === 2) {
+    } 
+    else if (colunas.length === 2) {
       const qtd = colunas[0];
       const nome = colunas[1];
 
       if (qtd !== "" && nome !== "" && !isNaN(qtd)) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
-          tipo: "",
+          tipo: "REC",
+          categoria: categoriaAtual,
           nome: nome
         });
       }

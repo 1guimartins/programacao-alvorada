@@ -61,7 +61,7 @@ body {
   cursor: pointer;
 }
 
-/* ESTILOS DE TODOS OS BOTÕES DO CABEÇALHO (CORES E TEXTOS VIBRANTES) */
+/* BOTÕES DE AÇÃO */
 .btn {
   padding: 8px 14px;
   border-radius: 6px;
@@ -81,49 +81,15 @@ body {
   transform: translateY(-1px);
 }
 
-/* 1. Publicar / Alternar Status */
-.btn-green {
-  background-color: #15803d !important;
-  color: #ffffff !important;
-}
+.btn-green { background-color: #15803d !important; color: #ffffff !important; }
+.btn-blue { background-color: #1d4ed8 !important; color: #ffffff !important; }
+.btn-teal { background-color: #0f766e !important; color: #ffffff !important; }
+.btn-indigo { background-color: #4338ca !important; color: #ffffff !important; }
+.btn-red { background-color: #b91c1c !important; color: #ffffff !important; }
+.btn-red-dark { background-color: #7f1d1d !important; color: #ffffff !important; }
+.btn-orange { background-color: #c2410c !important; color: #ffffff !important; }
 
-/* 2. Nova Semana */
-.btn-blue {
-  background-color: #1d4ed8 !important;
-  color: #ffffff !important;
-}
-
-/* 3. Criar Setor */
-.btn-teal {
-  background-color: #0f766e !important;
-  color: #ffffff !important;
-}
-
-/* 4. Importar do Excel */
-.btn-indigo {
-  background-color: #4338ca !important;
-  color: #ffffff !important;
-}
-
-/* 5. Excluir Setor */
-.btn-red {
-  background-color: #b91c1c !important;
-  color: #ffffff !important;
-}
-
-/* 6. Excluir Semana */
-.btn-red-dark {
-  background-color: #7f1d1d !important;
-  color: #ffffff !important;
-}
-
-/* 7. Imprimir */
-.btn-orange {
-  background-color: #c2410c !important;
-  color: #ffffff !important;
-}
-
-/* NAVEGAÇÃO DE SETORES */
+/* ABAS DE SETORES */
 .nav-setores {
   display: flex;
   gap: 6px;
@@ -150,24 +116,11 @@ body {
   border-color: #064e3b;
 }
 
-/* CONTEÚDO PRINCIPAL */
+/* QUADRO PRINCIPAL E CARDS */
 .main-content {
   padding: 12px 16px;
 }
 
-.sector-title-banner {
-  background-color: #1d4ed8;
-  color: #ffffff;
-  text-align: center;
-  padding: 8px;
-  font-weight: 800;
-  font-size: 1rem;
-  border-radius: 4px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-
-/* GRID DOS DIAS DA SEMANA */
 .days-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -175,15 +128,11 @@ body {
 }
 
 @media (max-width: 1200px) {
-  .days-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .days-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .days-grid {
-    grid-template-columns: 1fr;
-  }
+  .days-grid { grid-template-columns: 1fr; }
 }
 
 .day-card {
@@ -229,15 +178,34 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .badge-rec {
-  background-color: #eff6ff;
-  color: #1d4ed8;
+  background-color: #1e293b;
+  color: #ffffff;
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 4px;
+  font-size: 0.75rem;
 }
+
+/* CORES DAS CATEGORIAS DE BOLO */
+.badge-categoria {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.cat-placa { background-color: #dbeafe; color: #1e40af; }
+.cat-cobertura { background-color: #fce7f3; color: #9d174d; }
+.cat-caseiro { background-color: #fef3c7; color: #92400e; }
+.cat-ingles { background-color: #e0e7ff; color: #3730a3; }
+.cat-cremoso { background-color: #dcfce7; color: #166534; }
+.cat-redondo { background-color: #ffedd5; color: #9a3412; }
+.cat-padrao { background-color: #f1f5f9; color: #475569; }
 
 .item-nome {
   font-weight: 600;
@@ -254,16 +222,7 @@ body {
   padding: 0 4px;
 }
 
-.input-qtd-realizada {
-  width: 50px;
-  padding: 2px 4px;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  text-align: center;
-  font-weight: 700;
-}
-
-/* MODAL FIXO E SOBREPOSIÇÃO */
+/* MODAL */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -284,4 +243,5 @@ body {
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   width: 90%;
+  max-width: 600px;
 }
