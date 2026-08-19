@@ -1,33 +1,45 @@
-// LISTA DE SETORES PADRÃO
-const setoresLideres = [
-  "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
-  "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
-  "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
-];
-
 const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
+let setoresLideres = [];
 let setorAtivoLider = "PANIFICAÇÃO";
 
-// CARREGA OS DADOS SALVOS DO ADM
 function obterDadosSalvos() {
   const dados = localStorage.getItem("bancoDadosPanificacao");
-  if (dados) {
-    try {
-      return JSON.parse(dados);
-    } catch (e) {
-      console.error("Erro ao ler localStorage", e);
-    }
-  }
-  return {};
+  return dados ? JSON.parse(dados) : {};
 }
 
-// INICIALIZAÇÃO
+function obterSetoresSalvos() {
+  const lista = localStorage.getItem("setoresPanificacao");
+  const padrao = [
+    "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
+    "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
+    "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
+  ];
+  return lista ? JSON.parse(lista) : padrao;
+}
+
+function obterSemanaAtiva() {
+  return localStorage.getItem("semanaAtivaPanificacao") || "Semana 17/08 a 23/08";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  renderizarAbasLideres();
-  renderizarQuadroLideres();
+  sincronizarTela();
 });
 
-// RENDEREIZA AS ABAS
+window.addEventListener("storage", () => {
+  sincronizarTela();
+});
+
+function sincronizarTela() {
+  setoresLideres = obterSetoresSalvos();
+  
+  if (!setorAtivoLider || !setoresLideres.includes(setorAtivoLider)) {
+    setorAtivoLider = setoresLideres.includes("PANIFICAÇÃO") ? "PANIFICAÇÃO" : setoresLideres[0];
+  }
+  
+  renderizarAbasLideres();
+  renderizarQuadroLideres();
+}
+
 function renderizarAbasLideres() {
   const container = document.getElementById("nav-setores-lideres");
   if (!container) return;
@@ -46,7 +58,6 @@ function renderizarAbasLideres() {
   });
 }
 
-// RENDERIZA O QUADRO DE DIAS E PRODUTOS
 function renderizarQuadroLideres() {
   const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivoLider}`;
@@ -56,7 +67,10 @@ function renderizarQuadroLideres() {
   grid.innerHTML = "";
 
   const bancoDados = obterDadosSalvos();
-  const dadosSetor = bancoDados[setorAtivoLider] || {};
+  const semanaAtual = obterSemanaAtiva();
+  
+  const dadosSemana = bancoDados[semanaAtual] || {};
+  const dadosSetor = dadosSemana[setorAtivoLider] || {};
   const ehBolosSecos = setorAtivoLider === "BOLOS SECOS";
 
   diasDaSemana.forEach((dia) => {
@@ -105,8 +119,4 @@ function renderizarQuadroLideres() {
 
     grid.appendChild(card);
   });
-}
-
-function verHistorico() {
-  alert("Exibindo histórico de alterações...");
 }
