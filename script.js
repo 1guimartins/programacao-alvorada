@@ -323,31 +323,31 @@ function processarColagemExcel() {
     let tipo = "";
     let nome = "";
 
-    if (colunas.length >= 3 && !isNaN(parseInt(colunas[0]))) {
+    // Formato Bolos (3 colunas: Qtd | Tipo | Nome)
+    if (colunas.length >= 3 && !isNaN(parseInt(colunas[0])) && colunas[0].length <= 3) {
       qtd = colunas[0];
       tipo = colunas[1];
       nome = colunas.slice(2).join(" ");
     }
-    else if (colunas.length === 2 && !isNaN(parseInt(colunas[0]))) {
-      qtd = colunas[0];
-      nome = colunas[1];
-    }
-    else {
-      let idxQtd = colunas.findIndex(c => /\d+/.test(c));
-
-      if (idxQtd !== -1) {
-        qtd = colunas[idxQtd];
-        colunas.splice(idxQtd, 1);
-        nome = colunas.join(" ");
+    // Formato com 2 Colunas no Excel
+    else if (colunas.length >= 2) {
+      // Verifica se a primeira coluna é explicitamente uma quantidade isolada (ex: "200 UND" ou "200")
+      if (/^\d+(\s*(UND|KG|G|PC|UN))?$/i.test(colunas[0])) {
+        qtd = colunas[0];
+        nome = colunas.slice(1).join(" ");
       } else {
         nome = colunas.join(" ");
       }
     }
+    // Apenas 1 coluna
+    else {
+      nome = colunas[0];
+    }
 
     if (nome.trim() !== "") {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-        qtd: qtd,
-        tipo: tipo,
+        qtd: qtd.trim(),
+        tipo: tipo.trim(),
         categoria: categoriaAtual,
         nome: nome.trim()
       });
