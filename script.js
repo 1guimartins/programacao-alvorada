@@ -283,28 +283,41 @@ function processarColagemExcel() {
     return;
   }
 
-  // Separa o texto por linhas
+  // Normaliza o nome do setor ativo para evitar falha com acentos e barras
+  // Mantém a compatibilidade com 'BOLOS SECOS' e 'PANIFICAÇÃO'
+  let chaveSetor = setorAtivo;
+  if (typeof obterChaveSetor === 'function') {
+    chaveSetor = obterChaveSetor(setorAtivo);
+  } else {
+    // Tratamento padrão de chave de setor para normalizar nomes
+    chaveSetor = setorAtivo
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase()
+      .trim();
+  }
+
+  // Garante a hierarquia de objetos no banco de dados
+  if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
+  if (!bancoDados[semanaAtual][chaveSetor]) bancoDados[semanaAtual][chaveSetor] = {};
+  if (!bancoDados[semanaAtual][chaveSetor][diaSelecionado]) {
+    bancoDados[semanaAtual][chaveSetor][diaSelecionado] = [];
+  }
+
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
     if (!linha.trim()) return;
 
-    // Separa as colunas copiadas do Excel (por tabulação \t ou múltiplos espaços)
+    // Divide por tabulação (padrão de cópia do Excel) ou múltiplos espaços
     const colunas = linha.split(/\t|  +/).map(col => col.trim()).filter(col => col !== '');
 
     if (colunas.length >= 2) {
       const qtd = colunas[0];
-      const nome = colunas.slice(1).join(' '); // Garante que pega todo o nome restante
+      const nome = colunas.slice(1).join(' ');
 
-      // Garante que a estrutura do banco existe
-      if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
-      if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
-      if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
-        bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
-      }
-
-      // Adiciona o item ao dia selecionado
-      bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
+      // Adiciona o item na chave correta do setor
+      bancoDados[semanaAtual][chaveSetor][diaSelecionado].push({
         qtd: qtd,
         tipo: 'REC',
         categoria: typeof categoriaAtual !== 'undefined' ? categoriaAtual : 'PADRAO',
@@ -313,16 +326,16 @@ function processarColagemExcel() {
     }
   });
 
-  // Salva no localStorage se sua aplicação usar persistência
+  // Salva no localStorage se houver a função
   if (typeof salvarDados === 'function') {
     salvarDados();
   }
 
-  // Limpa o campo, fecha o modal e redesenha a tela
+  // Limpa o campo
   if (document.getElementById('excel-input')) {
     document.getElementById('excel-input').value = '';
   }
-  
+
   fecharModalExcel();
   renderizarQuadro();
 }
