@@ -275,31 +275,24 @@ function fecharModalExcel() {
 }
 
 function processarColagemExcel() {
-  const inputEl = document.getElementById('excel-input') || document.querySelector('textarea');
-  const selectEl = document.getElementById('dia-semana-select') || document.querySelector('select');
+  const inputEl = document.getElementById("excel-input") || document.querySelector("textarea");
+  const selectEl = document.getElementById("dia-semana-select") || document.querySelector("#modal-excel select");
+  const semanaSelect = document.getElementById("semana-select");
 
-  const textoInput = inputEl ? inputEl.value : '';
-  const diaSelecionado = selectEl ? selectEl.value : '';
+  const textoInput = inputEl ? inputEl.value : "";
+  const diaSelecionado = selectEl ? selectEl.value : "SEGUNDA";
+  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
 
   if (!textoInput.trim()) {
-    alert('Por favor, cole os dados do Excel na caixa de texto.');
+    alert("Por favor, cole os dados do Excel na caixa de texto.");
     return;
   }
 
-  // Identifica o setor ativo atual
-  let chaveSetor = typeof setorAtivo !== 'undefined' ? setorAtivo : '';
-  
-  if (typeof obterChaveSetor === 'function') {
-    chaveSetor = obterChaveSetor(chaveSetor);
-  }
-
-  // Inicializa a estrutura no banco se não existir
-  if (typeof bancoDados !== 'undefined' && typeof semanaAtual !== 'undefined') {
-    if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
-    if (!bancoDados[semanaAtual][chaveSetor]) bancoDados[semanaAtual][chaveSetor] = {};
-    if (!bancoDados[semanaAtual][chaveSetor][diaSelecionado]) {
-      bancoDados[semanaAtual][chaveSetor][diaSelecionado] = [];
-    }
+  // Garante a existência da estrutura no bancoDados
+  if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
+  if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
+  if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
+    bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
   }
 
   const linhas = textoInput.split(/\r?\n/);
@@ -308,52 +301,35 @@ function processarColagemExcel() {
     const linhaLimpa = linha.trim();
     if (!linhaLimpa) return;
 
-    let qtd = '';
-    let nome = '';
+    let qtd = "";
+    let nome = "";
 
-    // Separa por TAB (\t), 2 ou mais espaços, ou divide no primeiro espaço se houver "kg/g/un"
-    if (linhaLimpa.includes('\t')) {
-      const partes = linhaLimpa.split('\t');
+    if (linhaLimpa.includes("\t")) {
+      const partes = linhaLimpa.split("\t");
       qtd = partes[0].trim();
-      nome = partes.slice(1).join(' ').trim();
+      nome = partes.slice(1).join(" ").trim();
     } else {
-      // Procura o primeiro padrão de quantidade (ex: "40 kg", "40kg", "10") e o restante como nome
       const match = linhaLimpa.match(/^(\d+(?:\s*(?:kg|g|un|und|cx|pct))?)\s+(.+)$/i);
       if (match) {
         qtd = match[1].trim();
         nome = match[2].trim();
       } else {
-        // Separação genérica por espaços
         const partes = linhaLimpa.split(/\s+/);
         qtd = partes[0].trim();
-        nome = partes.slice(1).join(' ').trim();
+        nome = partes.slice(1).join(" ").trim();
       }
     }
 
-    if (qtd && nome && typeof bancoDados !== 'undefined') {
-      bancoDados[semanaAtual][chaveSetor][diaSelecionado].push({
+    if (qtd && nome) {
+      bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
-        tipo: 'REC',
-        categoria: typeof categoriaAtual !== 'undefined' ? categoriaAtual : 'PADRAO',
+        tipo: "REC",
+        categoria: typeof categoriaAtual !== "undefined" ? categoriaAtual : "",
         nome: nome
       });
     }
   });
 
-  if (typeof salvarDados === 'function') {
-    salvarDados();
-  }
-
-  if (inputEl) inputEl.value = '';
-
-  if (typeof fecharModalExcel === 'function') {
-    fecharModalExcel();
-  } else {
-    const modal = document.getElementById('modal-excel') || document.querySelector('.modal-overlay');
-    if (modal) modal.style.display = 'none';
-  }
-
-  if (typeof renderizarQuadro === 'function') {
-    renderizarQuadro();
-  }
+  fecharModalExcel();
+  renderizarQuadro();
 }
