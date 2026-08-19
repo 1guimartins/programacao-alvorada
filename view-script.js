@@ -1,66 +1,25 @@
-// LISTA DE SETORES
+// LISTA DE SETORES PADRÃO
 const setoresLideres = [
   "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
   "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
-  "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS", 
-  "SEPARAÇÃO SECA", "SOBREMESAS"
+  "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
 ];
 
+const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
 let setorAtivoLider = "PANIFICAÇÃO";
 
-// DADOS DE EXEMPLO (Carregados do ADM)
-let programacaoGeral = {
-  "PANIFICAÇÃO": {
-    "SEGUNDA 17/08/2026": [
-      { qtd: "50 kg", nome: "PÃO DE FORMA" },
-      { qtd: "40 kg", nome: "BRIOCHE" },
-      { qtd: "8 x 40 kg", nome: "SOVADO" },
-      { qtd: "60 kg", nome: "PÃO DE CEBOLA" },
-      { qtd: "80 kg", nome: "ROSCA RAINHA DE CREME" },
-      { qtd: "70 kg", nome: "ROSQUINHA DE CREME" }
-    ],
-    "TERÇA 18/08/2026": [
-      { qtd: "20 KG", nome: "ROSCA DE LEITE CONDENSADO" },
-      { qtd: "20 KG", nome: "PÃO DE MILHO" },
-      { qtd: "3X40 KG", nome: "SOVADO" },
-      { qtd: "30 KG", nome: "ROSCA LISA" },
-      { qtd: "20 KG", nome: "PÃO DE BATATA" },
-      { qtd: "40 KG", nome: "ROSCA RAINHA AÇÚCAR" },
-      { qtd: "30 KG", nome: "HOT DOG" },
-      { qtd: "40 KG", nome: "ROSCA FAZENDA" },
-      { qtd: "2 KITS", nome: "CHOCOTTONE / 30 COLOMBA" },
-      { qtd: "2 KITS", nome: "PANETTONE / 30 COLOMBA" }
-    ],
-    "QUARTA 19/08/2026": [
-      { qtd: "50 KG", nome: "PÃO DE FORMA" },
-      { qtd: "50 KG", nome: "PÃO DE FORMA INTEGRAL" },
-      { qtd: "3X40 KG", nome: "SOVADO" },
-      { qtd: "20 KG", nome: "PÃO DE CEBOLA" },
-      { qtd: "50 KG", nome: "ROSCA RAINHA DE CREME" },
-      { qtd: "40 KG", nome: "ROSQUINHA DE CREME" }
-    ],
-    "QUINTA 20/08/2026": [
-      { qtd: "4X40 KG", nome: "SOVADO" },
-      { qtd: "30 KG", nome: "ROSCA LISA" },
-      { qtd: "30 KG", nome: "PÃO DE BATATA" },
-      { qtd: "30 KG", nome: "HAMBURGUER TRADICIONAL" },
-      { qtd: "40 KG", nome: "HAMBURGUER GERGELIM" },
-      { qtd: "40 KG", nome: "ROSCA RAINHA AÇÚCAR" },
-      { qtd: "20 KG", nome: "ROSQUINHA C/ AÇÚCAR" },
-      { qtd: "30 KG", nome: "ROSCA FAZENDA C/ AÇÚCAR" }
-    ],
-    "SEXTA 21/08/2026": [
-      { qtd: "30 KG", nome: "ROSQUINHA C/ AÇÚCAR (CONGELAR)" }
-    ]
-  },
-  "BOLOS SECOS": {
-    "SEGUNDA 17/08/2026": [
-      { qtd: "2 rec", tipo: "PLACA", nome: "ABACAXI" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "CENOURA C/ COBERTURA" },
-      { qtd: "2 rec", tipo: "CREMOSO", nome: "FUBÁ CREMOSO" }
-    ]
+// CARREGA OS DADOS SALVOS DO ADM
+function obterDadosSalvos() {
+  const dados = localStorage.getItem("bancoDadosPanificacao");
+  if (dados) {
+    try {
+      return JSON.parse(dados);
+    } catch (e) {
+      console.error("Erro ao ler localStorage", e);
+    }
   }
-};
+  return {};
+}
 
 // INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
@@ -68,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarQuadroLideres();
 });
 
-// DESENHAR ABAS
+// RENDEREIZA AS ABAS
 function renderizarAbasLideres() {
   const container = document.getElementById("nav-setores-lideres");
   if (!container) return;
@@ -87,7 +46,7 @@ function renderizarAbasLideres() {
   });
 }
 
-// DESENHAR CARDS
+// RENDERIZA O QUADRO DE DIAS E PRODUTOS
 function renderizarQuadroLideres() {
   const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivoLider}`;
@@ -96,20 +55,15 @@ function renderizarQuadroLideres() {
   if (!grid) return;
   grid.innerHTML = "";
 
-  const dadosSetor = programacaoGeral[setorAtivoLider] || {};
+  const bancoDados = obterDadosSalvos();
+  const dadosSetor = bancoDados[setorAtivoLider] || {};
   const ehBolosSecos = setorAtivoLider === "BOLOS SECOS";
-  const diasChaves = Object.keys(dadosSetor);
 
-  if (diasChaves.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b; font-weight: 600;">Nenhuma programação cadastrada para o setor de ${setorAtivoLider}.</div>`;
-    return;
-  }
-
-  diasChaves.forEach((diaData) => {
+  diasDaSemana.forEach((dia) => {
     const card = document.createElement("div");
     card.className = "day-card";
 
-    const listaItens = dadosSetor[diaData] || [];
+    const listaItens = dadosSetor[dia] || [];
 
     let itensHTML = listaItens.map((item) => {
       let badgeTipoHTML = "";
@@ -141,11 +95,11 @@ function renderizarQuadroLideres() {
 
     card.innerHTML = `
       <div class="day-header">
-        <span>${diaData}</span>
+        <span>${dia}</span>
         <span style="font-size: 0.75rem; opacity: 0.85;">${listaItens.length} itens</span>
       </div>
       <div class="day-items-list">
-        ${itensHTML}
+        ${itensHTML || '<p style="font-size: 0.75rem; color: #94a3b8; text-align: center; padding: 10px;">Nenhum item cadastrado</p>'}
       </div>
     `;
 
