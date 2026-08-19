@@ -3,38 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Consulta</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <title>Consulta de Setores - Painel dos Líderes</title>
+  <link rel="stylesheet" href="lideres-style.css">
 </head>
 <body>
 
-  <header>
-    <h1>🥐 Consulta de Setores</h1>
-    <button class="sininho-btn" onclick="abrirModal()">🔔 Histórico</button>
+  <!-- CABEÇALHO SUPERIOR -->
+  <header class="header-lideres">
+    <div class="header-left">
+      <span class="logo-icon">🥐</span>
+      <h2>Consulta de Setores</h2>
+    </div>
+    <div class="header-right">
+      <button class="btn-top btn-hist" onclick="verHistorico()">🔔 Histórico</button>
+      <button class="btn-top btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
   </header>
 
-  <div class="semana-container">
-    <button class="btn btn-orange" onclick="window.print()" style="margin-left: auto;">🖨️ Imprimir</button>
-  </div>
+  <!-- ABAS DOS SETORES -->
+  <nav class="nav-setores-lideres" id="nav-setores-lideres">
+    <!-- Gerado dinamicamente via JS -->
+  </nav>
 
-  <div class="sub-tabs" id="sub-tabs-list-view"></div>
-  <div class="titulo-setor-exibicao" id="setor-titulo-view">CARREGANDO...</div>
-  <div id="setores-containers-view"></div>
-
-  <div id="modal-notificacoes" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3>📋 Histórico de Alterações</h3>
-        <button onclick="fecharModal()" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">&times;</button>
-      </div>
-      <div id="modal-lista">
-        <p class="item-vazio">Sem historico recente.</p>
-      </div>
+  <!-- CONTEÚDO DA PROGRAMAÇÃO DO SETOR -->
+  <main class="main-lideres">
+    <div class="sector-title-banner" id="titulo-setor-ativo">
+      PROGRAMAÇÃO DE PANIFICAÇÃO
     </div>
-  </div>
 
-  <script src="view-script.js"></script>
+    <div class="days-grid-lideres" id="grid-dias-lideres">
+      <!-- Cards dos dias gerados via JS -->
+    </div>
+  </main>
+
+  <script src="lideres-script.js"></script>
 </body>
 </html>
