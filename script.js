@@ -275,66 +275,54 @@ function fecharModalExcel() {
 }
 
 function processarColagemExcel() {
-  const texto = document.getElementById("excel-input").value;
-  const diaSelecionado = document.getElementById("select-dia-excel").value;
+  const textoInput = document.getElementById('excel-input') ? document.getElementById('excel-input').value : '';
+  const diaSelecionado = document.getElementById('dia-semana-select') ? document.getElementById('dia-semana-select').value : '';
 
-  if (!texto.trim()) return;
-
-  const semanaSelect = document.getElementById("semana-select");
-  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
-
-  // Garante inicialização correta das estruturas do banco
-  if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
-  if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
-  if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
-    bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
+  if (!textoInput.trim()) {
+    alert('Por favor, cole os dados do Excel na caixa de texto.');
+    return;
   }
 
-  const linhas = texto.split("\n");
-  let categoriaAtual = "";
+  // Separa o texto por linhas
+  const linhas = textoInput.split(/\r?\n/);
 
-  linhas.forEach((linha) => {
+  linhas.forEach(linha => {
     if (!linha.trim()) return;
 
-    const colunas = linha.split("\t").map(col => col.trim()).filter(col => col !== "");
-    if (colunas.length === 0) return;
+    // Separa as colunas copiadas do Excel (por tabulação \t ou múltiplos espaços)
+    const colunas = linha.split(/\t|  +/).map(col => col.trim()).filter(col => col !== '');
 
-    const primeiraColuna = colunas[0];
-    const ehNumero = !isNaN(parseInt(primeiraColuna)) && isFinite(primeiraColuna);
+    if (colunas.length >= 2) {
+      const qtd = colunas[0];
+      const nome = colunas.slice(1).join(' '); // Garante que pega todo o nome restante
 
-    // Se a primeira coluna NÃO é número, é uma linha de Cabeçalho/Categoria
-    if (!ehNumero) {
-      const textoCategoria = colunas.join(" ").trim().toUpperCase();
-      // Desconsidera se for nome de dia da semana para não virar categoria
-      const ehDia = diasDaSemana.some(d => textoCategoria.includes(d));
-      if (!ehDia) {
-        categoriaAtual = textoCategoria;
+      // Garante que a estrutura do banco existe
+      if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
+      if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
+      if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
+        bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
       }
-      return;
-    }
 
-    // Se for linha de produto (primeira coluna é um número)
-    const qtd = colunas[0];
-    let tipo = "REC";
-    let nome = "";
-
-    if (colunas.length >= 3) {
-      tipo = colunas[1];
-      nome = colunas.slice(2).join(" ");
-    } else if (colunas.length === 2) {
-      nome = colunas[1];
-    }
-
-    if (qtd !== "" && nome !== "") {
+      // Adiciona o item ao dia selecionado
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
-        tipo: tipo,
-        categoria: categoriaAtual,
+        tipo: 'REC',
+        categoria: typeof categoriaAtual !== 'undefined' ? categoriaAtual : 'PADRAO',
         nome: nome
       });
     }
   });
 
+  // Salva no localStorage se sua aplicação usar persistência
+  if (typeof salvarDados === 'function') {
+    salvarDados();
+  }
+
+  // Limpa o campo, fecha o modal e redesenha a tela
+  if (document.getElementById('excel-input')) {
+    document.getElementById('excel-input').value = '';
+  }
+  
   fecharModalExcel();
   renderizarQuadro();
 }
