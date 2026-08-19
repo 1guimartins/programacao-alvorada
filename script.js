@@ -13,11 +13,11 @@ function carregarDados() {
   const setoresSalvos = localStorage.getItem("setoresPanificacao");
 
   if (setoresSalvos) {
-    setores = JSON.parse(setoresSalvos);
+    try { setores = JSON.parse(setoresSalvos); } catch(e){}
   }
 
   if (dadosSalvos) {
-    bancoDados = JSON.parse(dadosSalvos);
+    try { bancoDados = JSON.parse(dadosSalvos); } catch(e){}
   } else {
     const semanaInicial = "Semana 17/08 a 23/08";
     bancoDados[semanaInicial] = {};
@@ -178,7 +178,9 @@ function removerItem(dia, index) {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
   
-  bancoDados[semanaAtual][setorAtivo][dia].splice(index, 1);
+  if (bancoDados[semanaAtual] && bancoDados[semanaAtual][setorAtivo] && bancoDados[semanaAtual][setorAtivo][dia]) {
+    bancoDados[semanaAtual][setorAtivo][dia].splice(index, 1);
+  }
   renderizarQuadro();
 }
 
@@ -281,6 +283,7 @@ function processarColagemExcel() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
 
+  // Garante inicialização correta das estruturas do banco
   if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
   if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
   if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
@@ -290,53 +293,45 @@ function processarColagemExcel() {
   const linhas = texto.split("\n");
   let categoriaAtual = "";
 
-  const categoriasValidas = ["PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
-
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
 
-    const colunas = linha.split("\t").map(col => col.trim());
-    const primeiraColuna = colunas[0].toUpperCase();
+    const colunas = linha.split("\t").map(col => col.trim()).filter(col => col !== "");
+    if (colunas.length === 0) return;
+
+    const primeiraColuna = colunas[0];
     const ehNumero = !isNaN(parseInt(primeiraColuna)) && isFinite(primeiraColuna);
 
-    // 1. LINHA DE CABEÇALHO (Não começa com número)
+    // Se a primeira coluna NÃO é número, é uma linha de Cabeçalho/Categoria
     if (!ehNumero) {
-      const textoLinha = colunas.join(" ").toUpperCase();
-      const achouCat = categoriasValidas.find(cat => textoLinha.includes(cat));
-
-      if (achouCat) {
-        categoriaAtual = (achouCat === "INGLES") ? "INGLÊS" : achouCat;
+      const textoCategoria = colunas.join(" ").trim().toUpperCase();
+      // Desconsidera se for nome de dia da semana para não virar categoria
+      const ehDia = diasDaSemana.some(d => textoCategoria.includes(d));
+      if (!ehDia) {
+        categoriaAtual = textoCategoria;
       }
       return;
     }
 
-    // 2. LINHA DE PRODUTO (Começa com a quantidade numérica)
+    // Se for linha de produto (primeira coluna é um número)
+    const qtd = colunas[0];
+    let tipo = "REC";
+    let nome = "";
+
     if (colunas.length >= 3) {
-      const qtd = colunas[0];
-      const tipo = colunas[1];
-      const nome = colunas.slice(2).join(" ");
+      tipo = colunas[1];
+      nome = colunas.slice(2).join(" ");
+    } else if (colunas.length === 2) {
+      nome = colunas[1];
+    }
 
-      if (qtd !== "" && nome !== "") {
-        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-          qtd: qtd,
-          tipo: tipo,
-          categoria: categoriaAtual,
-          nome: nome
-        });
-      }
-    } 
-    else if (colunas.length === 2) {
-      const qtd = colunas[0];
-      const nome = colunas[1];
-
-      if (qtd !== "" && nome !== "") {
-        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-          qtd: qtd,
-          tipo: "REC",
-          categoria: categoriaAtual,
-          nome: nome
-        });
-      }
+    if (qtd !== "" && nome !== "") {
+      bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
+        qtd: qtd,
+        tipo: tipo,
+        categoria: categoriaAtual,
+        nome: nome
+      });
     }
   });
 
