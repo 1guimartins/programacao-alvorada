@@ -50,15 +50,31 @@
     </div>
   </main>
 
-  <!-- MODAL EXCEL -->
+  <!-- MODAL EXCEL COM SELEÇÃO DE DIA -->
   <div id="modal-excel" class="modal-overlay" style="display: none;">
     <div class="modal-card" style="max-width: 550px;">
       <h3>Importar do Excel</h3>
       <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
-        Cole abaixo os dados copiados de duas colunas do Excel (Ex: Quantidade e Produto).
+        Selecione o dia e cole os dados copiados de duas colunas do Excel (Ex: Quantidade e Produto).
       </p>
+
       <div style="margin-bottom: 12px;">
-        <textarea id="excel-input" rows="9" 
+        <label for="select-dia-excel" style="font-size: 0.85rem; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">
+          Selecione o dia da semana:
+        </label>
+        <select id="select-dia-excel" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 600;">
+          <option value="SEGUNDA">SEGUNDA</option>
+          <option value="TERÇA">TERÇA</option>
+          <option value="QUARTA">QUARTA</option>
+          <option value="QUINTA">QUINTA</option>
+          <option value="SEXTA">SEXTA</option>
+          <option value="SÁBADO">SÁBADO</option>
+          <option value="DOMINGO">DOMINGO</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <textarea id="excel-input" rows="8" 
           placeholder="Selecione as duas colunas no Excel (Ex: 120 Kg | MASSA DE PIZZA), copie (Ctrl+C) e cole aqui..."
           style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 0.8rem; box-sizing: border-box;"></textarea>
       </div>

@@ -149,6 +149,8 @@ function fecharModalExcel() {
 
 function processarColagemExcel() {
   const texto = document.getElementById("excel-input").value;
+  const diaSelecionado = document.getElementById("select-dia-excel").value;
+
   if (!texto.trim()) return;
 
   const semanaSelect = document.getElementById("semana-select");
@@ -162,7 +164,7 @@ function processarColagemExcel() {
         const qtd = colunas[0].trim();
         const nome = colunas[1].trim();
         if (qtd && nome) {
-          bancoDados[semanaAtual][setorAtivo]["SEGUNDA"].push({ qtd, nome });
+          bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({ qtd, nome });
         }
       }
     }
