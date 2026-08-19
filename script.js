@@ -8,42 +8,20 @@ let bancoDados = {
     "SEGUNDA": [
       { qtd: "2 rec", tipo: "PLACA", nome: "ABACAXI" },
       { qtd: "2 rec", tipo: "PLACA", nome: "CENOURA C/ COBERTURA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "CENOURA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "CHOCOLATE C/ COBERTURA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "CHOCOLATE" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "COCO C/ COBERTURA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "COCO" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "FUBÁ" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "LARANJA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "LEITE CONDENSADO" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "LIMÃO C/ COBERTURA" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "LIMÃO" },
-      { qtd: "2 rec", tipo: "PLACA", nome: "MILHO" }
+      { qtd: "2 rec", tipo: "PLACA", nome: "CENOURA" }
     ],
-    "TERÇA": [
-      { qtd: "1 rec", tipo: "REDONDO", nome: "ABACAXI" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "CENOURA" },
-      { qtd: "2 rec", tipo: "REDONDO", nome: "CHOCOLATE" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "COCO" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "FORMIGUEIRO" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "FUBÁ" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "LARANJA" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "LEITE CONDENSADO" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "LIMÃO" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "MILHO" },
-      { qtd: "1 rec", tipo: "REDONDO", nome: "NEUTRO" },
-      { qtd: "3 rec", tipo: "COBERTURA", nome: "RED VELVET" },
-      { qtd: "3 rec", tipo: "COBERTURA", nome: "CENOURA" }
+    "TERÇA": [], "QUARTA": [], "QUINTA": [], "SEXTA": [], "SÁBADO": [], "DOMINGO": []
+  },
+  "PRÉ-PESAGEM": {
+    "SEGUNDA": [
+      { qtd: "120 Kg", tipo: "", nome: "MASSA DE PIZZA" },
+      { qtd: "3 rec", tipo: "", nome: "CIGARRETE" },
+      { qtd: "8 rec", tipo: "", nome: "BOLINHO DE MILHO" },
+      { qtd: "8 rec", tipo: "", nome: "BOLINHA DE PIZZA" },
+      { qtd: "1 rec", tipo: "", nome: "FRICASSÊ DE FRANGO" },
+      { qtd: "4 rec", tipo: "", nome: "PÃO DE QUEIJO LANCHE" }
     ],
-    "QUARTA": [
-      { qtd: "1 rec", tipo: "PLACA", nome: "ABACAXI" },
-      { qtd: "1 rec", tipo: "PLACA", nome: "CENOURA" },
-      { qtd: "1 rec", tipo: "PLACA", nome: "CHOCOLATE C/ COBERTURA" }
-    ],
-    "QUINTA": [],
-    "SEXTA": [],
-    "SÁBADO": [],
-    "DOMINGO": []
+    "TERÇA": [], "QUARTA": [], "QUINTA": [], "SEXTA": [], "SÁBADO": [], "DOMINGO": []
   }
 };
 
@@ -83,6 +61,8 @@ function renderizarProgramacao() {
     bancoDados[setorAtivo] = { SEGUNDA: [], TERÇA: [], QUARTA: [], QUINTA: [], SEXTA: [], SÁBADO: [], DOMINGO: [] };
   }
 
+  const ehBolosSecos = setorAtivo === "BOLOS SECOS";
+
   diasDaSemana.forEach((dia) => {
     const card = document.createElement("div");
     card.className = "day-card";
@@ -90,20 +70,27 @@ function renderizarProgramacao() {
     const items = bancoDados[setorAtivo][dia] || [];
 
     let itemsHTML = items.map((item, index) => {
-      let badgeClass = "badge-padrao";
-      const t = (item.tipo || "").toUpperCase();
-      if (t.includes("PLACA")) badgeClass = "badge-placa";
-      else if (t.includes("REDONDO")) badgeClass = "badge-redondo";
-      else if (t.includes("CREMOSO")) badgeClass = "badge-cremoso";
-      else if (t.includes("INGLÊS")) badgeClass = "badge-inglês";
-      else if (t.includes("COBERTURA")) badgeClass = "badge-cobertura";
-      else if (t.includes("CASEIRO")) badgeClass = "badge-caseiro";
+      let badgeHTML = "";
+
+      // Exibe a TAG de tipo (PLACA, REDONDO, etc.) APENAS se for o setor BOLOS SECOS
+      if (ehBolosSecos && item.tipo) {
+        let badgeClass = "badge-padrao";
+        const t = item.tipo.toUpperCase();
+        if (t.includes("PLACA")) badgeClass = "badge-placa";
+        else if (t.includes("REDONDO")) badgeClass = "badge-redondo";
+        else if (t.includes("CREMOSO")) badgeClass = "badge-cremoso";
+        else if (t.includes("INGLÊS")) badgeClass = "badge-inglês";
+        else if (t.includes("COBERTURA")) badgeClass = "badge-cobertura";
+        else if (t.includes("CASEIRO")) badgeClass = "badge-caseiro";
+
+        badgeHTML = `<span class="badge-tipo ${badgeClass}">${item.tipo}</span>`;
+      }
 
       return `
         <div class="item-row">
           <div class="item-info">
             <span class="badge-rec">${item.qtd}</span>
-            <span class="badge-tipo ${badgeClass}">${item.tipo}</span>
+            ${badgeHTML}
             <span class="item-nome">${item.nome}</span>
           </div>
           <button class="btn-remove" onclick="removerItem('${dia}', ${index})">×</button>
@@ -195,6 +182,7 @@ function processarColagemExcel() {
   let contagemInclusoes = 0;
 
   const categoriasConhecidas = ["PLACA", "REDONDO", "CREMOSO", "INGLÊS", "COBERTURA", "CASEIRO"];
+  const ehBolosSecos = setorAtivo === "BOLOS SECOS";
 
   linhas.forEach((linha) => {
     if (!linha.trim()) return;
@@ -202,54 +190,71 @@ function processarColagemExcel() {
     // As colunas copiadas do Excel vêm separadas por caractere TAB (\t)
     const colunas = linha.split("\t").map(c => c.trim()).filter(c => c !== "");
 
-    // Se a linha contiver apenas o nome do tipo/categoria
-    const linhaTextoUnificado = colunas.join(" ").toUpperCase();
-    if (categoriasConhecidas.includes(linhaTextoUnificado)) {
-      tipoAtual = linhaTextoUnificado;
-      return;
-    }
-
-    let qtd = "";
-    let nome = "";
-
-    // Analisa as colunas da linha lida do Excel
-    colunas.forEach((col) => {
-      const colUpper = col.toUpperCase();
-
-      // Se for número puro, é a Quantidade
-      if (/^\d+$/.test(col)) {
-        qtd = col + " rec";
-      } 
-      // Se for a palavra da categoria isolada, atualiza o tipo atual
-      else if (categoriasConhecidas.includes(colUpper)) {
-        tipoAtual = colUpper;
-      } 
-      // Se não for "REC" nem número, é o Nome/Sabor do Bolo
-      else if (colUpper !== "REC") {
-        nome = colUpper;
-      }
-    });
-
-    // Se identificou um nome de produto
-    if (nome !== "") {
-      if (!bancoDados[setorAtivo]) {
-        bancoDados[setorAtivo] = { SEGUNDA: [], TERÇA: [], QUARTA: [], QUINTA: [], SEXTA: [], SÁBADO: [], DOMINGO: [] };
-      }
-      if (!bancoDados[setorAtivo][dia]) {
-        bancoDados[setorAtivo][dia] = [];
+    if (ehBolosSecos) {
+      // REGRA PARA BOLOS SECOS (Reconhece Placa, Redondo, etc.)
+      const linhaTextoUnificado = colunas.join(" ").toUpperCase();
+      if (categoriasConhecidas.includes(linhaTextoUnificado)) {
+        tipoAtual = linhaTextoUnificado;
+        return;
       }
 
-      bancoDados[setorAtivo][dia].push({
-        qtd: qtd || "1 rec",
-        tipo: tipoAtual,
-        nome: nome
+      let qtd = "";
+      let nome = "";
+
+      colunas.forEach((col) => {
+        const colUpper = col.toUpperCase();
+        if (/^\d+$/.test(col)) {
+          qtd = col + " rec";
+        } else if (categoriasConhecidas.includes(colUpper)) {
+          tipoAtual = colUpper;
+        } else if (colUpper !== "REC") {
+          nome = colUpper;
+        }
       });
 
-      contagemInclusoes++;
+      if (nome !== "") {
+        garantirEstruturaBanco(dia);
+        bancoDados[setorAtivo][dia].push({
+          qtd: qtd || "1 rec",
+          tipo: tipoAtual,
+          nome: nome
+        });
+        contagemInclusoes++;
+      }
+    } else {
+      // REGRA PARA QUALQUER OUTRO SETOR (Pré-Pesagem, Panificação, Salgados, etc.)
+      let qtd = "";
+      let nome = "";
+
+      if (colunas.length >= 2) {
+        qtd = colunas[0]; // Ex: "120 Kg" ou "3 rec"
+        nome = colunas.slice(1).join(" ").toUpperCase(); // Ex: "MASSA DE PIZZA"
+      } else if (colunas.length === 1) {
+        nome = colunas[0].toUpperCase();
+      }
+
+      if (nome !== "" && nome !== "REC") {
+        garantirEstruturaBanco(dia);
+        bancoDados[setorAtivo][dia].push({
+          qtd: qtd || "1 rec",
+          tipo: "",
+          nome: nome
+        });
+        contagemInclusoes++;
+      }
     }
   });
 
   fecharModalExcel();
   renderizarProgramacao();
   alert(`${contagemInclusoes} itens foram importados com sucesso para ${dia}!`);
+}
+
+function garantirEstruturaBanco(dia) {
+  if (!bancoDados[setorAtivo]) {
+    bancoDados[setorAtivo] = { SEGUNDA: [], TERÇA: [], QUARTA: [], QUINTA: [], SEXTA: [], SÁBADO: [], DOMINGO: [] };
+  }
+  if (!bancoDados[setorAtivo][dia]) {
+    bancoDados[setorAtivo][dia] = [];
+  }
 }

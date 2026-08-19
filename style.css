@@ -195,8 +195,8 @@ body {
 .badge-rec {
   color: #2563eb;
   font-weight: 800;
-  font-size: 0.75rem;
-  min-width: 35px;
+  font-size: 0.8rem;
+  min-width: 45px;
 }
 
 .badge-tipo {
