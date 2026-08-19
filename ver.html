@@ -3,39 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Setores - Painel dos Líderes</title>
-  <link rel="stylesheet" href="lideres-style.css">
+  <title>Consulta de Setores - Panificação Alvorada</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- CABEÇALHO SUPERIOR -->
-  <header class="header-lideres">
-    <div class="header-left">
-      <span class="logo-icon">🥐</span>
-      <h2>Consulta de Setores</h2>
+  <header class="header-banner">
+    <div class="header-title">
+      <span class="icon">🥐</span>
+      <h1>Consulta de Setores</h1>
     </div>
-    <div class="header-right">
-      <button class="btn-top btn-hist" onclick="verHistorico()">🔔 Histórico</button>
-      <button class="btn-top btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    <div class="actions-bar" style="margin-left: auto;">
+      <button class="btn btn-orange" onclick="verHistorico()">🔔 Histórico</button>
+      <button class="btn btn-orange" onclick="window.print()">🖨️ Imprimir</button>
     </div>
   </header>
 
   <!-- ABAS DOS SETORES -->
-  <nav class="nav-setores-lideres" id="nav-setores-lideres">
+  <nav class="nav-setores" id="nav-setores-lideres">
     <!-- Gerado dinamicamente via JS -->
   </nav>
 
   <!-- CONTEÚDO DA PROGRAMAÇÃO DO SETOR -->
-  <main class="main-lideres">
+  <main class="main-content">
     <div class="sector-title-banner" id="titulo-setor-ativo">
       PROGRAMAÇÃO DE PANIFICAÇÃO
     </div>
 
-    <div class="days-grid-lideres" id="grid-dias-lideres">
+    <div class="days-grid" id="grid-dias-lideres">
       <!-- Cards dos dias gerados via JS -->
     </div>
   </main>
 
-  <script src="lideres-script.js"></script>
+  <script src="view-script.js"></script>
 </body>
 </html>

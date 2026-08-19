@@ -8,7 +8,7 @@ const setoresLideres = [
 
 let setorAtivoLider = "PANIFICAÇÃO";
 
-// DADOS DE EXEMPLO (Simulação da programação vinda do ADM)
+// DADOS DE EXEMPLO (Carregados do ADM)
 let programacaoGeral = {
   "PANIFICAÇÃO": {
     "SEGUNDA 17/08/2026": [
@@ -68,14 +68,15 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarQuadroLideres();
 });
 
-// DESENHAR AS ABAS DOS SETORES
+// DESENHAR ABAS
 function renderizarAbasLideres() {
   const container = document.getElementById("nav-setores-lideres");
+  if (!container) return;
   container.innerHTML = "";
 
   setoresLideres.forEach((setor) => {
     const btn = document.createElement("button");
-    btn.className = `tab-lider ${setor === setorAtivoLider ? "active" : ""}`;
+    btn.className = `tab-setor ${setor === setorAtivoLider ? "active" : ""}`;
     btn.innerText = setor;
     btn.onclick = () => {
       setorAtivoLider = setor;
@@ -86,10 +87,13 @@ function renderizarAbasLideres() {
   });
 }
 
-// DESENHAR OS CARDS DA PROGRAMAÇÃO DOS LÍDERES
+// DESENHAR CARDS
 function renderizarQuadroLideres() {
-  document.getElementById("titulo-setor-ativo").innerText = `PROGRAMAÇÃO DE ${setorAtivoLider}`;
+  const titulo = document.getElementById("titulo-setor-ativo");
+  if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivoLider}`;
+  
   const grid = document.getElementById("grid-dias-lideres");
+  if (!grid) return;
   grid.innerHTML = "";
 
   const dadosSetor = programacaoGeral[setorAtivoLider] || {};
@@ -103,14 +107,13 @@ function renderizarQuadroLideres() {
 
   diasChaves.forEach((diaData) => {
     const card = document.createElement("div");
-    card.className = "day-card-lider";
+    card.className = "day-card";
 
     const listaItens = dadosSetor[diaData] || [];
 
-    let itensHTML = listaItens.map((item, idx) => {
+    let itensHTML = listaItens.map((item) => {
       let badgeTipoHTML = "";
 
-      // Apenas no setor "BOLOS SECOS" renderiza as tags de tipo
       if (ehBolosSecos && item.tipo) {
         let badgeClass = "badge-padrao";
         const t = item.tipo.toUpperCase();
@@ -121,32 +124,27 @@ function renderizarQuadroLideres() {
         else if (t.includes("COBERTURA")) badgeClass = "badge-cobertura";
         else if (t.includes("CASEIRO")) badgeClass = "badge-caseiro";
 
-        badgeTipoHTML = `<span class="badge-tipo-lider ${badgeClass}">${item.tipo}</span>`;
+        badgeTipoHTML = `<span class="badge-tipo ${badgeClass}">${item.tipo}</span>`;
       }
 
       return `
-        <div class="item-row-lider">
+        <div class="item-row">
           <div class="item-left-info">
-            <span class="badge-qtd-lider">${item.qtd}</span>
+            <span class="badge-rec" style="min-width: 65px;">${item.qtd}</span>
             ${badgeTipoHTML}
-            <span class="item-nome-lider">${item.nome}</span>
+            <span class="item-nome">${item.nome}</span>
           </div>
-          <input 
-            type="text" 
-            class="input-qtd-realizada" 
-            placeholder="Qtd" 
-            title="Digite a quantidade realizada"
-          />
+          <input type="text" class="input-qtd-realizada" placeholder="Qtd" />
         </div>
       `;
     }).join("");
 
     card.innerHTML = `
-      <div class="day-header-lider">
+      <div class="day-header">
         <span>${diaData}</span>
         <span style="font-size: 0.75rem; opacity: 0.85;">${listaItens.length} itens</span>
       </div>
-      <div class="day-items-list-lider">
+      <div class="day-items-list">
         ${itensHTML}
       </div>
     `;
