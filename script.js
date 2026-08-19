@@ -1,4 +1,3 @@
-// LISTA PADRÃO DE SETORES
 let setores = [
   "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
   "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
@@ -9,7 +8,6 @@ const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO
 let setorAtivo = "PANIFICAÇÃO";
 let bancoDados = {};
 
-// CARREGAR DADOS DO LOCALSTORAGE OU INICIALIZAR
 function carregarDados() {
   const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
   const setoresSalvos = localStorage.getItem("setoresPanificacao");
@@ -21,7 +19,6 @@ function carregarDados() {
   if (dadosSalvos) {
     bancoDados = JSON.parse(dadosSalvos);
   } else {
-    // Inicialização vazia para a primeira semana
     const semanaInicial = "Semana 17/08 a 23/08";
     bancoDados[semanaInicial] = {};
     setores.forEach(setor => {
@@ -113,7 +110,6 @@ function removerItem(dia, index) {
   renderizarQuadro();
 }
 
-// PUBLICAÇÃO DE DADOS PARA A TELA DOS LÍDERES
 function alternarStatus() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
