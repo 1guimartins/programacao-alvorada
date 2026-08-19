@@ -147,11 +147,14 @@ function renderizarQuadro() {
 
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
+      
+      // Monta a badge de quantidade/tipo apenas exibindo 'tipo' se ele existir no Excel
+      const textoBadge = item.tipo ? `${item.qtd} ${item.tipo}` : `${item.qtd}`;
 
       return `
         <div class="item-row">
           <div class="item-left-info">
-            <span class="badge-rec">${item.qtd} ${item.tipo || 'REC'}</span>
+            <span class="badge-rec">${textoBadge}</span>
             ${item.categoria ? `<span class="badge-categoria ${classeCor}">${item.categoria}</span>` : ""}
             <span class="item-nome">${item.nome}</span>
           </div>
@@ -288,7 +291,6 @@ function processarColagemExcel() {
     return;
   }
 
-  // Garante a existência da estrutura no bancoDados
   if (!bancoDados[semanaAtual]) bancoDados[semanaAtual] = {};
   if (!bancoDados[semanaAtual][setorAtivo]) bancoDados[semanaAtual][setorAtivo] = {};
   if (!bancoDados[semanaAtual][setorAtivo][diaSelecionado]) {
@@ -301,14 +303,30 @@ function processarColagemExcel() {
     const linhaLimpa = linha.trim();
     if (!linhaLimpa) return;
 
+    let colunas = [];
+    if (linhaLimpa.includes("\t")) {
+      colunas = linhaLimpa.split("\t").map(c => c.trim());
+    } else {
+      colunas = linhaLimpa.split(/\s{2,}/).map(c => c.trim());
+    }
+
     let qtd = "";
+    let tipo = "";
     let nome = "";
 
-    if (linhaLimpa.includes("\t")) {
-      const partes = linhaLimpa.split("\t");
-      qtd = partes[0].trim();
-      nome = partes.slice(1).join(" ").trim();
-    } else {
+    // Trata colagem de 3 colunas (QTD | TIPO | NOME) - Ex: 2 | REC | ABACAXI
+    if (colunas.length >= 3) {
+      qtd = colunas[0];
+      tipo = colunas[1];
+      nome = colunas.slice(2).join(" ");
+    } 
+    // Trata colagem de 2 colunas (QTD | NOME) - Ex: 40 kg | PAULISTINHA ou 200 UND | BROA
+    else if (colunas.length === 2) {
+      qtd = colunas[0];
+      nome = colunas[1];
+    } 
+    // Fallback para linhas com espaço simples
+    else {
       const match = linhaLimpa.match(/^(\d+(?:\s*(?:kg|g|un|und|cx|pct))?)\s+(.+)$/i);
       if (match) {
         qtd = match[1].trim();
@@ -323,7 +341,7 @@ function processarColagemExcel() {
     if (qtd && nome) {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
-        tipo: "REC",
+        tipo: tipo, // Só terá valor se existir no Excel colado
         categoria: typeof categoriaAtual !== "undefined" ? categoriaAtual : "",
         nome: nome
       });
