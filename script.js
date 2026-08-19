@@ -296,26 +296,27 @@ function processarColagemExcel() {
     if (!linha.trim()) return;
 
     const colunas = linha.split("\t").map(col => col.trim());
-    const linhaTextoCompleto = colunas.join(" ").toUpperCase();
+    const primeiraColuna = colunas[0].toUpperCase();
+    const ehNumero = !isNaN(parseInt(primeiraColuna)) && isFinite(primeiraColuna);
 
-    // 1. Identifica se a linha é um cabeçalho de categoria (ex: PLACA, CASEIRO, INGLÊS)
-    const categoriaEncontrada = categoriasValidas.find(cat => linhaTextoCompleto.includes(cat));
+    // 1. LINHA DE CABEÇALHO (Não começa com número)
+    if (!ehNumero) {
+      const textoLinha = colunas.join(" ").toUpperCase();
+      const achouCat = categoriasValidas.find(cat => textoLinha.includes(cat));
 
-    // Se a primeira coluna não é número ou a linha é um título de categoria
-    if (isNaN(parseInt(colunas[0])) || categoriaEncontrada) {
-      if (categoriaEncontrada) {
-        categoriaAtual = categoriaEncontrada === "INGLES" ? "INGLÊS" : categoriaEncontrada;
+      if (achouCat) {
+        categoriaAtual = (achouCat === "INGLES") ? "INGLÊS" : achouCat;
       }
-      return; // Pula a linha do cabeçalho para não incluir como produto
+      return;
     }
 
-    // 2. Processa linha com dados do produto (Qtd | REC | Sabor)
+    // 2. LINHA DE PRODUTO (Começa com a quantidade numérica)
     if (colunas.length >= 3) {
       const qtd = colunas[0];
       const tipo = colunas[1];
       const nome = colunas.slice(2).join(" ");
 
-      if (qtd !== "" && nome !== "" && !isNaN(parseInt(qtd))) {
+      if (qtd !== "" && nome !== "") {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo,
@@ -324,12 +325,11 @@ function processarColagemExcel() {
         });
       }
     } 
-    // 3. Processa linha com dados do produto (Qtd | Sabor)
     else if (colunas.length === 2) {
       const qtd = colunas[0];
       const nome = colunas[1];
 
-      if (qtd !== "" && nome !== "" && !isNaN(parseInt(qtd))) {
+      if (qtd !== "" && nome !== "") {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: "REC",
