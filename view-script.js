@@ -23,7 +23,7 @@ function carregarDadosLocais() {
     try { bancoDados = JSON.parse(dadosSalvos); } catch(e){} 
   }
   
-  semanaAtiva = semanaSalva || Object.keys(bancoDados)[0] || "Semana 17/08 a 23/08";
+  semanaAtiva = semanaSalva || Object.keys(bancoDados)[0] || "";
 
   if (!setores.includes(setorAtivo)) {
     setorAtivo = setores[0];
@@ -36,24 +36,37 @@ function carregarDadosLocais() {
 document.addEventListener("DOMContentLoaded", () => {
   carregarDadosLocais();
 
-  // Escuta dados em tempo real do Firebase
   if (typeof firebase !== "undefined" && firebase.database) {
-    firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        if (data.bancoDados) bancoDados = data.bancoDados;
-        if (data.setores && Array.isArray(data.setores) && data.setores.length > 0) {
-          setores = data.setores;
-        }
-        if (data.semanaAtiva) semanaAtiva = data.semanaAtiva;
+    // Escuta a raiz inteira do Firebase para garantir compatibilidade
+    firebase.database().ref("/").on("value", (snapshot) => {
+      const raiz = snapshot.val();
+      if (!raiz) return;
 
-        if (!setores.includes(setorAtivo)) {
-          setorAtivo = setores[0];
+      // 1. Tenta carregar do novo padrão
+      if (raiz.painelPanificacao) {
+        if (raiz.painelPanificacao.bancoDados) bancoDados = raiz.painelPanificacao.bancoDados;
+        if (raiz.painelPanificacao.setores && Array.isArray(raiz.painelPanificacao.setores)) {
+          setores = raiz.painelPanificacao.setores;
         }
-
-        renderizarAbas();
-        renderizarQuadro();
+        if (raiz.painelPanificacao.semanaAtiva) semanaAtiva = raiz.painelPanificacao.semanaAtiva;
+      } 
+      // 2. Se não houver novo padrão, tenta mapear as chaves 'semanas_v2' / 'semanas' / 'programacao'
+      else {
+        if (raiz.semanas_v2) bancoDados = raiz.semanas_v2;
+        else if (raiz.semanas) bancoDados = raiz.semanas;
+        else if (raiz.programacao) bancoDados = raiz.programacao;
       }
+
+      if (!semanaAtiva || !bancoDados[semanaAtiva]) {
+        semanaAtiva = Object.keys(bancoDados)[0] || "";
+      }
+
+      if (!setores.includes(setorAtivo)) {
+        setorAtivo = setores[0];
+      }
+
+      renderizarAbas();
+      renderizarQuadro();
     });
   }
 });
@@ -122,8 +135,7 @@ function renderizarQuadro() {
   const rotulosDias = obterDatasDaSemana(semanaAtiva);
 
   diasDaSemana.forEach((dia) => {
-    if (!dadosSetor[dia]) dadosSetor[dia] = [];
-    const listaItens = dadosSetor[dia];
+    const listaItens = dadosSetor[dia] || [];
 
     const card = document.createElement("div");
     card.className = "day-card";
@@ -138,7 +150,7 @@ function renderizarQuadro() {
         <div class="item-row">
           <div class="item-left-info">
             ${textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : ""}
-            <span class="item-nome">${item.nome}</span>
+            <span class="item-nome">${item.nome || item.descricao || ""}</span>
           </div>
           <input type="text" class="input-qtd-lider" placeholder="Qtd" />
         </div>

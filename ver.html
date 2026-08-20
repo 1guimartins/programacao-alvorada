@@ -30,20 +30,20 @@
     </div>
   </main>
 
-  <!-- 1. SDKs do Firebase (ESSENCIAIS para sincronizar no celular) -->
+  <!-- 1. SDKs do Firebase (Obrigatório para o celular funcionar) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <!-- 2. Credenciais do Firebase -->
+  <!-- 2. Credenciais Reais do Firebase -->
   <script>
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-      projectId: "SEU_PROJETO",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+      apiKey: "AIzaSyBen86e0Dc0v3LCH9cyvwyCisciVuM-05E",
+      authDomain: "programacao-alvorada.firebaseapp.com",
+      databaseURL: "https://programacao-alvorada-default-rtdb.firebaseio.com",
+      projectId: "programacao-alvorada",
+      storageBucket: "programacao-alvorada.firebasestorage.app",
+      messagingSenderId: "482889574306",
+      appId: "1:482889574306:web:56463da674a065162c34fb"
     };
 
     if (!firebase.apps.length) {
@@ -51,7 +51,7 @@
     }
   </script>
 
-  <!-- 3. Seu script de controle -->
-  <script src="view-script.js?v=3"></script>
+  <!-- 3. Script de exibição do celular -->
+  <script src="view-script.js?v=4"></script>
 </body>
 </html>
