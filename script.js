@@ -305,7 +305,7 @@ function processarColagemExcel() {
     "INGLÊS", "INGLES", "CREMOSO", "REDONDO", "CHURROS"
   ];
   
-  let categoriaAtualGuardada = ""; // Inicia vazia
+  let categoriaAtualGuardada = "";
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
@@ -336,19 +336,18 @@ function processarColagemExcel() {
     if (setorAtivo === "BOLOS SECOS") {
       const textoLimpo = nome.toUpperCase().trim();
       
-      // Verifica se a linha atual é apenas o cabeçalho azul de grupo (ex: PLACA, CASEIRO, INGLÊS, REDONDO, COBERTURA)
+      // Detecta a linha do cabeçalho azul no Excel (PLACA, CASEIRO, INGLÊS, REDONDO, COBERTURA, etc.)
       const eGrupoCabecalho = categoriasConhecidas.find(c => c === textoLimpo);
       if (eGrupoCabecalho && !qtd) {
-        categoriaAtualGuardada = eGrupoCabecalho; // Atualiza para o novo grupo (ex: CASEIRO)
-        return; // Pula a linha sem adicionar como item
+        categoriaAtualGuardada = eGrupoCabecalho;
+        return;
       }
 
-      // Adiciona o produto com a categoria do grupo ativo no momento
       if (nome || qtd) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo || "REC",
-          categoria: categoriaAtualGuardada, // Associa o tipo correto (PLACA, CASEIRO, INGLÊS, etc.)
+          categoria: categoriaAtualGuardada,
           nome: nome
         });
       }
