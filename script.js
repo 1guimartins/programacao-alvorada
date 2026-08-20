@@ -300,8 +300,8 @@ function processarColagemExcel() {
     bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
   }
 
-  const categoriasConhecidas = ["PLACA E COBERTURA", "PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
-  let categoriaAtualGuardada = "";
+  const categoriasConhecidas = ["PLACA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
+  let categoriaAtualGuardada = "PLACA"; // Categoria padrão inicial
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
@@ -329,34 +329,26 @@ function processarColagemExcel() {
       nome = colunas[0] || "";
     }
 
-    // Lógica especial exclusiva para BOLOS SECOS
     if (setorAtivo === "BOLOS SECOS") {
-      const possivelCategoria = categoriasConhecidas.find(c => c === nome.toUpperCase().trim());
-      if (possivelCategoria && !qtd) {
-        categoriaAtualGuardada = possivelCategoria;
-        return;
+      const textoLimpo = nome.toUpperCase().trim();
+      
+      // Se a linha for apenas o nome de um grupo (ex: PLACA ou CASEIRO isolados sem quantidade)
+      const ehGrupoApenas = categoriasConhecidas.find(c => c === textoLimpo);
+      if (ehGrupoApenas && !qtd) {
+        categoriaAtualGuardada = ehGrupoApenas;
+        return; // Não cria item na lista, apenas muda o grupo guardado
       }
 
-      let categoriaItem = categoriaAtualGuardada;
-      for (const cat of categoriasConhecidas) {
-        const regex = new RegExp(`\\b${cat}\\b`, "i");
-        if (regex.test(nome)) {
-          categoriaItem = cat;
-          nome = nome.replace(regex, "").trim();
-          break;
-        }
-      }
-
+      // Garante que "COBERTURA" permaneça no nome do produto (ex: CENOURA C/ COBERTURA)
       if (nome || qtd) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo || "REC",
-          categoria: categoriaItem,
+          categoria: categoriaAtualGuardada, // Aplica a tag (PLACA, CASEIRO, INGLÊS) no item
           nome: nome
         });
       }
     } else {
-      // Outras abas permanecem normais
       if (nome || qtd) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
