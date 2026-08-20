@@ -37,21 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarDadosLocais();
 
   if (typeof firebase !== "undefined" && firebase.database) {
-    // Escuta a raiz inteira do Firebase para garantir compatibilidade
     firebase.database().ref("/").on("value", (snapshot) => {
       const raiz = snapshot.val();
       if (!raiz) return;
 
-      // 1. Tenta carregar do novo padrão
       if (raiz.painelPanificacao) {
         if (raiz.painelPanificacao.bancoDados) bancoDados = raiz.painelPanificacao.bancoDados;
         if (raiz.painelPanificacao.setores && Array.isArray(raiz.painelPanificacao.setores)) {
           setores = raiz.painelPanificacao.setores;
         }
         if (raiz.painelPanificacao.semanaAtiva) semanaAtiva = raiz.painelPanificacao.semanaAtiva;
-      } 
-      // 2. Se não houver novo padrão, tenta mapear as chaves 'semanas_v2' / 'semanas' / 'programacao'
-      else {
+      } else {
         if (raiz.semanas_v2) bancoDados = raiz.semanas_v2;
         else if (raiz.semanas) bancoDados = raiz.semanas;
         else if (raiz.programacao) bancoDados = raiz.programacao;
@@ -119,7 +115,7 @@ function obterDatasDaSemana(semanaNome) {
 }
 
 function renderizarQuadro() {
-  const titulo = document.getElementById("titulo-setor-ativo");
+  const titulo = document.getElementById("titulo-setor-ativo") || document.querySelector(".sector-title-banner");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
 
   const grid = document.getElementById("grid-dias-lideres") || document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm") || document.querySelector(".days-grid") || document.querySelector(".grid-dias");
