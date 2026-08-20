@@ -148,10 +148,23 @@ function renderizarQuadro() {
     let itensHTML = listaItens.map((item, index) => {
       const classeCor = obterClasseCategoria(item.categoria);
       
+      // Renderiza a badge de quantidade/tipo apenas se houver valor de quantidade/tipo
       let badgeQtd = "";
       if (item.qtd || item.tipo) {
         const textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
         badgeQtd = `<span class="badge-rec">${textoBadge}</span>`;
+      }
+
+      // Se for apenas uma categoria isolada (ex: PLACA ou CASEIRO sem quantidade)
+      if (!item.qtd && !item.tipo && item.categoria) {
+        return `
+          <div class="item-row item-categoria-header">
+            <div class="item-left-info">
+              <span class="badge-categoria ${classeCor}">${item.categoria}</span>
+            </div>
+            <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">×</button>
+          </div>
+        `;
       }
 
       return `
@@ -300,6 +313,7 @@ function processarColagemExcel() {
     bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
   }
 
+  const categoriasConhecidas = ["PLACA E COBERTURA", "PLACA", "COBERTURA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
@@ -315,6 +329,7 @@ function processarColagemExcel() {
     let qtd = "";
     let tipo = "";
     let nome = "";
+    let categoria = "";
 
     if (colunas.length >= 3) {
       qtd = colunas[0];
@@ -324,14 +339,20 @@ function processarColagemExcel() {
       qtd = colunas[0];
       nome = colunas[1];
     } else {
-      nome = colunas[0] || "";
+      const textoUnico = colunas[0] || "";
+      const catMatch = categoriasConhecidas.find(c => c === textoUnico.toUpperCase());
+      if (catMatch) {
+        categoria = catMatch;
+      } else {
+        nome = textoUnico;
+      }
     }
 
-    if (nome || qtd) {
+    if (nome || qtd || categoria) {
       bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
         qtd: qtd,
         tipo: tipo,
-        categoria: "",
+        categoria: categoria,
         nome: nome
       });
     }
