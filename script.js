@@ -1,11 +1,10 @@
 let setores = [
-  "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
-  "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
-  "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
+  "EMBALAGEM CONGELADA", "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", 
+  "PRATOS PRONTOS", "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
 ];
 
 const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
-let setorAtivo = "BOLOS SECOS";
+let setorAtivo = setores[0]; 
 let bancoDados = {};
 
 function carregarDados() {
@@ -13,7 +12,14 @@ function carregarDados() {
   const setoresSalvos = localStorage.getItem("setoresPanificacao");
 
   if (setoresSalvos) {
-    try { setores = JSON.parse(setoresSalvos); } catch(e){}
+    try { 
+      const parsed = JSON.parse(setoresSalvos);
+      if (Array.isArray(parsed) && parsed.length > 0) setores = parsed;
+    } catch(e){}
+  }
+
+  if (!setores.includes(setorAtivo)) {
+    setorAtivo = setores[0];
   }
 
   if (dadosSalvos) {
@@ -36,6 +42,22 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarDados();
   renderizarAbas();
   renderizarQuadro();
+
+  // Escuta dados do Firebase caso já existam sincronizados
+  if (typeof firebase !== "undefined" && firebase.database) {
+    firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.bancoDados) bancoDados = data.bancoDados;
+        if (data.setores) setores = data.setores;
+        if (!setores.includes(setorAtivo)) setorAtivo = setores[0];
+        
+        atualizarSelectSemanas();
+        renderizarAbas();
+        renderizarQuadro();
+      }
+    });
+  }
 });
 
 function atualizarSelectSemanas() {
@@ -44,7 +66,6 @@ function atualizarSelectSemanas() {
 
   const valorSelecionadoAtual = semanaSelect.value;
   semanaSelect.innerHTML = "";
-
   const listaSemanas = Object.keys(bancoDados);
 
   listaSemanas.forEach(semana => {
@@ -59,10 +80,6 @@ function atualizarSelectSemanas() {
   } else if (listaSemanas.length > 0) {
     semanaSelect.value = listaSemanas[0];
   }
-}
-
-function trocarSemana() {
-  renderizarQuadro();
 }
 
 function renderizarAbas() {
@@ -85,6 +102,10 @@ function renderizarAbas() {
 
 function obterDatasDaSemana(semanaNome) {
   const datasFormatadas = {};
+  if (!semanaNome) {
+    diasDaSemana.forEach(dia => datasFormatadas[dia] = dia);
+    return datasFormatadas;
+  }
   const match = semanaNome.match(/(\d{1,2}\/\d{1,2})/);
 
   if (match) {
@@ -95,7 +116,6 @@ function obterDatasDaSemana(semanaNome) {
     diasDaSemana.forEach((dia, index) => {
       const dataDia = new Date(dataInicial);
       dataDia.setDate(dataInicial.getDate() + index);
-
       const d = String(dataDia.getDate()).padStart(2, "0");
       const m = String(dataDia.getMonth() + 1).padStart(2, "0");
       datasFormatadas[dia] = `${dia} (${d}/${m})`;
@@ -107,23 +127,9 @@ function obterDatasDaSemana(semanaNome) {
   return datasFormatadas;
 }
 
-function obterClasseCategoria(categoria) {
-  if (!categoria) return "cat-padrao";
-  const catUpper = categoria.toUpperCase().trim();
-
-  if (catUpper.includes("PLACA")) return "cat-placa";
-  if (catUpper.includes("COBERTURA")) return "cat-cobertura";
-  if (catUpper.includes("CASEIRO")) return "cat-caseiro";
-  if (catUpper.includes("INGLÊS") || catUpper.includes("INGLES")) return "cat-ingles";
-  if (catUpper.includes("CREMOSO")) return "cat-cremoso";
-  if (catUpper.includes("REDONDO")) return "cat-redondo";
-
-  return "cat-padrao";
-}
-
 function renderizarQuadro() {
   const semanaSelect = document.getElementById("semana-select");
-  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
+  const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
   
   const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
@@ -146,19 +152,13 @@ function renderizarQuadro() {
     card.className = "day-card";
 
     let itensHTML = listaItens.map((item, index) => {
-      const classeCor = obterClasseCategoria(item.categoria);
-      
-      let badgeQtd = "";
-      if (item.qtd || item.tipo) {
-        const textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
-        badgeQtd = `<span class="badge-rec">${textoBadge}</span>`;
-      }
+      let textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
+      if (!textoBadge && item.qtd) textoBadge = item.qtd;
 
       return `
         <div class="item-row">
           <div class="item-left-info">
-            ${badgeQtd}
-            ${item.categoria ? `<span class="badge-categoria ${classeCor}">${item.categoria}</span>` : ""}
+            ${textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : ""}
             <span class="item-nome">${item.nome}</span>
           </div>
           <button class="btn-del-item" onclick="removerItem('${dia}', ${index})">×</button>
@@ -182,55 +182,12 @@ function renderizarQuadro() {
 
 function removerItem(dia, index) {
   const semanaSelect = document.getElementById("semana-select");
-  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
+  const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
   
   if (bancoDados[semanaAtual] && bancoDados[semanaAtual][setorAtivo] && bancoDados[semanaAtual][setorAtivo][dia]) {
     bancoDados[semanaAtual][setorAtivo][dia].splice(index, 1);
   }
   renderizarQuadro();
-}
-
-function criarNovaSemanaRascunho() {
-  const nomeNovaSemana = prompt("Digite o nome da nova semana (Ex: Semana 24/08 a 30/08):");
-  
-  if (nomeNovaSemana && nomeNovaSemana.trim() !== "") {
-    const nomeFormatado = nomeNovaSemana.trim();
-
-    if (bancoDados[nomeFormatado]) {
-      alert("Esta semana já existe!");
-      return;
-    }
-
-    bancoDados[nomeFormatado] = {};
-    setores.forEach(setor => {
-      bancoDados[nomeFormatado][setor] = {};
-      diasDaSemana.forEach(dia => {
-        bancoDados[nomeFormatado][setor][dia] = [];
-      });
-    });
-
-    atualizarSelectSemanas();
-    document.getElementById("semana-select").value = nomeFormatado;
-    renderizarQuadro();
-  }
-}
-
-function excluirSemanaAtual() {
-  const semanaSelect = document.getElementById("semana-select");
-  const semanaAtual = semanaSelect ? semanaSelect.value : "";
-
-  const listaSemanas = Object.keys(bancoDados);
-
-  if (listaSemanas.length <= 1) {
-    alert("Você não pode excluir a única semana existente!");
-    return;
-  }
-
-  if (confirm(`Tem certeza que deseja excluir a "${semanaAtual}"?`)) {
-    delete bancoDados[semanaAtual];
-    atualizarSelectSemanas();
-    renderizarQuadro();
-  }
 }
 
 function excluirSetorAtual() {
@@ -242,6 +199,7 @@ function excluirSetorAtual() {
   if (confirm(`Tem certeza que deseja excluir o setor "${setorAtivo}"?`)) {
     setores = setores.filter(s => s !== setorAtivo);
     setorAtivo = setores[0];
+    localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
     renderizarAbas();
     renderizarQuadro();
   }
@@ -249,25 +207,28 @@ function excluirSetorAtual() {
 
 function alternarStatus() {
   const semanaSelect = document.getElementById("semana-select");
-  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
+  const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
 
   localStorage.setItem("bancoDadosPanificacao", JSON.stringify(bancoDados));
   localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
   localStorage.setItem("semanaAtivaPanificacao", semanaAtual);
 
-  alert("Programação publicada com sucesso no Painel dos Líderes!");
-}
+  const dadosParaEnviar = {
+    bancoDados: bancoDados,
+    setores: setores,
+    semanaAtiva: semanaAtual
+  };
 
-function abrirModalCriarSetor() {
-  const nomeSetor = prompt("Digite o nome do novo setor:");
-  if (nomeSetor && nomeSetor.trim() !== "") {
-    const nomeFormatado = nomeSetor.trim().toUpperCase();
-    if (!setores.includes(nomeFormatado)) {
-      setores.push(nomeFormatado);
-      setorAtivo = nomeFormatado;
-      renderizarAbas();
-      renderizarQuadro();
-    }
+  if (typeof firebase !== "undefined" && firebase.database) {
+    firebase.database().ref("painelPanificacao").set(dadosParaEnviar)
+      .then(() => {
+        alert("Programação publicada e sincronizada com os celulares via Firebase!");
+      })
+      .catch((error) => {
+        alert("Erro ao enviar para o Firebase: " + error.message);
+      });
+  } else {
+    alert("Salvo localmente! (Firebase não foi detectado no HTML).");
   }
 }
 
@@ -287,7 +248,7 @@ function processarColagemExcel() {
 
   const textoInput = inputEl ? inputEl.value : "";
   const diaSelecionado = selectEl ? selectEl.value : "SEGUNDA";
-  const semanaAtual = semanaSelect ? semanaSelect.value : "Semana 17/08 a 23/08";
+  const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
 
   if (!textoInput.trim()) {
     alert("Por favor, cole os dados do Excel na caixa de texto.");
@@ -300,12 +261,6 @@ function processarColagemExcel() {
     bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
   }
 
-  const categoriasConhecidas = [
-    "PLACA E COBERTURA", "PLACA", "COBERTURA", "CASEIRO", 
-    "INGLÊS", "INGLES", "CREMOSO", "REDONDO", "CHURROS"
-  ];
-  
-  let categoriaAtualGuardada = "";
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
@@ -318,56 +273,47 @@ function processarColagemExcel() {
     colunas = colunas.filter(c => c !== "");
     if (colunas.length === 0) return;
 
-    if (setorAtivo === "BOLOS SECOS") {
-      const textoLinhaCompleto = colunas.join(" ").toUpperCase().trim();
-      const ehCabecalhoGrupo = categoriasConhecidas.find(cat => cat === textoLinhaCompleto);
+    let qtd = "";
+    let tipo = "";
+    let nome = "";
 
-      if (ehCabecalhoGrupo) {
-        categoriaAtualGuardada = ehCabecalhoGrupo;
-        return;
-      }
-
-      let qtd = "";
-      let tipo = "REC";
-      let nome = "";
-
-      if (/^\d+$/.test(colunas[0])) {
+    if (colunas.length >= 3) {
+      qtd = colunas[0];
+      tipo = colunas[1];
+      nome = colunas.slice(2).join(" ");
+    } else if (colunas.length === 2) {
+      if (/^\d+/.test(colunas[0])) {
         qtd = colunas[0];
-        
-        if (colunas.length >= 3) {
+        if (colunas[1].toUpperCase() === "REC" || colunas[1].toLowerCase().endsWith("x")) {
           tipo = colunas[1];
-          nome = colunas.slice(2).join(" ");
-        } else if (colunas.length === 2) {
-          if (colunas[1].toUpperCase() === "REC") {
-            tipo = "REC";
-          } else {
-            nome = colunas[1];
-          }
+        } else {
+          nome = colunas[1];
         }
       } else {
         nome = colunas.join(" ");
       }
-
-      if (nome) {
-        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-          qtd: qtd,
-          tipo: tipo,
-          categoria: categoriaAtualGuardada,
-          nome: nome
-        });
-      }
     } else {
-      let qtd = colunas[0] || "";
-      let nome = colunas.slice(1).join(" ") || colunas[0] || "";
-
-      if (nome || qtd) {
-        bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
-          qtd: qtd,
-          tipo: "",
-          categoria: "",
-          nome: nome
-        });
+      const partes = colunas[0].split(/\s+/);
+      if (/^\d+/.test(partes[0])) {
+        qtd = partes[0];
+        if (partes[1] && (partes[1].toUpperCase() === "REC" || partes[1].toLowerCase().endsWith("x"))) {
+          tipo = partes[1];
+          nome = partes.slice(2).join(" ");
+        } else {
+          nome = partes.slice(1).join(" ");
+        }
+      } else {
+        nome = colunas[0];
       }
+    }
+
+    if (nome || qtd) {
+      bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
+        qtd: qtd,
+        tipo: tipo,
+        categoria: "",
+        nome: nome
+      });
     }
   });
 

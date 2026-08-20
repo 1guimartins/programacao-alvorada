@@ -1,39 +1,51 @@
 let setores = [
-  "BOLOS CONGELADOS", "BOLOS SECOS", "EMBALAGEM CONGELADA", "EMBALAGEM SECAS", 
-  "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", "PRATOS PRONTOS", 
-  "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
+  "EMBALAGEM CONGELADA", "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", 
+  "PRATOS PRONTOS", "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
 ];
 
 const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"];
-let setorAtivo = "PANIFICAÇÃO";
+let setorAtivo = setores[0];
 let bancoDados = {};
 let semanaAtiva = "";
 
-function carregarDados() {
-  const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
-  const setoresSalvos = localStorage.getItem("setoresPanificacao");
-  const semanaSalva = localStorage.getItem("semanaAtivaPanificacao");
+function iniciarSincronizacaoFirebase() {
+  if (typeof firebase !== "undefined" && firebase.database) {
+    firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.bancoDados) bancoDados = data.bancoDados;
+        if (data.setores) setores = data.setores;
+        if (data.semanaAtiva) semanaAtiva = data.semanaAtiva;
 
-  if (setoresSalvos) {
-    try { setores = JSON.parse(setoresSalvos); } catch(e){}
-  }
+        if (!setores.includes(setorAtivo)) {
+          setorAtivo = setores[0];
+        }
 
-  if (dadosSalvos) {
-    try { bancoDados = JSON.parse(dadosSalvos); } catch(e){}
-  }
-
-  if (semanaSalva && bancoDados[semanaSalva]) {
-    semanaAtiva = semanaSalva;
+        renderizarAbas();
+        renderizarQuadro();
+      }
+    });
   } else {
-    const listaSemanas = Object.keys(bancoDados);
-    semanaAtiva = listaSemanas.length > 0 ? listaSemanas[0] : "Semana 17/08 a 23/08";
+    // Fallback caso não tenha conexão com o Firebase
+    const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
+    const setoresSalvos = localStorage.getItem("setoresPanificacao");
+    const semanaSalva = localStorage.getItem("semanaAtivaPanificacao");
+
+    if (setoresSalvos) { try { setores = JSON.parse(setoresSalvos); } catch(e){} }
+    if (dadosSalvos) { try { bancoDados = JSON.parse(dadosSalvos); } catch(e){} }
+    semanaAtiva = semanaSalva || Object.keys(bancoDados)[0] || "Semana 17/08 a 23/08";
+
+    if (!setores.includes(setorAtivo)) {
+      setorAtivo = setores[0];
+    }
+
+    renderizarAbas();
+    renderizarQuadro();
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  carregarDados();
-  renderizarAbas();
-  renderizarQuadro();
+  iniciarSincronizacaoFirebase();
 });
 
 function renderizarAbas() {
@@ -83,20 +95,6 @@ function obterDatasDaSemana(semanaNome) {
   return datasFormatadas;
 }
 
-function obterClasseCategoria(categoria) {
-  if (!categoria) return "cat-padrao";
-  const catUpper = categoria.toUpperCase().trim();
-
-  if (catUpper.includes("PLACA")) return "cat-placa";
-  if (catUpper.includes("COBERTURA")) return "cat-cobertura";
-  if (catUpper.includes("CASEIRO")) return "cat-caseiro";
-  if (catUpper.includes("INGLÊS") || catUpper.includes("INGLES")) return "cat-ingles";
-  if (catUpper.includes("CREMOSO")) return "cat-cremoso";
-  if (catUpper.includes("REDONDO")) return "cat-redondo";
-
-  return "cat-padrao";
-}
-
 function renderizarQuadro() {
   const titulo = document.getElementById("titulo-setor-ativo") || document.querySelector("h1") || document.querySelector("h2");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
@@ -119,9 +117,6 @@ function renderizarQuadro() {
     card.className = "day-card";
 
     let itensHTML = listaItens.map((item) => {
-      const classeCor = obterClasseCategoria(item.categoria);
-      
-      // Define a variável textoBadge (Ex: "50 REC", "6x")
       let textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
       if (!textoBadge && item.qtd) {
         textoBadge = item.qtd;
@@ -131,7 +126,6 @@ function renderizarQuadro() {
         <div class="item-row">
           <div class="item-left-info">
             ${textoBadge ? `<span class="badge-rec">${textoBadge}</span>` : ""}
-            ${item.categoria ? `<span class="badge-categoria ${classeCor}">${item.categoria}</span>` : ""}
             <span class="item-nome">${item.nome}</span>
           </div>
           <input type="text" class="input-qtd-lider" placeholder="Qtd" />
