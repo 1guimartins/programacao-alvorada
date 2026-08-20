@@ -1,4 +1,3 @@
-// Lista inicial de setores
 let setores = [
   "EMBALAGEM CONGELADA", "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", 
   "PRATOS PRONTOS", "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
@@ -44,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderizarAbas();
   renderizarQuadro();
 
-  // Escuta atualizações do Firebase em tempo real
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
       const data = snapshot.val();
@@ -139,7 +137,7 @@ function renderizarQuadro() {
   const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
 
-  const grid = document.getElementById("grid-dias-adm") || document.querySelector(".grid-dias");
+  const grid = document.getElementById("grid-dias-adm") || document.querySelector(".days-grid") || document.querySelector(".grid-dias");
   if (!grid) return;
   grid.innerHTML = "";
 
@@ -204,11 +202,9 @@ function excluirSetorAtual() {
   if (confirm(`Tem certeza que deseja excluir o setor "${setorAtivo}"?`)) {
     setores = setores.filter(s => s !== setorAtivo);
     setorAtivo = setores[0];
-    
-    // Atualiza localmente
+
     localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
-    
-    // Força atualização no Firebase se disponível
+
     if (typeof firebase !== "undefined" && firebase.database) {
       firebase.database().ref("painelPanificacao/setores").set(setores);
     }
@@ -222,7 +218,6 @@ function alternarStatus() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
 
-  // Salva no navegador local (backup)
   localStorage.setItem("bancoDadosPanificacao", JSON.stringify(bancoDados));
   localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
   localStorage.setItem("semanaAtivaPanificacao", semanaAtual);
@@ -233,7 +228,6 @@ function alternarStatus() {
     semanaAtiva: semanaAtual
   };
 
-  // Envia para os celulares via Firebase
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").set(dadosParaEnviar)
       .then(() => {
@@ -243,7 +237,7 @@ function alternarStatus() {
         alert("Erro de conexão com o Firebase: " + error.message);
       });
   } else {
-    alert("Dados salvos localmente! (Atenção: Os scripts do Firebase não foram encontrados no HTML).");
+    alert("Salvo apenas no navegador local! (Configure as credenciais do Firebase nos arquivos HTML).");
   }
 }
 
@@ -260,8 +254,8 @@ function fecharModalExcel() {
 }
 
 function processarColagemExcel() {
-  const inputEl = document.getElementById("excel-input") || document.querySelector("textarea");
-  const selectEl = document.getElementById("dia-semana-select") || document.querySelector("#modal-excel select");
+  const inputEl = document.getElementById("excel-input");
+  const selectEl = document.getElementById("dia-semana-select");
   const semanaSelect = document.getElementById("semana-select");
 
   const textoInput = inputEl ? inputEl.value : "";

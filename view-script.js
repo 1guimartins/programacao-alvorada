@@ -34,10 +34,9 @@ function carregarDadosLocais() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Carrega o backup do cache local primeiro
   carregarDadosLocais();
 
-  // 2. Conecta no Firebase para baixar os dados atualizados em tempo real
+  // Escuta dados em tempo real do Firebase
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
       const data = snapshot.val();
@@ -60,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderizarAbas() {
-  const container = document.getElementById("nav-setores-lider") || document.querySelector(".nav-setores") || document.querySelector("nav");
+  const container = document.getElementById("nav-setores-lideres") || document.getElementById("nav-setores-lider") || document.querySelector(".nav-setores");
   if (!container) return;
   container.innerHTML = "";
 
@@ -107,10 +106,10 @@ function obterDatasDaSemana(semanaNome) {
 }
 
 function renderizarQuadro() {
-  const titulo = document.getElementById("titulo-setor-ativo") || document.querySelector("h1") || document.querySelector("h2");
+  const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
 
-  const grid = document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm") || document.querySelector(".grid-dias") || document.querySelector(".main-content");
+  const grid = document.getElementById("grid-dias-lideres") || document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm") || document.querySelector(".days-grid") || document.querySelector(".grid-dias");
   if (!grid) return;
   grid.innerHTML = "";
 

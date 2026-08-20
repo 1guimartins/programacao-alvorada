@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Setores - Panificação Alvorada</title>
-  <!-- ÍCONE DE CROISSANT NA ABA DO NAVEGADOR -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥐</text></svg>">
+  <title>Consulta de Setores - Líderes</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- CABEÇALHO SUPERIOR -->
   <header class="header-banner">
-    <div class="header-title">
-      <span class="icon">🥐</span>
-      <h1>Consulta de Setores</h1>
-    </div>
-    
     <div class="actions-bar">
       <button class="btn btn-orange" onclick="window.print()">🖨️ Imprimir</button>
     </div>
@@ -38,6 +30,28 @@
     </div>
   </main>
 
-  <script src="view-script.js?v=2"></script>
+  <!-- 1. SDKs do Firebase (ESSENCIAIS para sincronizar no celular) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- 2. Credenciais do Firebase -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
+
+  <!-- 3. Seu script de controle -->
+  <script src="view-script.js?v=3"></script>
 </body>
 </html>

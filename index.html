@@ -3,45 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panificação Alvorada - Gestão ADM</title>
-  <!-- ÍCONE DE ENGRENAGEM NA ABA DO NAVEGADOR -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <title>Painel Administrativo - Produção</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- CABEÇALHO SUPERIOR -->
   <header class="header-banner">
-    <div class="header-title">
-      <span class="icon">⚙️</span>
-      <h1>Panificação Alvorada - Gestão ADM</h1>
-      <span class="badge-status status-publicado" id="status-badge">Publicado</span>
-    </div>
-    
     <div class="actions-bar">
-      <div class="semana-selector">
-        <label for="semana-select">📅 Semana:</label>
-        <select id="semana-select" onchange="trocarSemana()">
-          <option value="Semana 17/08 a 23/08">Semana 17/08 a 23/08</option>
-        </select>
-      </div>
-
-      <button class="btn btn-green" onclick="alternarStatus()">📣 Publicar / Alternar Status</button>
-      <button class="btn btn-blue" onclick="criarNovaSemanaRascunho()">🚀 Nova Semana (Rascunho)</button>
-      <button class="btn btn-teal" onclick="abrirModalCriarSetor()">➕ Criar Setor</button>
-      <button class="btn btn-indigo" onclick="abrirModalExcel()">📋 Importar do Excel</button>
-      <button class="btn btn-red" onclick="excluirSetorAtual()">🗑️ Excluir Setor</button>
-      <button class="btn btn-red-dark" onclick="excluirSemanaAtual()">❌ Excluir Semana</button>
-      <button class="btn btn-orange" onclick="window.print()">🖨️ Imprimir</button>
+      <select id="semana-select" onchange="renderizarQuadro()">
+        <!-- Opções geradas via JS -->
+      </select>
+      <button class="btn btn-blue" onclick="abrirModalExcel()">📋 Colar Excel</button>
+      <button class="btn btn-danger" onclick="excluirSetorAtual()">🗑️ Excluir Setor</button>
+      <button class="btn btn-green" onclick="alternarStatus()">🚀 Publicar / Sincronizar</button>
     </div>
   </header>
 
-  <!-- ABAS DOS SETORES -->
   <nav class="nav-setores" id="nav-setores-adm">
     <!-- Gerado dinamicamente via JS -->
   </nav>
 
-  <!-- CONTEÚDO DA PROGRAMAÇÃO DO SETOR -->
   <main class="main-content">
     <div class="sector-title-banner" id="titulo-setor-ativo">
       PROGRAMAÇÃO DE PANIFICAÇÃO
@@ -52,19 +33,13 @@
     </div>
   </main>
 
-  <!-- MODAL EXCEL COM SELEÇÃO DE DIA -->
+  <!-- MODAL EXCEL -->
   <div id="modal-excel" class="modal-overlay" style="display: none;">
     <div class="modal-card" style="max-width: 550px;">
-      <h3>Importar do Excel</h3>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">
-        Selecione o dia e cole os dados copiados de duas colunas do Excel (Ex: Quantidade e Produto).
-      </p>
-
+      <h3 style="margin-top: 0;">Importar do Excel</h3>
       <div style="margin-bottom: 12px;">
-        <label for="select-dia-excel" style="font-size: 0.85rem; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">
-          Selecione o dia da semana:
-        </label>
-        <select id="select-dia-excel" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: 600;">
+        <label for="dia-semana-select">Selecione o dia da semana:</label>
+        <select id="dia-semana-select" style="width: 100%; padding: 8px; margin-top: 4px;">
           <option value="SEGUNDA">SEGUNDA</option>
           <option value="TERÇA">TERÇA</option>
           <option value="QUARTA">QUARTA</option>
@@ -77,7 +52,7 @@
 
       <div style="margin-bottom: 12px;">
         <textarea id="excel-input" rows="8" 
-          placeholder="Selecione as duas colunas no Excel (Ex: 120 Kg | MASSA DE PIZZA), copie (Ctrl+C) e cole aqui..."
+          placeholder="Selecione as colunas no Excel (Ex: 120 Kg | MASSA DE PIZZA), copie (Ctrl+C) e cole aqui..." 
           style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 0.8rem; box-sizing: border-box;"></textarea>
       </div>
 
@@ -88,6 +63,28 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- 1. SDKs do Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- 2. Credenciais do Firebase -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
+
+  <!-- 3. Seu script de controle -->
+  <script src="script.js?v=3"></script>
 </body>
 </html>
