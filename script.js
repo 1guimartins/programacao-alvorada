@@ -300,8 +300,12 @@ function processarColagemExcel() {
     bancoDados[semanaAtual][setorAtivo][diaSelecionado] = [];
   }
 
-  const categoriasConhecidas = ["PLACA", "CASEIRO", "INGLÊS", "INGLES", "CREMOSO", "REDONDO"];
-  let categoriaAtualGuardada = "PLACA"; // Categoria padrão inicial
+  const categoriasConhecidas = [
+    "PLACA E COBERTURA", "PLACA", "COBERTURA", "CASEIRO", 
+    "INGLÊS", "INGLES", "CREMOSO", "REDONDO", "CHURROS"
+  ];
+  
+  let categoriaAtualGuardada = ""; // Inicia vazia
   const linhas = textoInput.split(/\r?\n/);
 
   linhas.forEach(linha => {
@@ -332,19 +336,19 @@ function processarColagemExcel() {
     if (setorAtivo === "BOLOS SECOS") {
       const textoLimpo = nome.toUpperCase().trim();
       
-      // Se a linha for apenas o nome de um grupo (ex: PLACA ou CASEIRO isolados sem quantidade)
-      const ehGrupoApenas = categoriasConhecidas.find(c => c === textoLimpo);
-      if (ehGrupoApenas && !qtd) {
-        categoriaAtualGuardada = ehGrupoApenas;
-        return; // Não cria item na lista, apenas muda o grupo guardado
+      // Verifica se a linha atual é apenas o cabeçalho azul de grupo (ex: PLACA, CASEIRO, INGLÊS, REDONDO, COBERTURA)
+      const eGrupoCabecalho = categoriasConhecidas.find(c => c === textoLimpo);
+      if (eGrupoCabecalho && !qtd) {
+        categoriaAtualGuardada = eGrupoCabecalho; // Atualiza para o novo grupo (ex: CASEIRO)
+        return; // Pula a linha sem adicionar como item
       }
 
-      // Garante que "COBERTURA" permaneça no nome do produto (ex: CENOURA C/ COBERTURA)
+      // Adiciona o produto com a categoria do grupo ativo no momento
       if (nome || qtd) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
           tipo: tipo || "REC",
-          categoria: categoriaAtualGuardada, // Aplica a tag (PLACA, CASEIRO, INGLÊS) no item
+          categoria: categoriaAtualGuardada, // Associa o tipo correto (PLACA, CASEIRO, INGLÊS, etc.)
           nome: nome
         });
       }
