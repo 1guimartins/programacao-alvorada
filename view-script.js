@@ -8,13 +8,44 @@ let setorAtivo = setores[0];
 let bancoDados = {};
 let semanaAtiva = "";
 
-function iniciarSincronizacaoFirebase() {
+function carregarDadosLocais() {
+  const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
+  const setoresSalvos = localStorage.getItem("setoresPanificacao");
+  const semanaSalva = localStorage.getItem("semanaAtivaPanificacao");
+
+  if (setoresSalvos) { 
+    try { 
+      const parsed = JSON.parse(setoresSalvos); 
+      if (Array.isArray(parsed) && parsed.length > 0) setores = parsed;
+    } catch(e){} 
+  }
+  if (dadosSalvos) { 
+    try { bancoDados = JSON.parse(dadosSalvos); } catch(e){} 
+  }
+  
+  semanaAtiva = semanaSalva || Object.keys(bancoDados)[0] || "Semana 17/08 a 23/08";
+
+  if (!setores.includes(setorAtivo)) {
+    setorAtivo = setores[0];
+  }
+
+  renderizarAbas();
+  renderizarQuadro();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Carrega o backup do cache local primeiro
+  carregarDadosLocais();
+
+  // 2. Conecta no Firebase para baixar os dados atualizados em tempo real
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
       const data = snapshot.val();
       if (data) {
         if (data.bancoDados) bancoDados = data.bancoDados;
-        if (data.setores) setores = data.setores;
+        if (data.setores && Array.isArray(data.setores) && data.setores.length > 0) {
+          setores = data.setores;
+        }
         if (data.semanaAtiva) semanaAtiva = data.semanaAtiva;
 
         if (!setores.includes(setorAtivo)) {
@@ -25,27 +56,7 @@ function iniciarSincronizacaoFirebase() {
         renderizarQuadro();
       }
     });
-  } else {
-    // Fallback caso não tenha conexão com o Firebase
-    const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
-    const setoresSalvos = localStorage.getItem("setoresPanificacao");
-    const semanaSalva = localStorage.getItem("semanaAtivaPanificacao");
-
-    if (setoresSalvos) { try { setores = JSON.parse(setoresSalvos); } catch(e){} }
-    if (dadosSalvos) { try { bancoDados = JSON.parse(dadosSalvos); } catch(e){} }
-    semanaAtiva = semanaSalva || Object.keys(bancoDados)[0] || "Semana 17/08 a 23/08";
-
-    if (!setores.includes(setorAtivo)) {
-      setorAtivo = setores[0];
-    }
-
-    renderizarAbas();
-    renderizarQuadro();
   }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  iniciarSincronizacaoFirebase();
 });
 
 function renderizarAbas() {
@@ -102,6 +113,8 @@ function renderizarQuadro() {
   const grid = document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm") || document.querySelector(".grid-dias") || document.querySelector(".main-content");
   if (!grid) return;
   grid.innerHTML = "";
+
+  if (!semanaAtiva) semanaAtiva = Object.keys(bancoDados)[0] || "";
 
   if (!bancoDados[semanaAtiva]) bancoDados[semanaAtiva] = {};
   if (!bancoDados[semanaAtiva][setorAtivo]) bancoDados[semanaAtiva][setorAtivo] = {};

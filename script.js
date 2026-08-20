@@ -1,3 +1,4 @@
+// Lista inicial de setores
 let setores = [
   "EMBALAGEM CONGELADA", "LEVAIN", "PANIFICAÇÃO", "PIZZAS CONGELADAS", 
   "PRATOS PRONTOS", "PRÉ-PESAGEM", "PÃO DE QUEIJO / SALGADOS FRITOS", "SALGADOS ASSADOS"
@@ -7,7 +8,7 @@ const diasDaSemana = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO
 let setorAtivo = setores[0]; 
 let bancoDados = {};
 
-function carregarDados() {
+function carregarDadosLocais() {
   const dadosSalvos = localStorage.getItem("bancoDadosPanificacao");
   const setoresSalvos = localStorage.getItem("setoresPanificacao");
 
@@ -39,18 +40,22 @@ function carregarDados() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  carregarDados();
+  carregarDadosLocais();
   renderizarAbas();
   renderizarQuadro();
 
-  // Escuta dados do Firebase caso já existam sincronizados
+  // Escuta atualizações do Firebase em tempo real
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").on("value", (snapshot) => {
       const data = snapshot.val();
       if (data) {
         if (data.bancoDados) bancoDados = data.bancoDados;
-        if (data.setores) setores = data.setores;
-        if (!setores.includes(setorAtivo)) setorAtivo = setores[0];
+        if (data.setores && Array.isArray(data.setores) && data.setores.length > 0) {
+          setores = data.setores;
+        }
+        if (!setores.includes(setorAtivo)) {
+          setorAtivo = setores[0];
+        }
         
         atualizarSelectSemanas();
         renderizarAbas();
@@ -83,7 +88,7 @@ function atualizarSelectSemanas() {
 }
 
 function renderizarAbas() {
-  const container = document.getElementById("nav-setores-adm");
+  const container = document.getElementById("nav-setores-adm") || document.querySelector(".nav-setores");
   if (!container) return;
   container.innerHTML = "";
 
@@ -134,7 +139,7 @@ function renderizarQuadro() {
   const titulo = document.getElementById("titulo-setor-ativo");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
 
-  const grid = document.getElementById("grid-dias-adm");
+  const grid = document.getElementById("grid-dias-adm") || document.querySelector(".grid-dias");
   if (!grid) return;
   grid.innerHTML = "";
 
@@ -199,7 +204,15 @@ function excluirSetorAtual() {
   if (confirm(`Tem certeza que deseja excluir o setor "${setorAtivo}"?`)) {
     setores = setores.filter(s => s !== setorAtivo);
     setorAtivo = setores[0];
+    
+    // Atualiza localmente
     localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
+    
+    // Força atualização no Firebase se disponível
+    if (typeof firebase !== "undefined" && firebase.database) {
+      firebase.database().ref("painelPanificacao/setores").set(setores);
+    }
+
     renderizarAbas();
     renderizarQuadro();
   }
@@ -209,6 +222,7 @@ function alternarStatus() {
   const semanaSelect = document.getElementById("semana-select");
   const semanaAtual = semanaSelect ? semanaSelect.value : Object.keys(bancoDados)[0];
 
+  // Salva no navegador local (backup)
   localStorage.setItem("bancoDadosPanificacao", JSON.stringify(bancoDados));
   localStorage.setItem("setoresPanificacao", JSON.stringify(setores));
   localStorage.setItem("semanaAtivaPanificacao", semanaAtual);
@@ -219,26 +233,30 @@ function alternarStatus() {
     semanaAtiva: semanaAtual
   };
 
+  // Envia para os celulares via Firebase
   if (typeof firebase !== "undefined" && firebase.database) {
     firebase.database().ref("painelPanificacao").set(dadosParaEnviar)
       .then(() => {
-        alert("Programação publicada e sincronizada com os celulares via Firebase!");
+        alert("Programação publicada com sucesso no celular dos líderes!");
       })
       .catch((error) => {
-        alert("Erro ao enviar para o Firebase: " + error.message);
+        alert("Erro de conexão com o Firebase: " + error.message);
       });
   } else {
-    alert("Salvo localmente! (Firebase não foi detectado no HTML).");
+    alert("Dados salvos localmente! (Atenção: Os scripts do Firebase não foram encontrados no HTML).");
   }
 }
 
 function abrirModalExcel() {
-  document.getElementById("modal-excel").style.display = "flex";
+  const modal = document.getElementById("modal-excel");
+  if (modal) modal.style.display = "flex";
 }
 
 function fecharModalExcel() {
-  document.getElementById("modal-excel").style.display = "none";
-  document.getElementById("excel-input").value = "";
+  const modal = document.getElementById("modal-excel");
+  if (modal) modal.style.display = "none";
+  const input = document.getElementById("excel-input");
+  if (input) input.value = "";
 }
 
 function processarColagemExcel() {
