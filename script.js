@@ -311,51 +311,59 @@ function processarColagemExcel() {
   linhas.forEach(linha => {
     if (!linha.trim()) return;
 
-    let colunas = [];
-    if (linha.includes("\t")) {
-      colunas = linha.split("\t").map(c => c.trim());
-    } else {
-      colunas = linha.split(/\s{2,}/).map(c => c.trim());
-    }
+    let colunas = linha.includes("\t") 
+      ? linha.split("\t").map(c => c.trim()) 
+      : linha.split(/\s{2,}/).map(c => c.trim());
 
-    let qtd = "";
-    let tipo = "";
-    let nome = "";
-
-    if (colunas.length >= 3) {
-      qtd = colunas[0];
-      tipo = colunas[1];
-      nome = colunas.slice(2).join(" ");
-    } else if (colunas.length === 2) {
-      qtd = colunas[0];
-      nome = colunas[1];
-    } else {
-      nome = colunas[0] || "";
-    }
+    colunas = colunas.filter(c => c !== "");
+    if (colunas.length === 0) return;
 
     if (setorAtivo === "BOLOS SECOS") {
-      const textoLimpo = nome.toUpperCase().trim();
-      
-      // Detecta a linha do cabeçalho azul no Excel (PLACA, CASEIRO, INGLÊS, REDONDO, COBERTURA, etc.)
-      const eGrupoCabecalho = categoriasConhecidas.find(c => c === textoLimpo);
-      if (eGrupoCabecalho && !qtd) {
-        categoriaAtualGuardada = eGrupoCabecalho;
+      const textoLinhaCompleto = colunas.join(" ").toUpperCase().trim();
+      const ehCabecalhoGrupo = categoriasConhecidas.find(cat => cat === textoLinhaCompleto);
+
+      if (ehCabecalhoGrupo) {
+        categoriaAtualGuardada = ehCabecalhoGrupo;
         return;
       }
 
-      if (nome || qtd) {
+      let qtd = "";
+      let tipo = "REC";
+      let nome = "";
+
+      if (/^\d+$/.test(colunas[0])) {
+        qtd = colunas[0];
+        
+        if (colunas.length >= 3) {
+          tipo = colunas[1];
+          nome = colunas.slice(2).join(" ");
+        } else if (colunas.length === 2) {
+          if (colunas[1].toUpperCase() === "REC") {
+            tipo = "REC";
+          } else {
+            nome = colunas[1];
+          }
+        }
+      } else {
+        nome = colunas.join(" ");
+      }
+
+      if (nome) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
-          tipo: tipo || "REC",
+          tipo: tipo,
           categoria: categoriaAtualGuardada,
           nome: nome
         });
       }
     } else {
+      let qtd = colunas[0] || "";
+      let nome = colunas.slice(1).join(" ") || colunas[0] || "";
+
       if (nome || qtd) {
         bancoDados[semanaAtual][setorAtivo][diaSelecionado].push({
           qtd: qtd,
-          tipo: tipo,
+          tipo: "",
           categoria: "",
           nome: nome
         });
