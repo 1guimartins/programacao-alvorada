@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderizarAbas() {
-  const container = document.getElementById("nav-setores-lider");
+  const container = document.getElementById("nav-setores-lider") || document.querySelector(".nav-setores") || document.querySelector("nav");
   if (!container) return;
   container.innerHTML = "";
 
@@ -56,6 +56,11 @@ function renderizarAbas() {
 
 function obterDatasDaSemana(semanaNome) {
   const datasFormatadas = {};
+  if (!semanaNome) {
+    diasDaSemana.forEach(dia => datasFormatadas[dia] = dia);
+    return datasFormatadas;
+  }
+
   const match = semanaNome.match(/(\d{1,2}\/\d{1,2})/);
 
   if (match) {
@@ -93,10 +98,10 @@ function obterClasseCategoria(categoria) {
 }
 
 function renderizarQuadro() {
-  const titulo = document.getElementById("titulo-setor-ativo");
+  const titulo = document.getElementById("titulo-setor-ativo") || document.querySelector("h1") || document.querySelector("h2");
   if (titulo) titulo.innerText = `PROGRAMAÇÃO DE ${setorAtivo}`;
 
-  const grid = document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm");
+  const grid = document.getElementById("grid-dias-lider") || document.getElementById("grid-dias-adm") || document.querySelector(".grid-dias") || document.querySelector(".main-content");
   if (!grid) return;
   grid.innerHTML = "";
 
@@ -116,7 +121,7 @@ function renderizarQuadro() {
     let itensHTML = listaItens.map((item) => {
       const classeCor = obterClasseCategoria(item.categoria);
       
-      // Concatena a quantidade e o tipo (Ex: "50 REC", "6x")
+      // Define a variável textoBadge (Ex: "50 REC", "6x")
       let textoBadge = [item.qtd, item.tipo].filter(Boolean).join(" ");
       if (!textoBadge && item.qtd) {
         textoBadge = item.qtd;
